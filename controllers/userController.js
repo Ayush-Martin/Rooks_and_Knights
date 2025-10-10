@@ -1,256 +1,395 @@
-//requring modules
-const passport = require('passport')
+const passport = require("passport");
+const userService = require("../services/userService");
+const accountService = require("../services/userAccountService");
+const resetPasswordServices = require("../services/resetPasswordServices");
+const addressService = require("../services/addressServices");
+const orderService = require("../services/orderServices");
+const walletService = require("../services/walletService");
+const transactionService = require("../services/transactionService");
+const generateAccessToken = require("../utils/JWTUtils");
+const signupFormValidation = require("../utils/registerValidation");
+const { STATUS_CODES } = require("../constants/statusCodes");
+const {
+  USER_RESPONSE_MESSAGE,
+  AUTH_RESPONSE_MESSAGE,
+  GENERAL_RESPONSE_MESSAGE,
+} = require("../constants/responseMessages");
+const { PUBLIC_ROUTES, OTP_ROUTES } = require("../constants/routes");
+const { ACCESS_TOKEN_NAME } = require("../constants/general");
+const { USER_ROUTES } = require("../constants/routes");
 
-//services
-const userSevice = require('../services/userService');
-const accountService = require('../services/userAccountService');
-const resetPasswordServices = require('../services/resetPasswordServices');
-const addressService = require('../services/addressServices')
-const orderService = require('../services/orderServices')
-const walletService = require('../services/walletService')
-const transationService = require('../services/transationService')
+// ---- PAGE RENDERING ---- //
 
+/**
+ * Controller to render login page
+ * @param {*} req
+ * @param {*} res
+ * @returns
+ */
+exports.loginPage = (req, res) => {
+  res.render("user/login");
+};
 
-//utils
-const generateAccessToken = require('../utils/JWTUtils')
-const signupFormValidataion = require('../utils/registerValidation')
+/**
+ * Controller to render register page
+ * @param {*} req
+ * @param {*} res
+ */
+exports.registerPage = (req, res) => {
+  req.session.referalID = req.query.referalID;
 
+  res.render("user/register");
+};
 
-//GET login 
-exports.getLogin = (req, res) => {
-    res.render('user/login')
-}
+/**
+ * Controller to render complete register page
+ * @param {*} req
+ * @param {*} res
+ */
+exports.completeRegisterPage = (req, res) => {
+  res.render("user/completeRegister");
+};
 
-//POST login
-exports.postLogin = async (req, res) => {
-    try {
-        const { email, password } = req.body;
+/**
+ * Controller to render forget password page
+ * @param {*} req
+ * @param {*} res
+ */
+exports.forgetPasswordPage = (req, res) => {
+  res.render("user/forgetPassword");
+};
 
-        if (!email || !password) {
-            return res.status(400).json({ error: 'Email and password are required' });
-        }
+/**
+ * Controller to render reset password page
+ * @param {*} req
+ * @param {*} res
+ */
+exports.resetPasswordPage = (req, res) => {
+  res.render("user/resetPassword");
+};
 
-        const userData = await userSevice.findUserByEmail(email);
+/**
+ * Controller to render account page
+ * - get user profile , address and orders details
+ * - pass them to account page and render
+ * @param {*} req
+ * @param {*} res
+ */
+exports.accountPage = async (req, res) => {
+  try {
+    const userProfile = await accountService.viewUserProfile(req.userID);
+    const address = await addressService.viewAddress(req.userID);
+    const orders = await orderService.viewOrders(req.userID);
+    res.render("account", { userProfile, address, orders });
+  } catch (err) {
+    console.log(err);
+  }
+};
 
-        if (!userData) {
-            return res.status(400).json({ error: 'User does not exist' });
-        }
+// ---- LOGIC ---- //
 
-        if (userData.isblocked) {
-            return res.status(400).json({ error: 'You are bocked by admin' });
-        }
+/**
+ * Controller to login user
+ * - validate user credentials
+ * - check if user is blocked
+ * - generate access token and set cookie
+ * - redirect to home page
+ * @param {*} req
+ * @param {*} res
+ * @returns
+ */
+exports.login = async (req, res, next) => {
+  try {
+    const { email, password } = req.body;
 
-        const isValidPassword = await userSevice.validateUserCredentials(password, userData.password);
-        if (!isValidPassword) {
-            return res.status(400).json({ error: 'Incorrect password' });
-        }
-
-        const accessToken = generateAccessToken(email, userData._id);
-
-        res.cookie('token', accessToken, { httpOnly: true, sameSite: 'Strict' });
-
-        res.redirect('/')
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ error: 'Server error' });
+    if (!email || !password) {
+      return res
+        .status(STATUS_CODES.BAD_REQUEST)
+        .json({ error: GENERAL_RESPONSE_MESSAGE.ALL_DATA_REQUIRED });
     }
-}
 
-//POST logout
-exports.postLogout = (req, res) => {
-    res.clearCookie('token');
-    res.status(200).json({ success: true, successRedirect: '/' });
-}
+    const userData = await userService.findUserByEmail(email);
 
-//GET Register
-exports.getRegister = (req, res) => {
-
-    req.session.referalID = req.query.referalID
-
-    res.render('user/register')
-}
-
-//POST Register
-exports.postRegister = async (req, res) => {
-    try {
-
-        const { username, email, phoneNumber, password, confirmPassword } = req.body;
-
-        const validationError = signupFormValidataion(username, email, password, confirmPassword);
-
-        if (validationError) {
-            return res.status(400).json({ error: validationError })
-        }
-
-        let result = await userSevice.registerUser(username, email, phoneNumber, password, req);
-
-        if (!result.success) {
-            // Inform user of the error
-            return res.status(400).json({ error: result.message });
-        }
-        req.session.OTPVerificationRedirect = '/user/completeRegister';
-        // Send success response with redirect URL
-        res.status(200).json({ success: true, successRedirect: result.redirectUrl });
-    } catch (err) {
-        console.error('Registration error:', err);
-        res.status(500).json({ error: 'Server error. Please try again later.' });
+    if (!userData) {
+      return res
+        .status(STATUS_CODES.NOT_FOUND)
+        .json({ error: USER_RESPONSE_MESSAGE.USER_NOT_FOUND });
     }
-}
 
-//GET complete register
-exports.getCompleteRegister = (req, res) => {
-    res.render('user/completeRegister')
-}
+    if (userData.isblocked) {
+      return res
+        .status(STATUS_CODES.FORBIDDEN)
+        .json({ error: AUTH_RESPONSE_MESSAGE.USER_BLOCKED });
+    }
 
-//POST complete register
-exports.postCompleteRegister = async (req, res) => {
+    const isValidPassword = await userService.validateUserCredentials(
+      password,
+      userData.password
+    );
+
+    if (!isValidPassword) {
+      return res
+        .status(STATUS_CODES.UNAUTHORIZED)
+        .json({ error: AUTH_RESPONSE_MESSAGE.INVALID_CREDENTIALS });
+    }
+
+    const accessToken = generateAccessToken(email, userData._id);
+
+    res.cookie(ACCESS_TOKEN_NAME, accessToken, {
+      httpOnly: true,
+      sameSite: "Strict",
+    });
+
+    res.redirect(PUBLIC_ROUTES.HOME);
+  } catch (err) {
+    next(err);
+  }
+};
+
+/**
+ * Controller to logout user
+ * - clear token from cookie
+ * - redirect to home page
+ * @param {*} req
+ * @param {*} res
+ */
+exports.logout = (req, res) => {
+  res.clearCookie(ACCESS_TOKEN_NAME);
+  res
+    .status(STATUS_CODES.OK)
+    .json({ success: true, successRedirect: PUBLIC_ROUTES.HOME });
+};
+
+/**
+ * Controller to register user
+ * - calls registerUser service and redirect
+ * @param {*} req
+ * @param {*} res
+ * @returns
+ */
+exports.register = async (req, res, next) => {
+  try {
+    const { username, email, phoneNumber, password, confirmPassword } =
+      req.body;
+
+    const validationError = signupFormValidation(
+      username,
+      email,
+      password,
+      confirmPassword
+    );
+
+    if (validationError) {
+      return res
+        .status(STATUS_CODES.BAD_REQUEST)
+        .json({ error: validationError });
+    }
+
+    let result = await userService.registerUser(
+      username,
+      email,
+      phoneNumber,
+      password,
+      req
+    );
+
+    if (!result.success) {
+      return res.status(result.statusCode).json({ error: result.message });
+    }
+
+    req.session.OTPVerificationRedirect = USER_ROUTES.COMPLETE_REGISTER;
+
+    res
+      .status(STATUS_CODES.OK)
+      .json({ success: true, successRedirect: result.redirectUrl });
+  } catch (err) {
+    next(err);
+  }
+};
+
+/**
+ * Controller to complete user registration
+ * - save user to database
+ * - If referal id is present add referal amount to the refered user
+ * - redirect to login page
+ * @param {*} req
+ * @param {*} res
+ */
+exports.completeRegister = async (req, res, next) => {
+  try {
     const { username, email, phoneNumber, password, referalID } = req.session;
 
-    const result = await userSevice.saveUserToDB(username, email, phoneNumber, password)
-
+    const result = await userService.saveUserToDB(
+      username,
+      email,
+      phoneNumber,
+      password
+    );
 
     if (referalID) {
-        const referedUserID = await userSevice.findUserByReferenceID(referalID)
+      const referedUserID = await userService.findUserByReferenceID(referalID);
 
-        if (referedUserID) {
-            await walletService.referal(referedUserID)
-            await transationService.completeTransation(referedUserID, 50, 'referal')
-        }
-
+      if (referedUserID) {
+        await walletService.referal(referedUserID);
+        await transactionService.completeTransaction(
+          referedUserID,
+          50,
+          "referal"
+        );
+      }
     }
 
     if (result.success) {
-        req.session.destroy((err) => {
-            if (err) {
-                console.log(err);
-            }
+      // If registration is successful, destroy session data stored in memory
+      req.session.destroy((err) => {
+        if (err) {
+          console.log(err);
+        }
 
-            res.clearCookie();
-            res.redirect('/user/login');
-        })
+        res.clearCookie();
+        res.redirect(USER_ROUTES.LOGIN);
+      });
     } else {
-        console.log("error while complete registration");
+      res.status(result.statusCode).json({ error: result.message });
     }
-}
+  } catch (err) {
+    next(err);
+  }
+};
 
-//google auth
-exports.getGoogleCallback = (req, res) => {
+/**
+ * Controller to handle google callback
+ * @param {*} req
+ * @param {*} res
+ */
+exports.googleCallback = (req, res) => {
+  const accessToken = generateAccessToken(req.user.email, req.user._id);
 
-    const accessToken = generateAccessToken(req.user.email, req.user._id)
+  res.cookie(ACCESS_TOKEN_NAME, accessToken, {
+    httpOnly: true,
+    sameSite: "Strict",
+  });
 
-    res.cookie('token', accessToken, { httpOnly: true, sameSite: 'Strict' });
-
-    res.send(`
+  res.send(`
             <script>
-                window.location.href = '/user/account';
+                window.location.href = '${PUBLIC_ROUTES.HOME}';
             </script>
         `);
+};
 
-}
+/**
+ * Controller to handle forget password
+ * - calls forgetPassword service
+ * - redirect to OTP page
+ * @param {*} req
+ * @param {*} res
+ * @returns
+ */
+exports.forgetPassword = async (req, res, next) => {
+  try {
+    const { email } = req.body;
+    let result = await resetPasswordServices.forgetPassword(email, req);
 
-//render forgot password
-exports.getForgetPassword = (req, res) => {
-    res.render('user/forgetPassword')
-}
-
-//get email for forget password
-exports.postForgetPassword = async (req, res) => {
-    try {
-        const { email } = req.body;
-        let error = await resetPasswordServices.forgetPassword(email, req)
-
-        if (error) {
-            return res.json({ error })
-        }
-        req.session.OTPVerificationRedirect = '/user/resetPassword';
-        res.redirect('/OTP/verifyOTP')
-
-    } catch (err) {
-        console.log(err);
-
+    if (!result.success) {
+      return res.status(result.statusCode).json({ error: result.message });
     }
-}
+    req.session.OTPVerificationRedirect = USER_ROUTES.RESET_PASSWORD;
 
-//render reset password page
-exports.getResetPassword = (req, res) => {
-
-    res.render('user/resetPassword')
-}
-
-//handle reset  password
-exports.postResetPassword = async (req, res) => {
-
+    res.redirect(OTP_ROUTES.VERIFY_OTP);
+  } catch (err) {
+    next(err);
+  }
+};
+/**
+ * Controller to handle reset password
+ * - check password and confirm password
+ * - calls resetPassword service
+ * - redirect to login
+ * @param {*} req
+ * @param {*} res
+ * @returns
+ */
+exports.resetPassword = async (req, res) => {
+  try {
     const { password, confirmPassword } = req.body;
     if (!password || !confirmPassword) {
-        return res.status(500).json({ error: 'Server error. Please try again later.' });
+      return res
+        .status(STATUS_CODES.BAD_REQUEST)
+        .json({ error: GENERAL_RESPONSE_MESSAGE.ALL_DATA_REQUIRED });
     }
 
     if (password != confirmPassword) {
-        return res.status(400).json({ error: "password and confirmPassword doesnot match" })
+      return res
+        .status(STATUS_CODES.BAD_REQUEST)
+        .json({ error: AUTH_RESPONSE_MESSAGE.PASSWORDS_DO_NOT_MATCH });
     }
 
-    try {
+    await resetPasswordServices.resetPassword(
+      password,
+      req.userID || req.session.userID
+    );
 
-        await resetPasswordServices.resetPassword(password, req.userID || req.session.userID)
+    req.session.destroy((err) => {
+      if (err) {
+        next(err);
+      }
+      res.clearCookie(ACCESS_TOKEN_NAME);
 
-        req.session.destroy((err) => {
-            if (err) {
-                console.log(err);
-                return res.status(500).json({ error: 'Server error. Please try again later.' });
-            }
-            res.clearCookie('token');
+      res
+        .status(200)
+        .json({ success: true, successRedirect: USER_ROUTES.LOGIN });
+    });
+  } catch (err) {
+    next(err);
+  }
+};
 
-            res.status(200).json({ success: true, successRedirect: '/user/login' })
-
-        })
-
-    } catch (err) {
-        console.log(err);
-
+/**
+ * Controller to handle update account
+ * @param {*} req
+ * @param {*} res
+ * @returns
+ */
+exports.updateAccount = async (req, res, next) => {
+  try {
+    const { username, phoneNumber } = req.body;
+    let result = await accountService.updateUserProfile(
+      username,
+      phoneNumber,
+      req.userID
+    );
+    if (!result.success) {
+      return res
+        .status(result.statusCode)
+        .json({ success: false, error: result.message });
     }
-}
+    res.status(200).json({ success: true });
+  } catch (err) {
+    next(err);
+  }
+};
 
+/**
+ * Controller to handle change password
+ * - calls forgetPassword service
+ * - redirect to OTP page
+ * @param {*} req
+ * @param {*} res
+ * @returns
+ */
+exports.changePassword = async (req, res, next) => {
+  try {
+    let result = await resetPasswordServices.forgetPassword(req.email, req);
 
-exports.getAccount = async (req, res) => {
-    try {
-        const userProfile = await accountService.viewUserProfile(req.userID);
-        const address = await addressService.viewAddress(req.userID);
-        const orders = await orderService.viewOrders(req.userID)
-        res.render('account', { userProfile, address, orders })
-
-    } catch (err) {
-        console.log(err);
+    if (!result.success) {
+      return res.json({ success: false, error: result.message });
     }
-}
-
-exports.putAccount = async (req, res) => {
-    try {
-        const { username, phoneNumber } = req.body;
-        let error = await accountService.updateUserProfile(username, phoneNumber, req.userID)
-        if (error) {
-            return res.status(400).json({ success: false, error: error.error })
-        }
-        res.status(200).json({ success: true })
-    } catch (err) {
-        console.log(err);
-
-    }
-}
-
-exports.postAccountChangePassword = async (req, res) => {
-    try {
-
-        let error = await resetPasswordServices.forgetPassword(req.email, req)
-
-        if (error) {
-            return res.json({ success: false, error })
-        }
-        req.session.userID = req.userID;
-        req.session.OTPVerificationRedirect = '/user/resetPassword';
-        res.status(200).json({ success: true, redirectUrl: '/OTP/verifyOTP' })
-
-    } catch (err) {
-        console.log(err);
-
-    }
-}
+    req.session.userID = req.userID;
+    req.session.OTPVerificationRedirect = USER_ROUTES.RESET_PASSWORD;
+    res
+      .status(STATUS_CODES.OK)
+      .json({ success: true, redirectUrl: OTP_ROUTES.VERIFY_OTP });
+  } catch (err) {
+    next(err);
+  }
+};

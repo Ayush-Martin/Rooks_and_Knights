@@ -1,5 +1,7 @@
 const USER_ROUTES = Object.freeze({
   LOGIN: "/user/login",
+  COMPLETE_REGISTER: "/user/completeRegister",
+  RESET_PASSWORD: "/user/resetPassword",
 });
 
 const OTP_ROUTES = Object.freeze({

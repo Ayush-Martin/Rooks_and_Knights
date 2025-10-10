@@ -10,7 +10,7 @@ const adminOrderService = require('../services/adminOrderService');
 const adminReturnService = require('../services/adminReturnService')
 const adminOfferService = require('../services/adminOfferService')
 const walletService = require('../services/walletService');
-const transationService = require('../services/transationService')
+const transactionService = require('../services/transactionService')
 const adminCouponService = require('../services/adminCouponServices');
 const adminSalesService = require('../services/adminSalesService')
 
@@ -482,7 +482,7 @@ exports.patchAproveRejectReturn = async (req, res) => {
 
         if (returnStatus == 'approved' && (paymentMethod == "Wallet" || paymentMethod == "Razorpay")) {
             await walletService.addToWallet(userID, amount)
-            await transationService.completeTransation(userID, amount, 'refund')
+            await transactionService.completeTransaction(userID, amount, 'refund')
         }
 
         res.json({ success: true })
@@ -494,18 +494,18 @@ exports.patchAproveRejectReturn = async (req, res) => {
 
 }
 
-//transations
-exports.getTransations = async (req, res) => {
+//transactions
+exports.getTransactions = async (req, res) => {
     try {
         const { page } = req.query;
         const currentPage = page || 1;
         const noOfList = 6;
         const skipPages = (currentPage - 1) * noOfList
 
-        const { transationList, totalNoOfList } = await transationService.allTransationsList(currentPage, noOfList, skipPages);
+        const { transactionList, totalNoOfList } = await transactionService.allTransactionsList(currentPage, noOfList, skipPages);
         const totalNoOfPages = Math.ceil(totalNoOfList / noOfList);
 
-        res.render('admin/transations', { transationList, currentPage, totalNoOfPages })
+        res.render('admin/transactions', { transactionList, currentPage, totalNoOfPages })
 
     } catch (err) {
         console.log(err);

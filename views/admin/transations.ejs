@@ -1,72 +1,60 @@
 <!DOCTYPE html>
 <html lang="en">
+  <%- include('./partials/header') %>
 
-<%- include('./partials/header') %>
+  <body>
+    <div class="wrapper">
+      <%- include('./partials/slidebar') %>
 
-    <body>
-        <div class="wrapper">
-            <%- include('./partials/slidebar') %>
+      <div id="content" class="container-fluid">
+        <h1 class="m-b-10 admin_title">Transactions</h1>
 
-                <div id="content" class="container-fluid">
-                    <h1 class="m-b-10 admin_title">Transations</h1>
-
-
-                    <div class="table-responsive">
-
-                        <table class="table table-bordered">
-                            <thead>
-                                <tr>
-                                    <th>Date</th>
-                                    <th>Email</th>
-                                    <th>Ammount</th>
-                                    <th>Transation Type</th>
-                                    <th>Payment Method</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <% transationList.forEach((transation)=>{ %>
-                                    <tr>
-                                        <td>
-                                            <%= transation.createdAt.toLocaleDateString() %>
-                                        </td>
-                                        <td>
-                                            <%= transation.userID.email %>
-                                        </td>
-                                        <td>
-                                            <%= transation.amount %>
-                                        </td>
-                                        <td>
-                                            <%= transation.transationType %>
-                                        </td>
-                                        <td>
-                                            <%= transation.paymentMethod %>
-                                        </td>
-                                    </tr>
-                                    <% }) %>
-
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="flex-c-m flex-w w-full p-t-45 gap-10">
-                        <!-- Previous Button -->
-                        <a href="/admin/transations?page=<%= (currentPage>1)? Number(currentPage)-1:1 %>"
-                            class="m-r-20 text-dark">
-                            <i class="fas fa-chevron-left"></i> Previous
-                        </a>
-                        <P class="m-r-20 text-dark">page : <%= currentPage %> of <%= Math.ceil(totalNoOfPages) %></P>
-                        <!-- Next Button -->
-                        <a href="/admin/transations?page=<%= (currentPage<totalNoOfPages)? Number(currentPage)+1:currentPage %>"
-                            class=" text-dark">
-                            Next <i class="fas fa-chevron-right"></i>
-                        </a>
-
-
-                    </div>
-                </div>
-
+        <div class="table-responsive">
+          <table class="table table-bordered">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Email</th>
+                <th>Ammount</th>
+                <th>Transaction Type</th>
+                <th>Payment Method</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% transactionList.forEach((transaction)=>{ %>
+              <tr>
+                <td><%= transaction.createdAt.toLocaleDateString() %></td>
+                <td><%= transaction.userID.email %></td>
+                <td><%= transaction.amount %></td>
+                <td><%= transaction.transactionType %></td>
+                <td><%= transaction.paymentMethod %></td>
+              </tr>
+              <% }) %>
+            </tbody>
+          </table>
         </div>
+        <div class="flex-c-m flex-w w-full p-t-45 gap-10">
+          <!-- Previous Button -->
+          <a
+            href="/admin/transactions?page=<%= (currentPage>1)? Number(currentPage)-1:1 %>"
+            class="m-r-20 text-dark"
+          >
+            <i class="fas fa-chevron-left"></i> Previous
+          </a>
+          <P class="m-r-20 text-dark"
+            >page : <%= currentPage %> of <%= Math.ceil(totalNoOfPages) %></P
+          >
+          <!-- Next Button -->
+          <a
+            href="/admin/transactions?page=<%= (currentPage<totalNoOfPages)? Number(currentPage)+1:currentPage %>"
+            class="text-dark"
+          >
+            Next <i class="fas fa-chevron-right"></i>
+          </a>
+        </div>
+      </div>
+    </div>
 
-        <%- include('./partials/footer') %>
-    </body>
-
+    <%- include('./partials/footer') %>
+  </body>
 </html>
