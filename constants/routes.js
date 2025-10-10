@@ -7,4 +7,9 @@ const PUBLIC_ROUTES = Object.freeze({
   ERROR: "/error",
 });
 
-module.exports = { USER_ROUTES, PUBLIC_ROUTES };
+const ADMIN_ROUTES = Object.freeze({
+  LOGIN: "/admin/login",
+  DASHBOARD: "/admin",
+});
+
+module.exports = { USER_ROUTES, PUBLIC_ROUTES, ADMIN_ROUTES };

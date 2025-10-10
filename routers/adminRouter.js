@@ -13,7 +13,7 @@ const adminMiddleware = require('../middlewares/adminAuthMiddleware');;
 
 //routers
 //Login 
-router.get('/login', adminMiddleware.checkAdminAldreadyAuthenticated, adminController.getLogin); //display login page
+router.get('/login', adminMiddleware.checkAdminAlreadyAuthenticated, adminController.getLogin); //display login page
 router.post('/login', adminController.postLogin); //login 
 router.post('/logout', adminController.postLogout); //logout
 
