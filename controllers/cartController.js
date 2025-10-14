@@ -18,7 +18,7 @@ exports.addToCart = async (req, res) => {
     try {
         const productID = req.params.id;
         const { quantity, categoryID, subCategoryID } = req.body;
-
+        
         const userID = req.userID;
 
         const error = await cartServices.addToCart(userID, productID, quantity, categoryID, subCategoryID)

@@ -1,39 +1,46 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
+  <head>
     <%- include('./partials/head.ejs') %>
-        <link rel="stylesheet" href="/public/css/account.css">
-</head>
+    <link rel="stylesheet" href="/public/css/account.css" />
+  </head>
 
-<body class="">
-
+  <body class="">
     <!-- Header -->
-    <header class="header-v4">
-        <%- include('./partials/header.ejs') %>
-    </header>
+    <header class="header-v4"><%- include('./partials/header.ejs') %></header>
 
     <div class="custon">
-        <div class="account-container">
-            <!-- Sidebar Menu -->
-            <div class="sidebar-menu">
-                <a href="#" id="profile-link" onclick="showSection('profile', this)" class="active"><i
-                        class="fa fa-user"></i> Profile</a>
-                <a href="#" id="address-link" onclick="showSection('address', this)"><i class="fa fa-home"></i>
-                    Address</a>
-                <a href="#" id="orders-link" onclick="showSection('orders', this)"><i class="fa fa-list"></i> Orders</a>
+      <div class="account-container">
+        <!-- Sidebar Menu -->
+        <div class="sidebar-menu">
+          <a
+            href="#"
+            id="profile-link"
+            onclick="showSection('profile', this)"
+            class="active"
+            ><i class="fa fa-user"></i> Profile</a
+          >
+          <a href="#" id="address-link" onclick="showSection('address', this)"
+            ><i class="fa fa-home"></i> Address</a
+          >
+          <a href="#" id="orders-link" onclick="showSection('orders', this)"
+            ><i class="fa fa-list"></i> Orders</a
+          >
 
-                <button onclick="changePassword()"><i class="fas fa-key"></i> Change Password </button>
-                <button onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
+          <button onclick="changePassword()">
+            <i class="fas fa-key"></i> Change Password
+          </button>
+          <button onclick="logout()">
+            <i class="fas fa-sign-out-alt"></i> Logout
+          </button>
+        </div>
 
-            </div>
-
-            <!-- Content Area -->
-            <div class="main-content">
-                <!-- Profile Section -->
-                <div class="section profile-section" id="profile-section">
-                    <div class="profile-card text-center">
-                        <!-- <div class="">
+        <!-- Content Area -->
+        <div class="main-content">
+          <!-- Profile Section -->
+          <div class="section profile-section" id="profile-section">
+            <div class="profile-card text-center">
+              <!-- <div class="">
                             <div>
                                 <% if(userProfile.profilePicture) {%>
                                     <img class="profile-image" src="<% userProfile.profilePicture %>" alt="">
@@ -46,346 +53,474 @@
                             <button class="btn "><i class="fa fa-pencil-alt"></i></button>
                             <button class="btn"><i class="fa fa-trash-alt"></i></button>
                         </div> -->
-                        <br>
-                        <form action="" onsubmit="updateProfile(event) ">
-                            <div class="form-group">
-                                <label for="name">Name</label>
-                                <input type="text" class="form-control" id="username"
-                                    value="<%= userProfile.username %>">
-                            </div>
-                            <div class="form-group">
-                                <label for="email">Email</label>
-                                <input type="email" class="form-control" id="email" value="<%= userProfile.email %>"
-                                    readonly>
-                            </div>
-                            <div class="form-group">
-                                <label for="phone">Phone</label>
-                                <input type="text" class="form-control" id="phoneNumber"
-                                    value="<%= userProfile.phoneNumber %>">
-                            </div>
-
-                            <div class="form-group">
-                                <label for="referalLink">Referal Link</label>
-                                <input type="text" class="form-control" id="referalLink" readonly
-                                    value="https://<%= domain %>/user/register?referalID=<%= userProfile.referalID %>">
-                            </div>
-                            <button class="btn btn-save">Save Changes</button>
-                        </form>
-
-                    </div>
+              <br />
+              <form action="" onsubmit="updateProfile(event) ">
+                <div class="form-group">
+                  <label for="name">Name</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="username"
+                    value="<%= userProfile.username %>"
+                  />
+                </div>
+                <div class="form-group">
+                  <label for="email">Email</label>
+                  <input
+                    type="email"
+                    class="form-control"
+                    id="email"
+                    value="<%= userProfile.email %>"
+                    readonly
+                  />
+                </div>
+                <div class="form-group">
+                  <label for="phone">Phone</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="phoneNumber"
+                    value="<%= userProfile.phoneNumber %>"
+                  />
                 </div>
 
-                <!-- Address Section -->
-                <div class="section hidden address-card-container" id="address-section">
-                    <h2>Address Book</h2>
-                    <% address.address.forEach((addressItem)=>{ %>
-                        <!-- Address Cards -->
-                        <div class="address-card">
-                            <div class="address-info">
-                                <strong>
-                                    <%= addressItem.addressTitle %>
-                                </strong><br>
-                                <%= addressItem.streetAddress %><br>
-                                    <%= addressItem.city %>, <%= addressItem.state %><br>
-                                            <%= addressItem.pinCode %>
-                            </div>
-                            <div class="address-actions">
-                                <button class="btn btn-dark btn-sm m-b-3"
-                                    data-address-item="<%= JSON.stringify(addressItem)%>"
-                                    onclick="editAddressModel(event,'<%=addressItem._id%>')" data-toggle="modal"
-                                    data-target="#editAddressModel">
-                                    <i class="fa fa-edit"></i>
-                                </button>
-                                <button class="btn btn-danger btn-sm m-b-3"
-                                    onclick=" removeAddress(event,'<%=addressItem._id%>')">
-                                    <i class="fa fa-trash"></i>
-                                </button>
-                            </div>
-                        </div>
-                        <% }) %>
-
-
-
-
-                            <!-- Add New Address Button -->
-                            <button class="btn btn-primary" data-toggle="modal" data-target="#addAddressModel"><i
-                                    class="fa fa-plus"></i> Add New Address</button>
+                <div class="form-group">
+                  <label for="referalLink">Referal Link</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="referalLink"
+                    readonly
+                    value="https://<%= domain %>/user/register?referalID=<%= userProfile.referalID %>"
+                  />
                 </div>
-
-                <!-- Orders Section -->
-                <div id="orders-section" class=" section hidden">
-                    <h3>My Orders</h3>
-                    <!-- When there are no orders -->
-
-
-                    <div class="order-section">
-                        <% orders.forEach((order)=>{ %>
-
-                            <div class="order-card">
-                                <div class="order-header">
-                                    <span>
-                                        <%= order.createdAt.toLocaleDateString() %>
-                                    </span>
-                                </div>
-                                <div class="order-info">
-                                    <p><strong>No of Products : </strong>
-                                        <%= order.products.length %>
-                                    </p>
-                                    <p><strong>Base Price : </strong>
-                                        <%= order.basePrice %>
-                                    </p>
-                                    <p><strong>Discount : </strong>
-                                        <%= order.discount %>
-                                    </p>
-                                    <p><strong>Total Amount : </strong>
-                                        <%= order.totalAmmount %>
-                                    </p>
-                                    <p><strong>Order Stauts : </strong>
-                                        <%= order.orderStatus %>
-                                    </p>
-                                    <p><strong>Payment Stauts : </strong>
-                                        <%= order.paymentStatus %>
-                                    </p>
-                                    <% if(order.paymentStatus=='pending' ){%>
-                                        <button class="btn p-t-10"
-                                            onclick="proccedToPayment('<%= order._id %>','<%= order.totalAmmount %>','Wallet')"><i
-                                                class="fas fa-wallet"></i> Pay by wallet</button>
-                                        <button class="btn p-t-10"
-                                            onclick="proccedToPayment('<%= order._id %>','<%= order.totalAmmount %>','Razorpay')"><i
-                                                class="fas fa-credit-card"></i> Pay online</button>
-
-                                        <%} %>
-                                </div>
-                                <div class="order-actions">
-                                    <button type="button" onclick="orderViewTable(event)" data-toggle="modal"
-                                        data-target="#orderModal" data-order-item="<%= JSON.stringify(order) %>"><i
-                                            class="fa fa-eye"></i>View</button>
-
-                                    <% if(order.orderStatus=='delivered') {%>
-                                        <button onclick="downloadInvoice('<%= order._id %>')"><i
-                                                class="fas fa-download"></i> Download Invoice </button>
-
-                                    <% } %>
-                                </div>
-                            </div>
-                            <% }) %>
-                                <!-- Order Card 1 -->
-
-                    </div>
-                </div>
-
-                <!-- Orders Section -->
-
-
+                <button class="btn btn-save">Save Changes</button>
+              </form>
             </div>
+          </div>
 
-        </div>
-
-        <!-- modal to add new address -->
-        <div class="modal fade m-t-50" id="addAddressModel" tabindex="-2" role="dialog">
-            <div class="modal-dialog modal-dialog-centered" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLabel">New Address</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <form>
-                            <div class="form-group">
-                                <label for="addressTitle" class="col-form-label">Address Title</label>
-                                <input type="text" class="form-control" id="addressTitle">
-                            </div>
-                            <div class="form-group">
-                                <label for="state" class="col-form-label">State</label>
-                                <input type="text" class="form-control" id="state">
-                            </div>
-                            <div class="form-group">
-                                <label for="city" class="col-form-label">City</label>
-                                <input type="text" class="form-control" id="city">
-                            </div>
-                            <div class="form-group">
-                                <label for="pinCode" class="col-form-label">Pin Code</label>
-                                <input type="text" class="form-control" id="pinCode">
-                            </div>
-                            <div class="form-group">
-                                <label for="streetAddress" class="col-form-label">Street Addrress</label>
-                                <textarea class="form-control" id="streetAddress"></textarea>
-                            </div>
-                        </form>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                        <button type="button" class="btn btn-primary" onclick="addNewAddress(event)">Add</button>
-                    </div>
-                </div>
+          <!-- Address Section -->
+          <div
+            class="section hidden address-card-container"
+            id="address-section"
+          >
+            <h2>Address Book</h2>
+            <% address.address.forEach((addressItem)=>{ %>
+            <!-- Address Cards -->
+            <div class="address-card">
+              <div class="address-info">
+                <strong> <%= addressItem.addressTitle %> </strong><br />
+                <%= addressItem.streetAddress %><br />
+                <%= addressItem.city %>, <%= addressItem.state %><br />
+                <%= addressItem.pinCode %>
+              </div>
+              <div class="address-actions">
+                <button
+                  class="btn btn-dark btn-sm m-b-3"
+                  data-address-item="<%= JSON.stringify(addressItem)%>"
+                  onclick="editAddressModel(event,'<%=addressItem._id%>')"
+                  data-toggle="modal"
+                  data-target="#editAddressModel"
+                >
+                  <i class="fa fa-edit"></i>
+                </button>
+                <button
+                  class="btn btn-danger btn-sm m-b-3"
+                  onclick=" removeAddress(event,'<%=addressItem._id%>')"
+                >
+                  <i class="fa fa-trash"></i>
+                </button>
+              </div>
             </div>
-        </div>
+            <% }) %>
 
+            <!-- Add New Address Button -->
+            <button
+              class="btn btn-primary"
+              data-toggle="modal"
+              data-target="#addAddressModel"
+            >
+              <i class="fa fa-plus"></i> Add New Address
+            </button>
+          </div>
 
+          <!-- Orders Section -->
+          <div id="orders-section" class="section hidden">
+            <h3>My Orders</h3>
+            <!-- When there are no orders -->
 
-        <!-- modal to edit address -->
-        <div class="modal fade m-t-50" id="editAddressModel" tabindex="-2" role="dialog">
-            <div class="modal-dialog modal-dialog-centered" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLabel">Edit Address</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <form>
-                            <div class="form-group">
-                                <label for="addressTitle" class="col-form-label">Address Title</label>
-                                <input type="text" class="form-control" id="addressTitleEdit">
-                            </div>
-                            <div class="form-group">
-                                <label for="state" class="col-form-label">State</label>
-                                <input type="text" class="form-control" id="stateEdit">
-                            </div>
-                            <div class="form-group">
-                                <label for="city" class="col-form-label">City</label>
-                                <input type="text" class="form-control" id="cityEdit">
-                            </div>
-                            <div class="form-group">
-                                <label for="pinCode" class="col-form-label">Pin Code</label>
-                                <input type="text" class="form-control" id="pinCodeEdit">
-                            </div>
-                            <div class="form-group">
-                                <label for="streetAddress" class="col-form-label">Street Addrress</label>
-                                <textarea class="form-control" id="streetAddressEdit"></textarea>
-                            </div>
-                        </form>
-                    </div>
-                    <div class="modal-footer" id="editAddressDiv">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    </div>
+            <div class="order-section">
+              <% orders.forEach((order)=>{ %>
+
+              <div class="order-card">
+                <div class="order-header">
+                  <span> <%= order.createdAt.toLocaleDateString() %> </span>
                 </div>
+                <div class="order-info">
+                  <p>
+                    <strong>No of Products : </strong>
+                    <%= order.products.length %>
+                  </p>
+                  <p>
+                    <strong>Base Price : </strong>
+                    <%= order.basePrice %>
+                  </p>
+                  <p>
+                    <strong>Discount : </strong>
+                    <%= order.discount %>
+                  </p>
+                  <p>
+                    <strong>Total Amount : </strong>
+                    <%= order.totalAmmount %>
+                  </p>
+                  <p>
+                    <strong>Order Stauts : </strong>
+                    <%= order.orderStatus %>
+                  </p>
+                  <p>
+                    <strong>Payment Stauts : </strong>
+                    <%= order.paymentStatus %>
+                  </p>
+                  <% if(order.paymentStatus=='pending' ){%>
+                  <button
+                    class="btn p-t-10"
+                    onclick="proccedToPayment('<%= order._id %>','<%= order.totalAmmount %>','Wallet')"
+                  >
+                    <i class="fas fa-wallet"></i> Pay by wallet
+                  </button>
+                  <button
+                    class="btn p-t-10"
+                    onclick="proccedToPayment('<%= order._id %>','<%= order.totalAmmount %>','Razorpay')"
+                  >
+                    <i class="fas fa-credit-card"></i> Pay online
+                  </button>
+
+                  <%} %>
+                </div>
+                <div class="order-actions">
+                  <button
+                    type="button"
+                    onclick="orderViewTable(event)"
+                    data-toggle="modal"
+                    data-target="#orderModal"
+                    data-order-item="<%= JSON.stringify(order) %>"
+                  >
+                    <i class="fa fa-eye"></i>View
+                  </button>
+
+                  <% if(order.orderStatus=='delivered') {%>
+                  <button onclick="downloadInvoice('<%= order._id %>')">
+                    <i class="fas fa-download"></i> Download Invoice
+                  </button>
+
+                  <% } %>
+                </div>
+              </div>
+              <% }) %>
+              <!-- Order Card 1 -->
             </div>
+          </div>
+
+          <!-- Orders Section -->
         </div>
+      </div>
+
+      <!-- modal to add new address -->
+      <div
+        class="modal fade m-t-50"
+        id="addAddressModel"
+        tabindex="-2"
+        role="dialog"
+      >
+        <div class="modal-dialog modal-dialog-centered" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalLabel">New Address</h5>
+              <button
+                type="button"
+                class="close"
+                data-dismiss="modal"
+                aria-label="Close"
+              >
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <form>
+                <div class="form-group">
+                  <label for="addressTitle" class="col-form-label"
+                    >Address Title</label
+                  >
+                  <input type="text" class="form-control" id="addressTitle" />
+                </div>
+                <div class="form-group">
+                  <label for="state" class="col-form-label">State</label>
+                  <input type="text" class="form-control" id="state" />
+                </div>
+                <div class="form-group">
+                  <label for="city" class="col-form-label">City</label>
+                  <input type="text" class="form-control" id="city" />
+                </div>
+                <div class="form-group">
+                  <label for="pinCode" class="col-form-label">Pin Code</label>
+                  <input type="text" class="form-control" id="pinCode" />
+                </div>
+                <div class="form-group">
+                  <label for="streetAddress" class="col-form-label"
+                    >Street Addrress</label
+                  >
+                  <textarea class="form-control" id="streetAddress"></textarea>
+                </div>
+              </form>
+            </div>
+            <div class="modal-footer">
+              <button
+                type="button"
+                class="btn btn-secondary"
+                data-dismiss="modal"
+              >
+                Close
+              </button>
+              <button
+                type="button"
+                class="btn btn-primary"
+                onclick="addNewAddress(event)"
+              >
+                Add
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- modal to edit address -->
+      <div
+        class="modal fade m-t-50"
+        id="editAddressModel"
+        tabindex="-2"
+        role="dialog"
+      >
+        <div class="modal-dialog modal-dialog-centered" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalLabel">Edit Address</h5>
+              <button
+                type="button"
+                class="close"
+                data-dismiss="modal"
+                aria-label="Close"
+              >
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <form>
+                <div class="form-group">
+                  <label for="addressTitle" class="col-form-label"
+                    >Address Title</label
+                  >
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="addressTitleEdit"
+                  />
+                </div>
+                <div class="form-group">
+                  <label for="state" class="col-form-label">State</label>
+                  <input type="text" class="form-control" id="stateEdit" />
+                </div>
+                <div class="form-group">
+                  <label for="city" class="col-form-label">City</label>
+                  <input type="text" class="form-control" id="cityEdit" />
+                </div>
+                <div class="form-group">
+                  <label for="pinCode" class="col-form-label">Pin Code</label>
+                  <input type="text" class="form-control" id="pinCodeEdit" />
+                </div>
+                <div class="form-group">
+                  <label for="streetAddress" class="col-form-label"
+                    >Street Addrress</label
+                  >
+                  <textarea
+                    class="form-control"
+                    id="streetAddressEdit"
+                  ></textarea>
+                </div>
+              </form>
+            </div>
+            <div class="modal-footer" id="editAddressDiv">
+              <button
+                type="button"
+                class="btn btn-secondary"
+                data-dismiss="modal"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- order model -->
 
-
-    <div class="modal fade" id="orderModal" tabindex="-1" aria-labelledby="orderModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="orderModalLabel">Order Details</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    <div
+      class="modal fade"
+      id="orderModal"
+      tabindex="-1"
+      aria-labelledby="orderModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="orderModalLabel">Order Details</h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <!-- Order Summary -->
+            <div class="order-summary">
+              <div class="row mb-3">
+                <div class="col-6">
+                  <strong>Order Date:</strong> <span id="orderDate"></span>
                 </div>
-                <div class="modal-body">
-                    <!-- Order Summary -->
-                    <div class="order-summary">
-                        <div class="row mb-3">
-                            <div class="col-6"><strong>Order Date:</strong> <span id="orderDate"></span></div>
-                            <div class="col-6"><strong>Number of Products:</strong> <span id="orderNoOfProducts"></span>
-                            </div>
-                        </div>
-                        <div class="row mb-3">
-                            <div class="col-6"><strong>Base Price:</strong> ₹<span id="orderBasePrice"></span> </div>
-                            <div class="col-6"><strong>Discount Amount:</strong> ₹<span id="orderDiscountAmount"></span>
-                            </div>
-                        </div>
-                        <div class="row mb-3">
-                            <div class="col-6"><strong>Delivery Charge:</strong> ₹<span id="orderDeliveryCharge"></span></div>
-                            <div class="col-6"><strong>Tax Amount:</strong> ₹<span id="orderTaxAmount"></span></div>
-                        </div>
-                        <div class="row mb-3">
-                            <div class="col-6"><strong>Total Amount:</strong> ₹<span id="orderTotalAmount"></span></div>
-                            <div class="col-6"><strong>Payment Status:</strong> <span id="orderPaymentStatus"></span></div>
-                        </div>
-                        <div class="row mb-3">
-                            <div class="col-6"><strong>Order Status:</strong> <span id="orderStatus"></span> </div>
-                            <div class="col-12"><strong>Address:</strong> <span id="orderAddress"></span></div>
-                        </div>
-                    </div>
-
-                    <!-- Products Table -->
-                    <div class="order-products">
-                        <table class="table table-bordered">
-                            <thead class="table-light">
-                                <tr>
-                                    <th>Product Image</th>
-                                    <th>Product Name</th>
-                                    <th>Quantity</th>
-                                    <th>Amount</th>
-                                    <th>Status</th>
-                                    <th>Action</th>
-                                </tr>
-                            </thead>
-                            <tbody id="orderTableBody">
-
-
-                            </tbody>
-                        </table>
-                    </div>
+                <div class="col-6">
+                  <strong>Number of Products:</strong>
+                  <span id="orderNoOfProducts"></span>
                 </div>
+              </div>
+              <div class="row mb-3">
+                <div class="col-6">
+                  <strong>Base Price:</strong> ₹<span
+                    id="orderBasePrice"
+                  ></span>
+                </div>
+                <div class="col-6">
+                  <strong>Discount Amount:</strong> ₹<span
+                    id="orderDiscountAmount"
+                  ></span>
+                </div>
+              </div>
+              <div class="row mb-3">
+                <div class="col-6">
+                  <strong>Delivery Charge:</strong> ₹<span
+                    id="orderDeliveryCharge"
+                  ></span>
+                </div>
+                <div class="col-6">
+                  <strong>Tax Amount:</strong> ₹<span
+                    id="orderTaxAmount"
+                  ></span>
+                </div>
+              </div>
+              <div class="row mb-3">
+                <div class="col-6">
+                  <strong>Total Amount:</strong> ₹<span
+                    id="orderTotalAmount"
+                  ></span>
+                </div>
+                <div class="col-6">
+                  <strong>Payment Status:</strong>
+                  <span id="orderPaymentStatus"></span>
+                </div>
+              </div>
+              <div class="row mb-3">
+                <div class="col-6">
+                  <strong>Order Status:</strong> <span id="orderStatus"></span>
+                </div>
+                <div class="col-12">
+                  <strong>Address:</strong> <span id="orderAddress"></span>
+                </div>
+              </div>
             </div>
+
+            <!-- Products Table -->
+            <div class="order-products">
+              <table class="table table-bordered">
+                <thead class="table-light">
+                  <tr>
+                    <th>Product Image</th>
+                    <th>Product Name</th>
+                    <th>Quantity</th>
+                    <th>Amount</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody id="orderTableBody"></tbody>
+              </table>
+            </div>
+          </div>
         </div>
+      </div>
     </div>
     <!-- Footer -->
     <footer class="bg3 p-t-75 p-b-32">
-        <%- include('./partials/footer.ejs') %>
+      <%- include('./partials/footer.ejs') %>
     </footer>
 
+    <%- include('./partials/backToTop.ejs') %> <%-
+    include('./partials/scriptBody.ejs') %>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script>
+      // Function to populate table with orders
+      function orderViewTable(e) {
+        const orderdata = e.target.closest("button");
 
-    <%- include('./partials/backToTop.ejs') %>
+        const order = JSON.parse(orderdata.getAttribute("data-order-item"));
+        const products = order.products;
+        console.log(order.createdAt);
 
+        document.getElementById("orderDate").innerText =
+          order.createdAt.split("T")[0];
+        document.getElementById("orderNoOfProducts").innerText =
+          products.length;
+        document.getElementById("orderBasePrice").innerText = order.basePrice;
+        document.getElementById("orderDiscountAmount").innerText =
+          order.discount;
+        document.getElementById("orderTotalAmount").innerText =
+          order.totalAmmount;
+        document.getElementById("orderStatus").innerText = order.orderStatus;
+        document.getElementById("orderPaymentStatus").innerText =
+          order.paymentStatus;
+        document.getElementById(
+          "orderAddress"
+        ).innerText = `${order.address.addressTitle}:${order.address.state},${order.address.city},${order.address.pinCode},${order.address.streetAddress}`;
+        document.getElementById("orderDeliveryCharge").innerText =
+          order.deliveryCharge;
+        document.getElementById("orderTaxAmount").innerText = order.taxAmmount;
 
-        <%- include('./partials/scriptBody.ejs') %>
-            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-            <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-            <script>
+        const tableBody = document.getElementById("orderTableBody");
 
+        // Clear existing rows in case this function is called multiple times
+        tableBody.innerHTML = "";
+        console.log(order.totalAmmount);
 
-                // Function to populate table with orders
-                function orderViewTable(e) {
-                    const orderdata = e.target.closest('button');
+        // Loop through each order and create table rows
+        products.forEach((order) => {
+          const row = document.createElement("tr");
+          let actionButton = ""; // Initialize action button variable
 
-                    const order = JSON.parse(orderdata.getAttribute('data-order-item'));
-                    const products = order.products
-                    console.log(order.createdAt);
+          // Check order status and set the button accordingly
+          if (order.status === "pending") {
+            actionButton = `<button class="btn btn-danger" onclick="cancelOrder('${order._id}', '${order.productID._id}' , ${order.quantity} ,${order.amountPaid})">Cancel</button>`;
+          } else if (
+            order.status === "delivered" &&
+            order.returnStatus == "notRequested"
+          ) {
+            actionButton = `<button class="btn btn-warning" onclick="returnOrder('${order._id}')">Return</button>`;
+          } else if (order.status === "delivered") {
+            actionButton = "return " + order.returnStatus;
+          }
 
-
-                    document.getElementById('orderDate').innerText = order.createdAt.split('T')[0]
-                    document.getElementById('orderNoOfProducts').innerText = products.length
-                    document.getElementById('orderBasePrice').innerText = order.basePrice
-                    document.getElementById('orderDiscountAmount').innerText = order.discount
-                    document.getElementById('orderTotalAmount').innerText = order.totalAmmount
-                    document.getElementById('orderStatus').innerText = order.orderStatus
-                    document.getElementById('orderPaymentStatus').innerText = order.paymentStatus
-                    document.getElementById('orderAddress').innerText = `${order.address.addressTitle}:${order.address.state},${order.address.city},${order.address.pinCode},${order.address.streetAddress}`
-                    document.getElementById('orderDeliveryCharge').innerText = order.deliveryCharge
-                    document.getElementById('orderTaxAmount').innerText=order.taxAmmount
-
-                    const tableBody = document.getElementById("orderTableBody");
-
-                    // Clear existing rows in case this function is called multiple times
-                    tableBody.innerHTML = "";
-                    console.log(order.totalAmmount);
-
-
-
-                    // Loop through each order and create table rows
-                    products.forEach(order => {
-                        const row = document.createElement("tr");
-                        let actionButton = ""; // Initialize action button variable
-
-                        // Check order status and set the button accordingly
-                        if (order.status === "pending") {
-                            actionButton = `<button class="btn btn-danger" onclick="cancelOrder('${order._id}', '${order.productID._id}' , ${order.quantity} ,${order.amountPaid})">Cancel</button>`;
-                        } else if (order.status === "delivered" && order.returnStatus == 'notRequested') {
-                            actionButton = `<button class="btn btn-warning" onclick="returnOrder('${order._id}')">Return</button>`;
-                        } else if (order.status === 'delivered') {
-                            actionButton = 'return ' + order.returnStatus
-                        }
-
-                        // Insert the row with dynamic data
-                        row.innerHTML = `
+          // Insert the row with dynamic data
+          row.innerHTML = `
         <td><img src="${order.productID.productImage1}" alt="${order.productName}" width="100px"></td>
         <td>${order.productID.productName}</td>
         <td>${order.quantity}</td>
@@ -393,577 +528,616 @@
         <td>${order.status}</td>
         <td>${actionButton}</td>
       `;
-                        tableBody.appendChild(row);
-                    });
+          tableBody.appendChild(row);
+        });
+      }
+    </script>
+
+    <script>
+      function logout() {
+        Swal.fire({
+          title: "Are you sure?",
+          text: "You won't be able to revert this!",
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonColor: "#3085d6",
+          cancelButtonColor: "#d33",
+          confirmButtonText: "Yes,Logout!",
+        }).then((result) => {
+          if (result.isConfirmed) {
+            fetch("/user/logout", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+            })
+              .then((res) => res.json())
+              .then((data) => {
+                if (data.success) {
+                  Swal.fire({
+                    title: "Loged Out",
+                    icon: "success",
+                    timer: 2000,
+                  });
+                  setTimeout(() => {
+                    window.location.href = data.successRedirect;
+                  }, 2000);
                 }
+              });
+          }
+        });
+      }
 
+      function updateProfile(event) {
+        event.preventDefault();
+        let username = document.getElementById("username").value;
+        let phoneNumber = document.getElementById("phoneNumber").value;
 
-            </script>
+        const error =
+          checkValidText(username, "username", 3, 10, false, false, false) ||
+          checkValidPhoneNumber(phoneNumber.toString());
 
-            <script>
-                function logout() {
+        if (error) {
+          Swal.fire({
+            icon: "error",
+            title: "Validation Error",
+            text: error,
+          });
+          return;
+        }
+        fetch("/user/account/updateProfile", {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ username, phoneNumber }),
+        })
+          .then((res) => res.json())
+          .then((data) => {
+            if (data.success) {
+              Swal.fire({
+                title: "Updated",
+                text: "Your Profile has been updated",
+                icon: "success",
+                timer: 2000,
+              });
+              setTimeout(() => {
+                window.location.reload();
+              }, 2000);
+            } else if (data.error) {
+              Swal.fire({
+                title: "Not updated",
+                text: data.error,
+                icon: "error",
+                timer: 2000,
+              });
+              setTimeout(() => {
+                window.location.reload();
+              }, 2000);
+            } else if (data.authError) {
+              Swal.fire({
+                icon: "error",
+                title: "Oops...",
+                text: data.authError,
+                footer: data.errorRedirect,
+              });
+            }
+          })
+          .catch((err) => console.log(err));
+      }
+
+      function changePassword() {
+        Swal.fire({
+          title: "Are you sure?",
+          text: "You must verify OTP to change password",
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonColor: "#3085d6",
+          cancelButtonColor: "#d33",
+          confirmButtonText: "Yes",
+        }).then((result) => {
+          if (result.isConfirmed) {
+            fetch("/user/account/changePassword", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+            })
+              .then((res) => res.json())
+              .then((data) => {
+                if (data.success) {
+                  window.location.href = data.redirectUrl;
+                } else if (data.error) {
+                  Swal.fire({
+                    title: "Not updated",
+                    text: data.error,
+                    icon: "error",
+                    timer: 2000,
+                  });
+                  setTimeout(() => {
+                    window.location.reload();
+                  }, 2000);
+                } else if (data.authError) {
+                  Swal.fire({
+                    icon: "error",
+                    title: "Oops...",
+                    text: data.authError,
+                    footer: data.errorRedirect,
+                  });
+                }
+              })
+              .catch((err) => console.log(err));
+          }
+        });
+      }
+
+      function addNewAddress(event) {
+        event.preventDefault();
+
+        let addressTitle = document.getElementById("addressTitle").value;
+        let state = document.getElementById("state").value;
+        let city = document.getElementById("city").value;
+        let pinCode = document.getElementById("pinCode").value;
+        let streetAddress = document.getElementById("streetAddress").value;
+
+        const error = ValidateAddress(
+          addressTitle,
+          state,
+          city,
+          pinCode,
+          streetAddress
+        );
+
+        if (error) {
+          Swal.fire({
+            icon: "error",
+            title: "Validation Error",
+            text: error,
+          });
+          return;
+        }
+        fetch("/address/add", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            addressTitle,
+            state,
+            city,
+            pinCode,
+            streetAddress,
+          }),
+        })
+          .then((res) => res.json())
+          .then((data) => {
+            if (data.success) {
+              Swal.fire({
+                title: "Added",
+                text: "New address has been added",
+                icon: "success",
+                timer: 2000,
+              });
+              setTimeout(() => {
+                window.location.reload();
+              }, 2000);
+            } else if (data.error) {
+              Swal.fire({
+                title: "Not added",
+                text: data.error,
+                icon: "error",
+                timer: 2000,
+              });
+              setTimeout(() => {
+                window.location.reload();
+              }, 2000);
+            } else if (data.authError) {
+              Swal.fire({
+                icon: "error",
+                title: "Oops...",
+                text: data.authError,
+                footer: data.errorRedirect,
+              });
+            }
+          })
+          .catch((err) => console.log(err));
+      }
+
+      function editAddress(event, _id) {
+        event.preventDefault();
+
+        let addressTitle = document.getElementById("addressTitleEdit").value;
+        let state = document.getElementById("stateEdit").value;
+        let city = document.getElementById("cityEdit").value;
+        let pinCode = document.getElementById("pinCodeEdit").value;
+        let streetAddress = document.getElementById("streetAddressEdit").value;
+
+        const error = ValidateAddress(
+          addressTitle,
+          state,
+          city,
+          pinCode,
+          streetAddress
+        );
+
+        if (error) {
+          Swal.fire({
+            icon: "error",
+            title: "Validation Error",
+            text: error,
+          });
+          return;
+        }
+
+        fetch(`/address/edit/${_id}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            addressTitle,
+            state,
+            city,
+            pinCode,
+            streetAddress,
+          }),
+        })
+          .then((res) => res.json())
+          .then((data) => {
+            if (data.success) {
+              Swal.fire({
+                title: "Edited",
+                text: "Address has been edited",
+                icon: "success",
+                timer: 2000,
+              });
+              setTimeout(() => {
+                window.location.reload();
+              }, 2000);
+            } else if (data.error) {
+              Swal.fire({
+                title: "Not Edited",
+                text: data.error,
+                icon: "error",
+                timer: 2000,
+              });
+              setTimeout(() => {
+                window.location.reload();
+              }, 2000);
+            } else if (data.authError) {
+              Swal.fire({
+                icon: "error",
+                title: "Oops...",
+                text: data.authError,
+                footer: data.errorRedirect,
+              });
+            }
+          })
+          .catch((err) => console.log(err));
+      }
+
+      function removeAddress(event, ID) {
+        event.preventDefault();
+        Swal.fire({
+          title: "Are you sure?",
+          text: "You want to remove this address",
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonColor: "#3085d6",
+          cancelButtonColor: "#d33",
+          confirmButtonText: "Yes",
+        }).then((result) => {
+          if (result.isConfirmed) {
+            fetch(`/address/delete/${ID}`, {
+              method: "DELETE",
+              headers: {
+                "Content-Type": "application/json",
+              },
+            })
+              .then((res) => res.json())
+              .then((data) => {
+                if (data.success) {
+                  Swal.fire({
+                    title: "Removed",
+                    text: "Address has been removed",
+                    icon: "success",
+                    timer: 2000,
+                  });
+                  setTimeout(() => {
+                    window.location.reload();
+                  }, 2000);
+                } else if (data.error) {
+                  Swal.fire({
+                    title: "Cannot remove",
+                    text: data.error,
+                    icon: "error",
+                    timer: 2000,
+                  });
+                  setTimeout(() => {
+                    window.location.reload();
+                  }, 2000);
+                } else if (data.authError) {
+                  Swal.fire({
+                    icon: "error",
+                    title: "Oops...",
+                    text: data.authError,
+                    footer: data.errorRedirect,
+                  });
+                }
+              })
+              .catch((err) => console.log(err));
+          }
+        });
+      }
+
+      function editAddressModel(e, _id) {
+        const addressdata = e.target.closest("button");
+
+        const { addressTitle, state, city, pinCode, streetAddress } =
+          JSON.parse(addressdata.getAttribute("data-address-item"));
+        document.getElementById("addressTitleEdit").value = addressTitle;
+        document.getElementById("stateEdit").value = state;
+        document.getElementById("cityEdit").value = city;
+        document.getElementById("pinCodeEdit").value = pinCode;
+        document.getElementById("streetAddressEdit").value = streetAddress;
+
+        // Get the parent div where the button should be appended
+        const editAddressDiv = document.getElementById("editAddressDiv");
+
+        // Check if the edit button already exists
+        if (!document.getElementById("editAddressButton")) {
+          var editButton = document.createElement("button");
+          editButton.textContent = "Edit";
+          editButton.id = "editAddressButton";
+          editButton.onclick = () => editAddress(event, _id);
+          editButton.classList.add("btn", "btn-primary");
+
+          editAddressDiv.appendChild(editButton);
+        }
+      }
+
+      function cancelOrder(
+        orderProductsID,
+        productID,
+        productQuantity,
+        amountPaid
+      ) {
+        Swal.fire({
+          title: "Are you sure?",
+          text: "You want to cancel this order",
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonColor: "#3085d6",
+          cancelButtonColor: "#d33",
+          confirmButtonText: "Yes",
+        }).then((result) => {
+          if (result.isConfirmed) {
+            fetch(`/order/cancel/${orderProductsID}`, {
+              method: "PATCH",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({ productID, productQuantity, amountPaid }),
+            })
+              .then((res) => res.json())
+              .then((data) => {
+                if (data.success) {
+                  Swal.fire({
+                    title: "Canceled",
+                    text: "Your order has been canceled",
+                    icon: "success",
+                    timer: 2000,
+                  });
+                  setTimeout(() => {
+                    window.location.reload();
+                  }, 2000);
+                } else if (data.error) {
+                  Swal.fire({
+                    title: "Cannot cancel",
+                    text: data.error,
+                    icon: "error",
+                    timer: 2000,
+                  });
+                  setTimeout(() => {
+                    window.location.reload();
+                  }, 2000);
+                } else if (data.authError) {
+                  Swal.fire({
+                    icon: "error",
+                    title: "Oops...",
+                    text: data.authError,
+                    footer: data.errorRedirect,
+                  });
+                }
+              })
+              .catch((err) => console.log(err));
+          }
+        });
+      }
+
+      function returnOrder(orderProductsID) {
+        Swal.fire({
+          title: "Select a reason for return",
+          input: "select",
+          inputOptions: {
+            "Return Reasons": {
+              "wrong-item": "Received the Wrong Item",
+              damaged: "Item Arrived Damaged",
+              "not-as-described": "Product is Not as Described",
+              "size-fit": "Size or Fit Issues",
+              "changed-mind": "Changed My Mind",
+              "poor-quality": "Product Quality is Poor",
+              "late-arrival": "Item Arrived Late",
+              "better-price": "Found a Better Price Elsewhere",
+              "wrong-product": "Ordered the Wrong Product",
+              "missing-parts": "Missing Parts or Accessories",
+            },
+          },
+          inputPlaceholder: "Select a reason",
+          showCancelButton: true,
+          inputValidator: (value) => {
+            return !value ? "You need to select a reason." : null;
+          },
+        })
+          .then((result) => {
+            if (result.isConfirmed && result.value) {
+              fetch(`/order/return/returnProduct/${orderProductsID}`, {
+                method: "PATCH",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                  returnReason: result.value,
+                }),
+              })
+                .then((res) => res.json())
+                .then((data) => {
+                  if (data.success) {
                     Swal.fire({
-                        title: "Are you sure?",
-                        text: "You won't be able to revert this!",
-                        icon: "warning",
-                        showCancelButton: true,
-                        confirmButtonColor: "#3085d6",
-                        cancelButtonColor: "#d33",
-                        confirmButtonText: "Yes,Logout!"
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-
-                            fetch('/user/logout', {
-                                method: "POST",
-                                headers: {
-                                    'Content-Type': 'application/json'
-                                },
-                            }).then((res) => res.json())
-                                .then((data) => {
-                                    if (data.success) {
-                                        Swal.fire({
-                                            title: "Loged Out",
-                                            icon: "success",
-                                            timer: 2000
-                                        });
-                                        setTimeout(() => {
-                                            window.location.href = data.successRedirect;
-                                        }, 2000)
-                                    }
-
-                                })
-
-                        }
+                      title: "Sent request",
+                      text: "Your order return request has been sent",
+                      icon: "success",
+                      timer: 2000,
                     });
-                }
-
-
-                function updateProfile(event) {
-                    event.preventDefault()
-                    let username = document.getElementById('username').value;
-                    let phoneNumber = document.getElementById('phoneNumber').value;
-
-                    const error = checkValidText(username, 'username', 3, 10, false, false, false) ||
-                        checkValidPhoneNumber(phoneNumber.toString())
-
-                    if (error) {
-                        Swal.fire({
-                            icon: "error",
-                            title: "Validation Error",
-                            text: error,
-                        });
-                        return
-                    }
-                    fetch('/user/account/updateProfile', {
-                        method: 'PUT',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({ username, phoneNumber })
-                    })
-                        .then(res => res.json())
-                        .then((data) => {
-                            if (data.success) {
-                                Swal.fire({
-                                    title: "Updated",
-                                    text: "Your Profile has been updated",
-                                    icon: "success",
-                                    timer: 2000
-                                });
-                                setTimeout(() => {
-                                    window.location.reload();
-                                }, 2000)
-                            } else if (data.error) {
-                                Swal.fire({
-                                    title: "Not updated",
-                                    text: data.error,
-                                    icon: "error",
-                                    timer: 2000
-                                })
-                                setTimeout(() => {
-                                    window.location.reload();
-                                }, 2000)
-                            } else if (data.authError) {
-                                Swal.fire({
-                                    icon: "error",
-                                    title: "Oops...",
-                                    text: data.authError,
-                                    footer: data.errorRedirect
-                                });
-                            }
-                        })
-                        .catch(err => console.log(err))
-                }
-
-                function changePassword() {
+                    setTimeout(() => {
+                      window.location.reload();
+                    }, 2000);
+                  } else if (data.authError) {
                     Swal.fire({
-                        title: "Are you sure?",
-                        text: "You must verify OTP to change password",
-                        icon: "warning",
-                        showCancelButton: true,
-                        confirmButtonColor: "#3085d6",
-                        cancelButtonColor: "#d33",
-                        confirmButtonText: "Yes"
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-
-                            fetch('/user/account/changePassword', {
-                                method: "POST",
-                                headers: {
-                                    'Content-Type': 'application/json'
-                                },
-                            }).then((res) => res.json())
-                                .then((data) => {
-                                    if (data.success) {
-                                        window.location.href = data.redirectUrl;
-                                    } else if (data.error) {
-                                        Swal.fire({
-                                            title: "Not updated",
-                                            text: data.error,
-                                            icon: "error",
-                                            timer: 2000
-                                        })
-                                        setTimeout(() => {
-                                            window.location.reload();
-                                        }, 2000)
-                                    } else if (data.authError) {
-                                        Swal.fire({
-                                            icon: "error",
-                                            title: "Oops...",
-                                            text: data.authError,
-                                            footer: data.errorRedirect
-                                        });
-                                    }
-                                })
-                                .catch(err => console.log(err))
-
-                        }
+                      icon: "error",
+                      title: "Oops...",
+                      text: data.authError,
+                      footer: data.errorRedirect,
                     });
-                }
+                  }
+                });
+            }
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+          });
+      }
 
-                function addNewAddress(event) {
-                    event.preventDefault()
+      function proccedToPayment(orderID, totalAmmount, paymentMethod) {
+        event.preventDefault();
 
-                    let addressTitle = document.getElementById('addressTitle').value;
-                    let state = document.getElementById('state').value;
-                    let city = document.getElementById('city').value;
-                    let pinCode = document.getElementById('pinCode').value;
-                    let streetAddress = document.getElementById('streetAddress').value;
+        fetch(
+          `/order/pendingProceedToPayment?orderID=${orderID}&&totalAmmount=${totalAmmount}&&paymentMethod=${paymentMethod}`,
+          {
+            method: "POST",
+            headers: {
+              "Content-type": "application/json",
+            },
+          }
+        )
+          .then((res) => res.json())
+          .then((data) => {
+            if (data.success) {
+              Swal.fire({
+                title: "Payment completed",
+                icon: "success",
+                timer: 2000,
+              });
+              setTimeout(() => {
+                window.location.href = data.successRedirect;
+              }, 2000);
+            }
 
-                    const error = ValidateAddress(addressTitle, state, city, pinCode, streetAddress);
+            if (data.error) {
+              Swal.fire({
+                title: "Error",
+                text: data.error,
+                icon: "error",
+              });
+            } else if (data.authError) {
+              Swal.fire({
+                icon: "error",
+                title: "Oops...",
+                text: data.authError,
+                footer: data.errorRedirect,
+              });
+              return;
+            }
 
-                    if (error) {
-                        Swal.fire({
-                            icon: "error",
-                            title: "Validation Error",
-                            text: error,
-                        });
-                        return
-                    }
-                    fetch('/address/add', {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json"
-                        },
-                        body: JSON.stringify({ addressTitle, state, city, pinCode, streetAddress })
-                    })
-                        .then((res) => res.json())
-                        .then((data) => {
-                            if (data.success) {
-                                Swal.fire({
-                                    title: "Added",
-                                    text: "New address has been added",
-                                    icon: "success",
-                                    timer: 2000
-                                });
-                                setTimeout(() => {
-                                    window.location.reload();
-                                }, 2000)
-                            } else if (data.error) {
-                                Swal.fire({
-                                    title: "Not added",
-                                    text: data.error,
-                                    icon: "error",
-                                    timer: 2000
-                                })
-                                setTimeout(() => {
-                                    window.location.reload();
-                                }, 2000)
-                            } else if (data.authError) {
-                                Swal.fire({
-                                    icon: "error",
-                                    title: "Oops...",
-                                    text: data.authError,
-                                    footer: data.errorRedirect
-                                });
-                            }
-                        })
-                        .catch(err => console.log(err))
-                }
+            if (data.razorpayOrder) {
+              console.log(data.razorpayOrder);
+              var options = {
+                key: "rzp_test_RSspzzgBAA2ViI", // Enter the Key ID generated from the Dashboard
+                name: "Rook & Knights",
+                description: "Test Transaction",
+                image:
+                  "https://imgs.search.brave.com/jsPXFiH4YxTvzVbUvQMILb4V32Y6I0DxlC2p3CaqAfA/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9ibG9n/LnBob3RvYWRraW5n/LmNvbS93cC1jb250/ZW50L3VwbG9hZHMv/MjAyMy8wNS8xNjgy/OTQ2NDIzMzgxLTEu/anBn",
+                order_id: data.razorpayOrder.id, //This is a sample Order ID. Pass the `id` obtained in the response of Step 1
+                callback_url: "/order/completePayment",
+                theme: {
+                  color: "#454545",
+                },
+              };
+              var rzp1 = new Razorpay(options);
 
-                function editAddress(event, _id) {
-                    event.preventDefault()
+              rzp1.open();
+            }
+          });
+      }
+    </script>
 
-                    let addressTitle = document.getElementById('addressTitleEdit').value;
-                    let state = document.getElementById('stateEdit').value;
-                    let city = document.getElementById('cityEdit').value;
-                    let pinCode = document.getElementById('pinCodeEdit').value;
-                    let streetAddress = document.getElementById('streetAddressEdit').value;
+    <script>
+      // JavaScript function to show different sections
+      function showSection(sectionId, element) {
+        // Hide all sections
+        document.querySelectorAll(".section").forEach(function (section) {
+          section.classList.add("hidden");
+        });
 
-                    const error = ValidateAddress(addressTitle, state, city, pinCode, streetAddress);
+        // Remove active class from all sidebar links
+        document.querySelectorAll(".sidebar-menu a").forEach(function (link) {
+          link.classList.remove("active");
+        });
 
-                    if (error) {
-                        Swal.fire({
-                            icon: "error",
-                            title: "Validation Error",
-                            text: error,
-                        });
-                        return
-                    }
+        // Show the selected section
+        document
+          .getElementById(sectionId + "-section")
+          .classList.remove("hidden");
 
-                    fetch(`/address/edit/${_id}`, {
-                        method: "PUT",
-                        headers: {
-                            "Content-Type": "application/json"
-                        },
-                        body: JSON.stringify({ addressTitle, state, city, pinCode, streetAddress })
-                    })
-                        .then((res) => res.json())
-                        .then((data) => {
-                            if (data.success) {
-                                Swal.fire({
-                                    title: "Edited",
-                                    text: "Address has been edited",
-                                    icon: "success",
-                                    timer: 2000
-                                });
-                                setTimeout(() => {
-                                    window.location.reload();
-                                }, 2000)
-                            } else if (data.error) {
-                                Swal.fire({
-                                    title: "Not Edited",
-                                    text: data.error,
-                                    icon: "error",
-                                    timer: 2000
-                                })
-                                setTimeout(() => {
-                                    window.location.reload();
-                                }, 2000)
-                            } else if (data.authError) {
-                                Swal.fire({
-                                    icon: "error",
-                                    title: "Oops...",
-                                    text: data.authError,
-                                    footer: data.errorRedirect
-                                });
-                            }
-                        })
-                        .catch(err => console.log(err))
-                }
+        // Add active class to the clicked link
+        element.classList.add("active");
+      }
 
-                function removeAddress(event, ID) {
+      function downloadInvoice(orderID) {
+        window.location.href = `/order/downloadInvoicePdf/${orderID}`;
+      }
 
-                    event.preventDefault()
-                    Swal.fire({
-                        title: "Are you sure?",
-                        text: "You want to remove this address",
-                        icon: "warning",
-                        showCancelButton: true,
-                        confirmButtonColor: "#3085d6",
-                        cancelButtonColor: "#d33",
-                        confirmButtonText: "Yes"
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-
-                            fetch(`/address/delete/${ID}`, {
-                                method: "DELETE",
-                                headers: {
-                                    'Content-Type': 'application/json',
-                                }
-                            })
-                                .then((res) => res.json())
-                                .then((data) => {
-                                    if (data.success) {
-                                        Swal.fire({
-                                            title: "Removed",
-                                            text: "Address has been removed",
-                                            icon: "success",
-                                            timer: 2000
-                                        });
-                                        setTimeout(() => {
-                                            window.location.reload();
-                                        }, 2000)
-                                    } else if (data.error) {
-                                        Swal.fire({
-                                            title: "Cannot remove",
-                                            text: data.error,
-                                            icon: "error",
-                                            timer: 2000
-                                        })
-                                        setTimeout(() => {
-                                            window.location.reload();
-                                        }, 2000)
-                                    } else if (data.authError) {
-                                        Swal.fire({
-                                            icon: "error",
-                                            title: "Oops...",
-                                            text: data.authError,
-                                            footer: data.errorRedirect
-                                        });
-                                    }
-                                })
-                                .catch(err => console.log(err))
-                        }
-                    });
-                }
-
-
-
-                function editAddressModel(e, _id) {
-
-                    const addressdata = e.target.closest('button');
-
-                    const { addressTitle, state, city, pinCode, streetAddress } = JSON.parse(addressdata.getAttribute('data-address-item'));
-                    document.getElementById('addressTitleEdit').value = addressTitle;
-                    document.getElementById('stateEdit').value = state;
-                    document.getElementById('cityEdit').value = city;
-                    document.getElementById('pinCodeEdit').value = pinCode;
-                    document.getElementById('streetAddressEdit').value = streetAddress;
-
-                    // Get the parent div where the button should be appended
-                    const editAddressDiv = document.getElementById('editAddressDiv');
-
-                    // Check if the edit button already exists
-                    if (!document.getElementById('editAddressButton')) {
-                        var editButton = document.createElement('button');
-                        editButton.textContent = "Edit";
-                        editButton.id = 'editAddressButton';
-                        editButton.onclick = () => editAddress(event, _id);
-                        editButton.classList.add('btn', 'btn-primary');
-
-                        editAddressDiv.appendChild(editButton);
-                    }
-                }
-
-
-                function cancelOrder(orderProductsID, productID, productQuantity, amountPaid) {
-
-
-                    Swal.fire({
-                        title: "Are you sure?",
-                        text: "You want to cancel this order",
-                        icon: "warning",
-                        showCancelButton: true,
-                        confirmButtonColor: "#3085d6",
-                        cancelButtonColor: "#d33",
-                        confirmButtonText: "Yes"
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            fetch(`/order/cancel/${orderProductsID}`, {
-                                method: "PATCH",
-                                headers: {
-                                    'Content-Type': 'application/json'
-                                },
-                                body: JSON.stringify({ productID, productQuantity, amountPaid })
-                            })
-                                .then(res => res.json())
-                                .then((data) => {
-                                    if (data.success) {
-                                        Swal.fire({
-                                            title: "Canceled",
-                                            text: "Your order has been canceled",
-                                            icon: "success",
-                                            timer: 2000
-                                        });
-                                        setTimeout(() => {
-                                            window.location.reload();
-                                        }, 2000)
-                                    } else if (data.error) {
-                                        Swal.fire({
-                                            title: "Cannot cancel",
-                                            text: data.error,
-                                            icon: "error",
-                                            timer: 2000
-                                        })
-                                        setTimeout(() => {
-                                            window.location.reload();
-                                        }, 2000)
-                                    } else if (data.authError) {
-                                        Swal.fire({
-                                            icon: "error",
-                                            title: "Oops...",
-                                            text: data.authError,
-                                            footer: data.errorRedirect
-                                        });
-                                    }
-                                })
-                                .catch(err => console.log(err))
-                        }
-                    })
-                }
-
-
-                function returnOrder(orderProductsID) {
-                    Swal.fire({
-                        title: "Select a reason for return",
-                        input: "select",
-                        inputOptions: {
-                            "Return Reasons": {
-                                "wrong-item": "Received the Wrong Item",
-                                "damaged": "Item Arrived Damaged",
-                                "not-as-described": "Product is Not as Described",
-                                "size-fit": "Size or Fit Issues",
-                                "changed-mind": "Changed My Mind",
-                                "poor-quality": "Product Quality is Poor",
-                                "late-arrival": "Item Arrived Late",
-                                "better-price": "Found a Better Price Elsewhere",
-                                "wrong-product": "Ordered the Wrong Product",
-                                "missing-parts": "Missing Parts or Accessories"
-                            }
-                        },
-                        inputPlaceholder: "Select a reason",
-                        showCancelButton: true,
-                        inputValidator: (value) => {
-                            return !value ? 'You need to select a reason.' : null;
-                        }
-                    }).then((result) => {
-                        if (result.isConfirmed && result.value) {
-                            fetch(`/order/return/returnProduct/${orderProductsID}`, {
-                                method: "PATCH",
-                                headers: {
-                                    'Content-Type': 'application/json'
-                                },
-                                body: JSON.stringify({
-                                    returnReason: result.value
-                                })
-                            })
-                                .then(res => res.json())
-                                .then((data) => {
-                                    if (data.success) {
-                                        Swal.fire({
-                                            title: "Sent request",
-                                            text: "Your order return request has been sent",
-                                            icon: "success",
-                                            timer: 2000
-                                        });
-                                        setTimeout(() => {
-                                            window.location.reload();
-                                        }, 2000)
-                                    } else if (data.authError) {
-                                        Swal.fire({
-                                            icon: "error",
-                                            title: "Oops...",
-                                            text: data.authError,
-                                            footer: data.errorRedirect
-                                        });
-                                    }
-                                })
-                        }
-                    }).catch((error) => {
-                        console.error("Error:", error);
-                    });
-
-                }
-
-                function proccedToPayment(orderID, totalAmmount, paymentMethod) {
-
-                    event.preventDefault()
-
-
-                    fetch(`/order/pendingProceedToPayment?orderID=${orderID}&&totalAmmount=${totalAmmount}&&paymentMethod=${paymentMethod}`, {
-                        method: "POST",
-                        headers: {
-                            'Content-type': 'application/json'
-                        },
-                    }).then((res) => res.json())
-                        .then((data) => {
-                            if (data.success) {
-                                Swal.fire({
-                                    title: "Payment completed",
-                                    icon: "success",
-                                    timer: 2000
-                                });
-                                setTimeout(() => {
-                                    window.location.href = data.successRedirect;
-                                }, 2000)
-                            }
-
-                            if (data.error) {
-                                Swal.fire({
-                                    title: "Error",
-                                    text: data.error,
-                                    icon: "error",
-                                });
-                            }
-
-                            else if (data.authError) {
-                                Swal.fire({
-                                    icon: "error",
-                                    title: "Oops...",
-                                    text: data.authError,
-                                    footer: data.errorRedirect
-                                });
-                                return
-                            }
-
-                            if (data.razorpayOrder) {
-                                console.log(data.razorpayOrder);
-                                var options = {
-                                    "key": "rzp_test_iPUiBGfQqstcsI", // Enter the Key ID generated from the Dashboard
-                                    "name": "Rook & Knights",
-                                    "description": "Test Transaction",
-                                    "image": "https://imgs.search.brave.com/jsPXFiH4YxTvzVbUvQMILb4V32Y6I0DxlC2p3CaqAfA/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9ibG9n/LnBob3RvYWRraW5n/LmNvbS93cC1jb250/ZW50L3VwbG9hZHMv/MjAyMy8wNS8xNjgy/OTQ2NDIzMzgxLTEu/anBn",
-                                    "order_id": data.razorpayOrder.id, //This is a sample Order ID. Pass the `id` obtained in the response of Step 1
-                                    "callback_url": "/order/completePayment",
-                                    "theme": {
-                                        "color": "#454545"
-                                    }
-                                };
-                                var rzp1 = new Razorpay(options);
-
-                                rzp1.open();
-
-                            }
-                        })
-                }
-
-            </script>
-
-            <script>
-                // JavaScript function to show different sections
-                function showSection(sectionId, element) {
-                    // Hide all sections
-                    document.querySelectorAll('.section').forEach(function (section) {
-                        section.classList.add('hidden');
-                    });
-
-                    // Remove active class from all sidebar links
-                    document.querySelectorAll('.sidebar-menu a').forEach(function (link) {
-                        link.classList.remove('active');
-                    });
-
-                    // Show the selected section
-                    document.getElementById(sectionId + '-section').classList.remove('hidden');
-
-                    // Add active class to the clicked link
-                    element.classList.add('active');
-                }
-
-
-                function downloadInvoice(orderID) {
-                    window.location.href = `/order/downloadInvoicePdf/${orderID}`
-                }
-
-                function ValidateAddress(addressTitle, state, city, pinCode, streetAddress) {
-                    return checkValidText(addressTitle, 'Address Title', 3, 20, true, true, false) ||
-                        checkValidText(state, 'State', 3, 25, true, false, false) ||
-                        checkValidText(city, 'City', 3, 25, true, false, false) ||
-                        checkPincode(pinCode) ||
-                        checkValidText(streetAddress, 'Street Address', 10, 100, true, true, true)
-                }
-
-            </script>
-</body>
-
+      function ValidateAddress(
+        addressTitle,
+        state,
+        city,
+        pinCode,
+        streetAddress
+      ) {
+        return (
+          checkValidText(
+            addressTitle,
+            "Address Title",
+            3,
+            20,
+            true,
+            true,
+            false
+          ) ||
+          checkValidText(state, "State", 3, 25, true, false, false) ||
+          checkValidText(city, "City", 3, 25, true, false, false) ||
+          checkPincode(pinCode) ||
+          checkValidText(
+            streetAddress,
+            "Street Address",
+            10,
+            100,
+            true,
+            true,
+            true
+          )
+        );
+      }
+    </script>
+  </body>
 </html>

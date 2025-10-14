@@ -1,149 +1,155 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
+  <head>
     <%- include('./partials/head.ejs') %>
-</head>
+  </head>
 
-<body class="">
-
+  <body class="">
     <!-- Header -->
-    <header>
-        <%- include('./partials/header.ejs') %>
-    </header>
+    <header><%- include('./partials/header.ejs') %></header>
 
     <div class="wallet-container m-t-100">
-        <div class="wallet-amount-section">
-            <div class="amount-display">
-                <h3><i class="fas fa-wallet"></i> Wallet Balance</h3>
-                <p class="amount">
-                    <%= wallet.balance %>
-                </p>
-                <button class="add-money-btn" data-toggle="modal" data-target="#exampleModal"><i
-                        class="fas fa-plus-circle"></i> Add Money</button>
-            </div>
+      <div class="wallet-amount-section">
+        <div class="amount-display">
+          <h3><i class="fas fa-wallet"></i> Wallet Balance</h3>
+          <p class="amount"><%= wallet.balance %></p>
+          <button
+            class="add-money-btn"
+            data-toggle="modal"
+            data-target="#exampleModal"
+          >
+            <i class="fas fa-plus-circle"></i> Add Money
+          </button>
         </div>
-        <div class="transaction-history">
-            <h3>Transaction History</h3>
-            <table class="transaction-table">
-                <thead>
-                    <tr>
-                        <th>Date</th>
-                        <th>Amount</th>
-                        <th>Transation Type</th>
-                        <th>Payment Method </th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <% transationList.forEach((transation)=>{ %>
-                        <tr>
-                            <td>
-                                <%= transation.createdAt.toLocaleDateString() %>
-                            </td>
-                            <td>
-                                <%= transation.amount %>
-                            </td>
-                            <td>
-                                <%= transation.transationType %>
-                            </td>
-                            <td>
-                                <%= transation.paymentMethod %>
-                            </td>
-                        </tr>
-                        <% }) %>
+      </div>
+      <div class="transaction-history">
+        <h3>Transaction History</h3>
+        <table class="transaction-table">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Amount</th>
+              <th>Transation Type</th>
+              <th>Payment Method</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% transationList.forEach((transation)=>{ %>
+            <tr>
+              <td><%= transation.createdAt.toLocaleDateString() %></td>
+              <td><%= transation.amount %></td>
+              <td><%= transation.transationType %></td>
+              <td><%= transation.paymentMethod %></td>
+            </tr>
+            <% }) %>
 
-
-                            <!-- Additional rows can be added here -->
-                </tbody>
-            </table>
-        </div>
+            <!-- Additional rows can be added here -->
+          </tbody>
+        </table>
+      </div>
     </div>
 
-
-    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Add Money To Wallet</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <form>
-                        <div class="form-group">
-                            <label for="ammount" class="col-form-label">Amount:</label>
-                            <input type="number" class="form-control" id="amount">
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary" onclick="addToWallet()">Add Money</button>
-                </div>
-            </div>
+    <div
+      class="modal fade"
+      id="exampleModal"
+      tabindex="-1"
+      role="dialog"
+      aria-labelledby="exampleModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">
+              Add Money To Wallet
+            </h5>
+            <button
+              type="button"
+              class="close"
+              data-dismiss="modal"
+              aria-label="Close"
+            >
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <form>
+              <div class="form-group">
+                <label for="ammount" class="col-form-label">Amount:</label>
+                <input type="number" class="form-control" id="amount" />
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-dismiss="modal"
+            >
+              Close
+            </button>
+            <button
+              type="button"
+              class="btn btn-primary"
+              onclick="addToWallet()"
+            >
+              Add Money
+            </button>
+          </div>
         </div>
+      </div>
     </div>
-
-
-
-
 
     <!-- Footer -->
     <footer class="bg3 p-t-75 p-b-32">
-        <%- include('./partials/footer.ejs') %>
+      <%- include('./partials/footer.ejs') %>
     </footer>
 
-    <%- include('./partials/backToTop.ejs') %>
+    <%- include('./partials/backToTop.ejs') %> <%-
+    include('./partials/scriptBody.ejs') %>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script>
+      function addToWallet() {
+        const amount = document.getElementById("amount").value;
 
+        fetch("/wallet/addToWallet", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ amount }),
+        })
+          .then((res) => res.json())
+          .then((data) => {
+            if (data.authError) {
+              Swal.fire({
+                icon: "error",
+                title: "Oops...",
+                text: data.authError,
+                footer: data.errorRedirect,
+              });
+              return;
+            }
 
-        <%- include('./partials/scriptBody.ejs') %>
-            <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-            <script>
-                function addToWallet() {
-                    const amount = document.getElementById('amount').value;
+            if (data.razorpayOrder) {
+              var options = {
+                key: "rzp_test_RSspzzgBAA2ViI", // Enter the Key ID generated from the Dashboard
+                name: "Rook & Knights",
+                description: "Test Transaction",
+                image:
+                  "https://imgs.search.brave.com/jsPXFiH4YxTvzVbUvQMILb4V32Y6I0DxlC2p3CaqAfA/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9ibG9n/LnBob3RvYWRraW5n/LmNvbS93cC1jb250/ZW50L3VwbG9hZHMv/MjAyMy8wNS8xNjgy/OTQ2NDIzMzgxLTEu/anBn",
+                order_id: data.razorpayOrder.id, //This is a sample Order ID. Pass the `id` obtained in the response of Step 1
+                callback_url: "/wallet/completePayment",
+                theme: {
+                  color: "#454545",
+                },
+              };
+              var rzp1 = new Razorpay(options);
 
-                    fetch('/wallet/addToWallet', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': "application/json"
-                        },
-                        body: JSON.stringify({ amount })
-                    })
-                        .then(res => res.json())
-                        .then((data) => {
-                            if (data.authError) {
-                                Swal.fire({
-                                    icon: "error",
-                                    title: "Oops...",
-                                    text: data.authError,
-                                    footer: data.errorRedirect
-                                });
-                                return
-                            }
-
-                            if (data.razorpayOrder) {
-
-                                var options = {
-                                    "key": "rzp_test_iPUiBGfQqstcsI", // Enter the Key ID generated from the Dashboard
-                                    "name": "Rook & Knights",
-                                    "description": "Test Transaction",
-                                    "image": "https://imgs.search.brave.com/jsPXFiH4YxTvzVbUvQMILb4V32Y6I0DxlC2p3CaqAfA/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9ibG9n/LnBob3RvYWRraW5n/LmNvbS93cC1jb250/ZW50L3VwbG9hZHMv/MjAyMy8wNS8xNjgy/OTQ2NDIzMzgxLTEu/anBn",
-                                    "order_id": data.razorpayOrder.id, //This is a sample Order ID. Pass the `id` obtained in the response of Step 1
-                                    "callback_url": "/wallet/completePayment",
-                                    "theme": {
-                                        "color": "#454545"
-                                    }
-                                };
-                                var rzp1 = new Razorpay(options);
-
-                                rzp1.open();
-
-                            }
-                        })
-                }
-            </script>
-</body>
-
+              rzp1.open();
+            }
+          });
+      }
+    </script>
+  </body>
 </html>
