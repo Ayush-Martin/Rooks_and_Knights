@@ -169,28 +169,12 @@ exports.increaseQuantity = async (cartItemId, userID) => {
 
     cartItem.quantity += 1;
 
-    // Calculate item total with offer
-    const offerPercentage = Math.max(
-      cartItem.productID.offer || 0,
-      cartItem.categoryID.offer || 0,
-      cartItem.subCategoryID.offer || 0
-    );
+    // Calculate plain item total (no offers)
+    const itemTotal = cartItem.productID.price * cartItem.quantity;
 
-    const itemTotal =
-      cartItem.productID.price *
-      cartItem.quantity *
-      (1 - offerPercentage / 100);
-
-    // Recalculate cart total
+    // Recalculate cart total without offers (plain prices)
     const cartTotal = cart.cartItems.reduce((total, item) => {
-      const itemOffer = Math.max(
-        item.productID.offer || 0,
-        item.categoryID.offer || 0,
-        item.subCategoryID.offer || 0
-      );
-      return (
-        total + item.productID.price * item.quantity * (1 - itemOffer / 100)
-      );
+      return total + item.productID.price * item.quantity;
     }, 0);
 
     // Persist the recalculated cart total to the DB so other flows read the correct value
@@ -229,28 +213,12 @@ exports.decreaseQuantity = async (cartItemId, userID) => {
 
     cartItem.quantity -= 1;
 
-    // Calculate item total with offer
-    const offerPercentage = Math.max(
-      cartItem.productID.offer || 0,
-      cartItem.categoryID.offer || 0,
-      cartItem.subCategoryID.offer || 0
-    );
+    // Calculate plain item total (no offers)
+    const itemTotal = cartItem.productID.price * cartItem.quantity;
 
-    const itemTotal =
-      cartItem.productID.price *
-      cartItem.quantity *
-      (1 - offerPercentage / 100);
-
-    // Recalculate cart total
+    // Recalculate cart total without offers (plain prices)
     const cartTotal = cart.cartItems.reduce((total, item) => {
-      const itemOffer = Math.max(
-        item.productID.offer || 0,
-        item.categoryID.offer || 0,
-        item.subCategoryID.offer || 0
-      );
-      return (
-        total + item.productID.price * item.quantity * (1 - itemOffer / 100)
-      );
+      return total + item.productID.price * item.quantity;
     }, 0);
 
     // Persist the recalculated cart total to the DB so other flows read the correct value
