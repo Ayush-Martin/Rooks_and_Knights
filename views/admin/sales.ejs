@@ -2,14 +2,14 @@
 
 <body>
     <div class="wrapper">
-        <div class="row">
+        <div class="row no-gutters">
             <!-- Sidebar Section -->
             <div class="col-md-3 col-lg-2">
                 <%- include('./partials/slidebar') %>
             </div>
 
             <!-- Main Content Section -->
-            <div class="container mt-4">
+            <div class="col-md-9 col-lg-10 mt-4">
                 <div class="d-flex justify-content-between align-items-center mb-4">
                     <!-- Filter Section -->
                     <form action="/admin/sales" method="get">
@@ -142,9 +142,85 @@
     <%- include('./partials/footer') %>
 
     <style>
+  body {
+    background-color: #f8f9fa;
+  }
 
+  .wrapper {
+    min-height: 100vh;
+    padding-top: 10px;
+    padding-left: 0;
+    padding-right: 0;
+  }
 
-    </style>
+  .row.no-gutters {
+    margin: 0;
+  }
+
+  .col-md-9.col-lg-10 {
+    padding: 15px 25px;
+  }
+
+  /* Sidebar */
+  .col-md-3.col-lg-2 {
+    min-height: 100vh;
+    background: #212529;
+    color: #fff;
+    padding: 0;
+  }
+
+  /* Cards smaller and tighter */
+  .card-summary {
+    border-radius: 8px;
+    padding: 8px;
+  }
+
+  .card-summary h4 {
+    font-size: 1rem;
+    margin-bottom: 6px;
+  }
+
+  .card-summary .lead {
+    font-size: 1.1rem;
+    margin: 0;
+  }
+
+  /* Table spacing */
+  table.table {
+    font-size: 0.9rem;
+  }
+
+  table.table th,
+  table.table td {
+    vertical-align: middle;
+    padding: 8px;
+  }
+
+  .table img {
+    border-radius: 4px;
+  }
+
+  /* Buttons and filters */
+  .btn,
+  .form-control {
+    font-size: 0.9rem;
+    padding: 6px 10px;
+  }
+
+  .form-group {
+    margin-bottom: 0;
+  }
+
+  .d-flex.align-items-center {
+    gap: 10px;
+  }
+
+  /* Pagination links */
+  .flex-c-m a {
+    font-size: 0.9rem;
+  }
+</style>
+
 
 <script>
     

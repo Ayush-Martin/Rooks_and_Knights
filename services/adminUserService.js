@@ -1,34 +1,38 @@
 //collections
-const userCollection = require('../models/userModel')
+const userCollection = require("../models/userModel");
 
 exports.userList = async (search, currentPage, noOfList, skipPages) => {
-    let findQuery = { isAdmin: false };
+  let findQuery = { isAdmin: false };
 
-    //for search user
-    if (search) {
-        findQuery["$or"] = [
-            { 'username': { "$regex": new RegExp(search, 'i') } },
-            { 'email': { "$regex": new RegExp(search, 'i') } }
-        ];
-    }
+  //for search user
+  if (search) {
+    findQuery["$or"] = [
+      { username: { $regex: new RegExp(search, "i") } },
+      { email: { $regex: new RegExp(search, "i") } },
+    ];
+  }
 
-    try {
-        let totalNoOfList = await userCollection.countDocuments({ isAdmin: false })
-        let userList = await userCollection.find(findQuery).skip(skipPages).limit(noOfList);
+  try {
+    let totalNoOfList = await userCollection.countDocuments(findQuery);
+    let userList = await userCollection
+      .find(findQuery)
+      .skip(skipPages)
+      .limit(noOfList);
 
-        return { userList, currentPage, totalNoOfList };
-    } catch (err) {
-        console.log(err);
-    }
-}
-
+    return { userList, currentPage, totalNoOfList };
+  } catch (err) {
+    console.log(err);
+  }
+};
 
 exports.blockUnblockUser = async (userID) => {
-    try {
-        const user = await userCollection.findById(userID)
-        await userCollection.updateOne({ _id: userID }, { isblocked: !user.isblocked })
-    } catch (err) {
-        console.log(err);
-
-    }
-}
+  try {
+    const user = await userCollection.findById(userID);
+    await userCollection.updateOne(
+      { _id: userID },
+      { isblocked: !user.isblocked }
+    );
+  } catch (err) {
+    console.log(err);
+  }
+};
