@@ -177,11 +177,15 @@
             return;
           }
 
+          // Update values (ensure numeric and formatted)
           document.getElementById(`productQuantity_${cartItemId}`).value =
-            data.newQuantity;
-          document.getElementById(`cartProductTotal_${cartItemId}`).innerText =
-            data.newTotal;
-          document.getElementById("totalAmmount").innerText = data.cartTotal;
+            Number(data.newQuantity);
+          document.getElementById(
+            `cartProductTotal_${cartItemId}`
+          ).innerText = `₹${Number(data.newTotal)}`;
+          document.getElementById("totalAmmount").innerText = `₹${Number(
+            data.cartTotal
+          )}`;
           document.getElementById(`stock-Left_${cartItemId}`).innerText = "";
         } catch (err) {
           Swal.fire({
@@ -208,11 +212,15 @@
             return;
           }
 
+          // Update values (ensure numeric and formatted)
           document.getElementById(`productQuantity_${cartItemId}`).value =
-            data.newQuantity;
-          document.getElementById(`cartProductTotal_${cartItemId}`).innerText =
-            data.newTotal;
-          document.getElementById("totalAmmount").innerText = data.cartTotal;
+            Number(data.newQuantity);
+          document.getElementById(
+            `cartProductTotal_${cartItemId}`
+          ).innerText = `₹${Number(data.newTotal)}`;
+          document.getElementById("totalAmmount").innerText = `₹${Number(
+            data.cartTotal
+          )}`;
           document.getElementById(`stock-Left_${cartItemId}`).innerText = "";
         } catch (err) {
           Swal.fire({

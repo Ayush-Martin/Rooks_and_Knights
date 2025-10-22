@@ -193,6 +193,8 @@ exports.increaseQuantity = async (cartItemId, userID) => {
       );
     }, 0);
 
+    // Persist the recalculated cart total to the DB so other flows read the correct value
+    cart.totalPrice = Math.round(cartTotal);
     await cart.save();
 
     return {
@@ -251,6 +253,8 @@ exports.decreaseQuantity = async (cartItemId, userID) => {
       );
     }, 0);
 
+    // Persist the recalculated cart total to the DB so other flows read the correct value
+    cart.totalPrice = Math.round(cartTotal);
     await cart.save();
 
     return {
