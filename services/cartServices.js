@@ -144,13 +144,122 @@ exports.deleteManyCartItem = async (cartItemIDs, price, userID) => {
   }
 };
 
-exports.updateCart = async (cartItems, totalPrice, userID) => {
+exports.increaseQuantity = async (cartItemId, userID) => {
   try {
-    await cartCollection.updateOne(
-      { userID },
-      { $set: { cartItems, totalPrice } }
+    const cart = await cartCollection
+      .findOne({ userID })
+      .populate("cartItems.productID")
+      .populate("cartItems.categoryID")
+      .populate("cartItems.subCategoryID");
+    const cartItem = cart.cartItems.find(
+      (item) => item._id.toString() === cartItemId
     );
+
+    if (!cartItem) {
+      return { error: "Cart item not found" };
+    }
+
+    if (cartItem.quantity >= 10) {
+      return { error: "Maximum quantity limit reached" };
+    }
+
+    if (cartItem.quantity >= cartItem.productID.stock) {
+      return { error: "Product stock limit reached" };
+    }
+
+    cartItem.quantity += 1;
+
+    // Calculate item total with offer
+    const offerPercentage = Math.max(
+      cartItem.productID.offer || 0,
+      cartItem.categoryID.offer || 0,
+      cartItem.subCategoryID.offer || 0
+    );
+
+    const itemTotal =
+      cartItem.productID.price *
+      cartItem.quantity *
+      (1 - offerPercentage / 100);
+
+    // Recalculate cart total
+    const cartTotal = cart.cartItems.reduce((total, item) => {
+      const itemOffer = Math.max(
+        item.productID.offer || 0,
+        item.categoryID.offer || 0,
+        item.subCategoryID.offer || 0
+      );
+      return (
+        total + item.productID.price * item.quantity * (1 - itemOffer / 100)
+      );
+    }, 0);
+
+    await cart.save();
+
+    return {
+      quantity: cartItem.quantity,
+      total: Math.round(itemTotal),
+      cartTotal: Math.round(cartTotal),
+    };
   } catch (err) {
     console.log(err);
+    return { error: "Server error" };
+  }
+};
+
+exports.decreaseQuantity = async (cartItemId, userID) => {
+  try {
+    const cart = await cartCollection
+      .findOne({ userID })
+      .populate("cartItems.productID")
+      .populate("cartItems.categoryID")
+      .populate("cartItems.subCategoryID");
+    const cartItem = cart.cartItems.find(
+      (item) => item._id.toString() === cartItemId
+    );
+
+    if (!cartItem) {
+      return { error: "Cart item not found" };
+    }
+
+    if (cartItem.quantity <= 1) {
+      return { error: "Minimum quantity reached" };
+    }
+
+    cartItem.quantity -= 1;
+
+    // Calculate item total with offer
+    const offerPercentage = Math.max(
+      cartItem.productID.offer || 0,
+      cartItem.categoryID.offer || 0,
+      cartItem.subCategoryID.offer || 0
+    );
+
+    const itemTotal =
+      cartItem.productID.price *
+      cartItem.quantity *
+      (1 - offerPercentage / 100);
+
+    // Recalculate cart total
+    const cartTotal = cart.cartItems.reduce((total, item) => {
+      const itemOffer = Math.max(
+        item.productID.offer || 0,
+        item.categoryID.offer || 0,
+        item.subCategoryID.offer || 0
+      );
+      return (
+        total + item.productID.price * item.quantity * (1 - itemOffer / 100)
+      );
+    }, 0);
+
+    await cart.save();
+
+    return {
+      quantity: cartItem.quantity,
+      total: Math.round(itemTotal),
+      cartTotal: Math.round(cartTotal),
+    };
+  } catch (err) {
+    console.log(err);
+    return { error: "Server error" };
   }
 };
