@@ -12,22 +12,35 @@ exports.createOrder = async (
   couponCodes,
   userID
 ) => {
+  const session = await orderCollection.startSession();
+
   try {
-    const address = await addressCollection.findOne({
-      userID,
-      "address._id": addressId,
-    });
+    session.startTransaction();
+
+    const address = await addressCollection.findOne(
+      { userID, "address._id": addressId },
+      null,
+      { session }
+    );
+
+    if (!address) {
+      throw new Error("Address not found");
+    }
+
     const productIDs = products.map((product) => product.productID);
     const orderedProducts = await productCollection
       .find({ _id: { $in: productIDs } })
       .populate("categoryID")
-      .populate("subCategoryID");
+      .populate("subCategoryID")
+      .session(session);
 
-    if (orderedProducts.some((product) => product.isListed == false)) {
-      return { error: "product does not exist" };
+    if (orderedProducts.some((product) => product.isListed === false)) {
+      throw new Error("One or more products do not exist");
     }
 
-    const coupons = await couponCollection.find({ _id: { $in: couponCodes } });
+    const coupons = await couponCollection
+      .find({ _id: { $in: couponCodes } })
+      .session(session);
 
     let discount = 0;
     let basePrice = 0;
@@ -69,23 +82,38 @@ exports.createOrder = async (
     for (const product of products) {
       const productDetails = await productCollection.findOneAndUpdate(
         { _id: product.productID },
-        { $inc: { stock: -product.quantity, noOfOrders: 1 } }
+        { $inc: { stock: -product.quantity, noOfOrders: 1 } },
+        { session, new: true }
       );
+
+      if (!productDetails) {
+        throw new Error("Product not found during update");
+      }
 
       await categoryCollection.updateOne(
         { _id: productDetails.categoryID },
-        { $inc: { noOfOrders: 1 } }
+        { $inc: { noOfOrders: 1 } },
+        { session }
       );
+
       await subCategoryCollection.updateOne(
         { _id: productDetails.subCategoryID },
-        { $inc: { noOfOrders: 1 } }
+        { $inc: { noOfOrders: 1 } },
+        { session }
       );
     }
 
-    await newOrder.save();
+    await newOrder.save({ session });
+
+    await session.commitTransaction();
+    session.endSession();
+
     return { order: newOrder };
   } catch (err) {
+    await session.abortTransaction();
+    session.endSession();
     console.log(err);
+    return { error: err.message };
   }
 };
 
