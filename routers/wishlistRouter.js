@@ -1,16 +1,28 @@
 //modules
-const express = require('express')
-const router = express.Router()
+import express from "express";
+const router = express.Router();
 
 //middlewares
-const userAuthMiddleware = require('../middlewares/userAuthMiddleware');
+import * as userAuthMiddleware from "../middlewares/userAuthMiddleware.js";
 
 //controllers
-const wishlistController = require('../controllers/wishlistController');
+import * as wishlistController from "../controllers/wishlistController.js";
 
 //routers
-router.get('/', userAuthMiddleware.checkUserAuthenticated, wishlistController.getWishlist);
-router.post('/:id', userAuthMiddleware.validUser, wishlistController.addToWihslist);
-router.delete('/:id', userAuthMiddleware.validUser, wishlistController.deleteFromWishlist);
+router.get(
+  "/",
+  userAuthMiddleware.checkUserAuthenticated,
+  wishlistController.getWishlist
+);
+router.post(
+  "/:id",
+  userAuthMiddleware.validUser,
+  wishlistController.addToWihslist
+);
+router.delete(
+  "/:id",
+  userAuthMiddleware.validUser,
+  wishlistController.deleteFromWishlist
+);
 
-module.exports = router;
+export default router;

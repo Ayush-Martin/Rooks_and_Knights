@@ -1,188 +1,188 @@
 //models
-const orderCollection = require('../models/orderModel')
+import orderCollection from "../models/orderModel.js";
+import * as dateFns from "date-fns";
 
-const dateFns = require('date-fns');
+export const salesList = async (
+  reportType,
+  startDate,
+  endDate,
+  currentPage,
+  noOfList,
+  skipPages
+) => {
+  const findQuery = {};
 
-exports.salesList = async (reportType, startDate, endDate, currentPage, noOfList, skipPages) => {
-    const findQuery = {};
+  const today = new Date();
 
-    const today = new Date()
+  if (reportType === "custom") {
+    startDate = new Date(startDate);
+    startDate.setHours(0, 0, 0, 0);
 
-    if (reportType === 'custom') {
+    endDate = new Date(endDate);
+    endDate.setHours(23, 59, 59, 999);
 
-        startDate = new Date(startDate);
-        startDate.setHours(0, 0, 0, 0);
+    findQuery.createdAt = {
+      $gte: startDate,
+      $lt: endDate,
+    };
+  } else if (reportType != "all") {
+    switch (reportType) {
+      case "daily":
+        startDate = dateFns.startOfDay(today);
+        endDate = dateFns.endOfDay(today);
 
-        endDate = new Date(endDate);
-        endDate.setHours(23, 59, 59, 999);
+        break;
 
-        findQuery.createdAt = {
-            $gte: startDate,
-            $lt: endDate
-        };
-    } else if (reportType != 'all') {
-        switch (reportType) {
-            case 'daily':
-                startDate = dateFns.startOfDay(today)
-                endDate = dateFns.endOfDay(today)
+      case "weekly":
+        startDate = dateFns.startOfWeek(today);
+        endDate = dateFns.endOfWeek(today);
 
-                break;
+        break;
 
-            case 'weekly':
-                startDate = dateFns.startOfWeek(today)
-                endDate = dateFns.endOfWeek(today)
+      case "monthly":
+        startDate = dateFns.startOfMonth(today);
+        endDate = dateFns.endOfMonth(today);
 
-                break;
+        break;
+      case "yearly":
+        startDate = dateFns.startOfYear(today);
+        endDate = dateFns.endOfYear(today);
 
-            case 'monthly':
-                startDate = dateFns.startOfMonth(today)
-                endDate = dateFns.endOfMonth(today)
-
-                break;
-            case 'yearly':
-                startDate = dateFns.startOfYear(today)
-                endDate = dateFns.endOfYear(today)
-
-                break;
-        }
-
-
-        findQuery.createdAt = {
-            $gte: startDate,
-            $lt: endDate
-        };
+        break;
     }
 
-    try {
+    findQuery.createdAt = {
+      $gte: startDate,
+      $lt: endDate,
+    };
+  }
 
-        const totalProductsCount = await orderCollection.aggregate([{ $unwind: '$products' }, { $count: 'totalProducts' }])
+  try {
+    const totalProductsCount = await orderCollection.aggregate([
+      { $unwind: "$products" },
+      { $count: "totalProducts" },
+    ]);
 
-        const totalNoOfList = totalProductsCount.length > 0 ? totalProductsCount[0].totalProducts : 0;
+    const totalNoOfList =
+      totalProductsCount.length > 0 ? totalProductsCount[0].totalProducts : 0;
 
-        const orderList = await orderCollection.find(findQuery);
+    const orderList = await orderCollection.find(findQuery);
 
-        const salesList = await orderCollection.aggregate([
-            { $match: findQuery },
-            { $unwind: '$products' },
-            {
-                $lookup: {
-                    from: 'products',
-                    localField: 'products.productID',
-                    foreignField: '_id',
-                    as: 'productDetails'
-                }
-            },
-            { $unwind: '$productDetails' },
-            {
-                $lookup: {
-                    from: 'users',
-                    localField: 'userID',
-                    foreignField: '_id',
-                    as: 'userDetails'
-                }
-            },
-            { $unwind: '$userDetails' },
-            {
-                $sort: {
-                    createdAt: -1
-                }
-            },
-            { $skip: skipPages },
-            { $limit: noOfList }
+    const salesList = await orderCollection.aggregate([
+      { $match: findQuery },
+      { $unwind: "$products" },
+      {
+        $lookup: {
+          from: "products",
+          localField: "products.productID",
+          foreignField: "_id",
+          as: "productDetails",
+        },
+      },
+      { $unwind: "$productDetails" },
+      {
+        $lookup: {
+          from: "users",
+          localField: "userID",
+          foreignField: "_id",
+          as: "userDetails",
+        },
+      },
+      { $unwind: "$userDetails" },
+      {
+        $sort: {
+          createdAt: -1,
+        },
+      },
+      { $skip: skipPages },
+      { $limit: noOfList },
+    ]);
 
-        ])
-
-        return { salesList, orderList, currentPage, totalNoOfList };
-
-    } catch (err) {
-        console.log(err);
-    }
+    return { salesList, orderList, currentPage, totalNoOfList };
+  } catch (err) {
+    console.log(err);
+  }
 };
 
+export const downloadSalesReport = async (reportType, startDate, endDate) => {
+  const findQuery = {};
 
-exports.downloadSalesReport = async (reportType, startDate, endDate) => {
-    const findQuery = {};
+  const today = new Date();
 
-    const today = new Date()
+  if (reportType === "custom") {
+    startDate = new Date(startDate);
+    startDate.setHours(0, 0, 0, 0);
 
-    if (reportType === 'custom') {
+    endDate = new Date(endDate);
+    endDate.setHours(23, 59, 59, 999);
 
-        startDate = new Date(startDate);
-        startDate.setHours(0, 0, 0, 0);
+    findQuery.createdAt = {
+      $gte: startDate,
+      $lt: endDate,
+    };
+  } else if (reportType != "all") {
+    switch (reportType) {
+      case "daily":
+        startDate = dateFns.startOfDay(today);
+        endDate = dateFns.endOfDay(today);
 
-        endDate = new Date(endDate);
-        endDate.setHours(23, 59, 59, 999);
+        break;
 
-        findQuery.createdAt = {
-            $gte: startDate,
-            $lt: endDate
-        };
-    } else if (reportType != 'all') {
-        switch (reportType) {
-            case 'daily':
-                startDate = dateFns.startOfDay(today)
-                endDate = dateFns.endOfDay(today)
+      case "weekly":
+        startDate = dateFns.startOfWeek(today);
+        endDate = dateFns.endOfWeek(today);
 
-                break;
+        break;
 
-            case 'weekly':
-                startDate = dateFns.startOfWeek(today)
-                endDate = dateFns.endOfWeek(today)
+      case "monthly":
+        startDate = dateFns.startOfMonth(today);
+        endDate = dateFns.endOfMonth(today);
 
-                break;
+        break;
+      case "yearly":
+        startDate = dateFns.startOfYear(today);
+        endDate = dateFns.endOfYear(today);
 
-            case 'monthly':
-                startDate = dateFns.startOfMonth(today)
-                endDate = dateFns.endOfMonth(today)
-
-                break;
-            case 'yearly':
-                startDate = dateFns.startOfYear(today)
-                endDate = dateFns.endOfYear(today)
-
-                break;
-        }
-
-
-        findQuery.createdAt = {
-            $gte: startDate,
-            $lt: endDate
-        };
+        break;
     }
 
-    try {
-        const salesList = await orderCollection.aggregate([
-            { $match: findQuery },
-            { $unwind: '$products' },
-            {
-                $lookup: {
-                    from: 'products',
-                    localField: 'products.productID',
-                    foreignField: '_id',
-                    as: 'productDetails'
-                }
-            },
-            { $unwind: '$productDetails' },
-            {
-                $lookup: {
-                    from: 'users',
-                    localField: 'userID',
-                    foreignField: '_id',
-                    as: 'userDetails'
-                }
-            },
-            { $unwind: '$userDetails' },
-            {
-                $sort: {
-                    createdAt: -1
-                }
-            },
+    findQuery.createdAt = {
+      $gte: startDate,
+      $lt: endDate,
+    };
+  }
 
-        ])
+  try {
+    const salesList = await orderCollection.aggregate([
+      { $match: findQuery },
+      { $unwind: "$products" },
+      {
+        $lookup: {
+          from: "products",
+          localField: "products.productID",
+          foreignField: "_id",
+          as: "productDetails",
+        },
+      },
+      { $unwind: "$productDetails" },
+      {
+        $lookup: {
+          from: "users",
+          localField: "userID",
+          foreignField: "_id",
+          as: "userDetails",
+        },
+      },
+      { $unwind: "$userDetails" },
+      {
+        $sort: {
+          createdAt: -1,
+        },
+      },
+    ]);
 
-        return salesList;
-
-    } catch (err) {
-        console.log(err);
-    }
-}
+    return salesList;
+  } catch (err) {
+    console.log(err);
+  }
+};

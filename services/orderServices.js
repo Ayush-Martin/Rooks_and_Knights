@@ -1,11 +1,11 @@
-const orderCollection = require("../models/orderModel");
-const productCollection = require("../models/productsModel");
-const addressCollection = require("../models/addressModel");
-const categoryCollection = require("../models/CategoryModel");
-const subCategoryCollection = require("../models/subCategoryModel");
-const couponCollection = require("../models/couponModel");
+import orderCollection from "../models/orderModel.js";
+import productCollection from "../models/productsModel.js";
+import addressCollection from "../models/addressModel.js";
+import categoryCollection from "../models/CategoryModel.js";
+import subCategoryCollection from "../models/subCategoryModel.js";
+import couponCollection from "../models/couponModel.js";
 
-exports.createOrder = async (
+export const createOrder = async (
   products,
   addressId,
   paymentMethod,
@@ -117,7 +117,7 @@ exports.createOrder = async (
   }
 };
 
-exports.completePayment = async (orderID) => {
+export const completePayment = async (orderID) => {
   try {
     await orderCollection.updateOne(
       { _id: orderID },
@@ -128,7 +128,7 @@ exports.completePayment = async (orderID) => {
   }
 };
 
-exports.viewOrders = async (userID) => {
+export const viewOrders = async (userID) => {
   try {
     let orders = await orderCollection
       .find({ userID })
@@ -140,7 +140,7 @@ exports.viewOrders = async (userID) => {
   }
 };
 
-exports.getOrder = async (orderID) => {
+export const getOrder = async (orderID) => {
   try {
     const order = await orderCollection
       .findOne({ _id: orderID })
@@ -153,7 +153,7 @@ exports.getOrder = async (orderID) => {
   }
 };
 
-exports.cancelOrders = async (_id, userID, productID, productQuantity) => {
+export const cancelOrders = async (_id, userID, productID, productQuantity) => {
   try {
     let order = await orderCollection.findOneAndUpdate(
       { userID, "products._id": _id },
@@ -186,7 +186,7 @@ exports.cancelOrders = async (_id, userID, productID, productQuantity) => {
   }
 };
 
-exports.returnOrders = async (userID, orderProductId, returnReason) => {
+export const returnOrders = async (userID, orderProductId, returnReason) => {
   try {
     await orderCollection.updateOne(
       { userID, "products._id": orderProductId },

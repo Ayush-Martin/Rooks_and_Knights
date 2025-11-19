@@ -1,8 +1,8 @@
 //services
-const cartServices = require("../services/cartServices");
+import * as cartServices from "../services/cartServices.js";
 
 //render cartpage
-exports.getCart = async (req, res) => {
+export const getCart = async (req, res) => {
   try {
     let cart = await cartServices.viewCart(req.userID);
 
@@ -14,7 +14,7 @@ exports.getCart = async (req, res) => {
 };
 
 //adding a new product to cart
-exports.addToCart = async (req, res) => {
+export const addToCart = async (req, res) => {
   try {
     const productID = req.params.id;
     const { quantity, categoryID, subCategoryID } = req.body;
@@ -29,12 +29,10 @@ exports.addToCart = async (req, res) => {
       subCategoryID
     );
     if (error && error.error) {
-      return res
-        .status(200)
-        .json({
-          error: error.error,
-          errorRedirect: `<a href="/cart">Check cart</a>`,
-        });
+      return res.status(200).json({
+        error: error.error,
+        errorRedirect: `<a href="/cart">Check cart</a>`,
+      });
     }
 
     res.status(200).json({ success: true });
@@ -45,7 +43,7 @@ exports.addToCart = async (req, res) => {
 };
 
 //delete cart
-exports.deleteCartItem = async (req, res) => {
+export const deleteCartItem = async (req, res) => {
   try {
     const cartItemID = req.params.id;
     await cartServices.deleteCartItem(cartItemID, req.userID);
@@ -58,7 +56,7 @@ exports.deleteCartItem = async (req, res) => {
 };
 
 //increase product quantity
-exports.increaseQuantity = async (req, res) => {
+export const increaseQuantity = async (req, res) => {
   try {
     const cartItemId = req.params.id;
     const result = await cartServices.increaseQuantity(cartItemId, req.userID);
@@ -80,7 +78,7 @@ exports.increaseQuantity = async (req, res) => {
 };
 
 //decrease product quantity
-exports.decreaseQuantity = async (req, res) => {
+export const decreaseQuantity = async (req, res) => {
   try {
     const cartItemId = req.params.id;
     const result = await cartServices.decreaseQuantity(cartItemId, req.userID);

@@ -1,12 +1,12 @@
-//requiring modules
-const express = require("express");
+//importing modules
+import express from "express";
 const router = express.Router();
 
 //controllers
-const cartController = require("../controllers/cartController");
+import * as cartController from "../controllers/cartController.js";
 
 //middlewares
-const userAuthMiddleware = require("../middlewares/userAuthMiddleware");
+import * as userAuthMiddleware from "../middlewares/userAuthMiddleware.js";
 
 router.get(
   "/",
@@ -34,4 +34,4 @@ router.patch(
   cartController.decreaseQuantity
 );
 
-module.exports = router;
+export default router;

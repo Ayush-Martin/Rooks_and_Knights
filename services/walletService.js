@@ -1,9 +1,9 @@
 //models
-const walletCollection = require("../models/walletModel");
-const userCollection = require("../models/userModel");
+import walletCollection from "../models/walletModel.js";
+import userCollection from "../models/userModel.js";
 
 //render walletList
-exports.walletList = async (userID) => {
+export const walletList = async (userID) => {
   try {
     const wallet = await walletCollection.findOne({ userID });
 
@@ -22,7 +22,7 @@ exports.walletList = async (userID) => {
 };
 
 //add money to wallet
-exports.addToWallet = async (userID, amount) => {
+export const addToWallet = async (userID, amount) => {
   try {
     console.log(userID, amount);
     await walletCollection.updateOne({ userID }, { $inc: { balance: amount } });
@@ -32,7 +32,7 @@ exports.addToWallet = async (userID, amount) => {
 };
 
 //pay form wallet
-exports.payFromWallet = async (userID, amount) => {
+export const payFromWallet = async (userID, amount) => {
   try {
     const wallet = await walletCollection.findOne({ userID });
 
@@ -60,7 +60,7 @@ exports.payFromWallet = async (userID, amount) => {
 };
 
 //add referal amount to user wallet
-exports.referal = async (referedUserID) => {
+export const referal = async (referedUserID) => {
   try {
     await walletCollection.updateOne(
       { userID: referedUserID },

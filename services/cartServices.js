@@ -1,9 +1,9 @@
 //models
-const cartCollection = require("../models/cartModel");
-const productCollection = require("../models/productsModel");
+import cartCollection from "../models/cartModel.js";
+import productCollection from "../models/productsModel.js";
 
 //Add a new product to cart
-exports.addToCart = async (
+export const addToCart = async (
   userID,
   productID,
   quantity,
@@ -72,7 +72,7 @@ exports.addToCart = async (
 };
 
 //view cart
-exports.viewCart = async (userID) => {
+export const viewCart = async (userID) => {
   try {
     const cart = await cartCollection
       .findOne({ userID })
@@ -105,7 +105,7 @@ exports.viewCart = async (userID) => {
 };
 
 //delete product from cart
-exports.deleteCartItem = async (cartItemID, userID) => {
+export const deleteCartItem = async (cartItemID, userID) => {
   try {
     let cart = await cartCollection.findOne({ userID }).populate({
       path: "cartItems.productID",
@@ -130,7 +130,7 @@ exports.deleteCartItem = async (cartItemID, userID) => {
   }
 };
 
-exports.deleteManyCartItem = async (cartItemIDs, price, userID) => {
+export const deleteManyCartItem = async (cartItemIDs, price, userID) => {
   try {
     await cartCollection.updateOne(
       { userID },
@@ -144,7 +144,7 @@ exports.deleteManyCartItem = async (cartItemIDs, price, userID) => {
   }
 };
 
-exports.increaseQuantity = async (cartItemId, userID) => {
+export const increaseQuantity = async (cartItemId, userID) => {
   try {
     const cart = await cartCollection
       .findOne({ userID })
@@ -192,7 +192,7 @@ exports.increaseQuantity = async (cartItemId, userID) => {
   }
 };
 
-exports.decreaseQuantity = async (cartItemId, userID) => {
+export const decreaseQuantity = async (cartItemId, userID) => {
   try {
     const cart = await cartCollection
       .findOne({ userID })

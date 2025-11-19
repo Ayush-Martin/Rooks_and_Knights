@@ -1,9 +1,9 @@
-const productCollection = require("../models/productsModel");
-const categoryCollection = require("../models/CategoryModel");
-const subCategoryCollection = require("../models/subCategoryModel");
-const wishlistCollection = require("../models/wishlistModel");
+import productCollection from "../models/productsModel.js";
+import categoryCollection from "../models/CategoryModel.js";
+import subCategoryCollection from "../models/subCategoryModel.js";
+import wishlistCollection from "../models/wishlistModel.js";
 
-exports.productList = async (
+export const productList = async (
   categoryID,
   sortby,
   price,
@@ -83,7 +83,7 @@ exports.productList = async (
   }
 };
 
-exports.viewProduct = async (_id, userID) => {
+export const viewProduct = async (_id, userID) => {
   try {
     const product = await productCollection
       .findById(_id)
@@ -110,7 +110,7 @@ exports.viewProduct = async (_id, userID) => {
   }
 };
 
-exports.addReview = async (_id, newReview) => {
+export const addReview = async (_id, newReview) => {
   try {
     await productCollection.updateOne(
       { _id },

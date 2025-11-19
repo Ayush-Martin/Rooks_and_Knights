@@ -1,8 +1,8 @@
 //services
-const addressService = require("../services/addressServices");
+import * as addressService from "../services/addressServices.js";
 
 //add new address
-exports.postNewAddress = async (req, res) => {
+export const postNewAddress = async (req, res) => {
   try {
     const { addressTitle, state, city, pinCode, streetAddress } = req.body;
     await addressService.addNewAddress(
@@ -21,7 +21,7 @@ exports.postNewAddress = async (req, res) => {
 };
 
 //delete address
-exports.deleteAddress = async (req, res) => {
+export const deleteAddress = async (req, res) => {
   try {
     const addressID = req.params.id;
 
@@ -34,7 +34,7 @@ exports.deleteAddress = async (req, res) => {
 };
 
 //change or edit address
-exports.putAddress = async (req, res) => {
+export const putAddress = async (req, res) => {
   try {
     const { addressTitle, state, city, pinCode, streetAddress } = req.body;
     const addressID = req.params.id;

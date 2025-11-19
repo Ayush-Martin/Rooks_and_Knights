@@ -1,11 +1,10 @@
-//requiring modules
-const express = require('express')
+//importing modules
+import express from "express";
 const router = express.Router();
 
 //controllers
-const homeController = require('../controllers/homeController');
+import * as homeController from "../controllers/homeController.js";
 
-router.get('/', homeController.getHome);
+router.get("/", homeController.getHome);
 
-
-module.exports = router;
+export default router;

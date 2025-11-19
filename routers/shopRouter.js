@@ -1,16 +1,23 @@
-//requiring modules
-const express = require('express');
-const router = express();
+//importing modules
+import express from "express";
+const router = express.Router();
 
 //controllers
-const shopController = require('../controllers/shopController')
+import * as shopController from "../controllers/shopController.js";
 
 //middlewares
-const userAuthMiddleware = require('../middlewares/userAuthMiddleware');
+import * as userAuthMiddleware from "../middlewares/userAuthMiddleware.js";
 
-router.get('/', shopController.getProductList)
-router.get('/product/:id', userAuthMiddleware.getUser, shopController.getProduct);
-router.post('/product/addReview/:id', userAuthMiddleware.checkUserAuthenticated, shopController.postReview);
+router.get("/", shopController.getProductList);
+router.get(
+  "/product/:id",
+  userAuthMiddleware.getUser,
+  shopController.getProduct
+);
+router.post(
+  "/product/addReview/:id",
+  userAuthMiddleware.checkUserAuthenticated,
+  shopController.postReview
+);
 
-
-module.exports = router;
+export default router;

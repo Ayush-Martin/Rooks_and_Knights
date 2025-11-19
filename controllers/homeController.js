@@ -1,12 +1,12 @@
 //services
-let homeServices = require('../services/homeServices');
+import * as homeServices from "../services/homeServices.js";
 
-exports.getHome = async (req, res) => {
-    try {
-        let { categories, topProductList } = await homeServices.index();
-        res.render('index', { categories, topProductList })
-    } catch (err) {
-        console.log(err);
-        res.redirect('/error')
-    }
-}
+export const getHome = async (req, res) => {
+  try {
+    let { categories, topProductList } = await homeServices.index();
+    res.render("index", { categories, topProductList });
+  } catch (err) {
+    console.log(err);
+    res.redirect("/error");
+  }
+};

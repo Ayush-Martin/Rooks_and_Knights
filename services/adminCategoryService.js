@@ -1,9 +1,14 @@
 //models
-const categoryCollection = require("../models/CategoryModel");
-const productCollection = require("../models/productsModel");
+import categoryCollection from "../models/CategoryModel.js";
+import productCollection from "../models/productsModel.js";
 
 //get cateogy list
-exports.categoryList = async (search, currentPage, noOfList, skipPages) => {
+export const categoryList = async (
+  search,
+  currentPage,
+  noOfList,
+  skipPages
+) => {
   let findQuery = {};
 
   if (search) {
@@ -25,7 +30,7 @@ exports.categoryList = async (search, currentPage, noOfList, skipPages) => {
 };
 
 //add a category
-exports.addCategory = async (categoryName, categoryDescription) => {
+export const addCategory = async (categoryName, categoryDescription) => {
   try {
     let category = await categoryCollection.findOne({
       categoryName: { $regex: new RegExp(`^${categoryName}$`, "i") },
@@ -57,7 +62,7 @@ exports.addCategory = async (categoryName, categoryDescription) => {
 };
 
 //edit category
-exports.editCategory = async (
+export const editCategory = async (
   categoryID,
   categoryName,
   categoryDescription
@@ -83,7 +88,7 @@ exports.editCategory = async (
 };
 
 //delete category
-exports.listUnlistCategory = async (categoryId, list) => {
+export const listUnlistCategory = async (categoryId, list) => {
   try {
     // const productsExists = await productCollection.findOne({ categoryID: categoryId })
     // if (productsExists) {

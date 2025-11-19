@@ -1,47 +1,79 @@
-//Requiring modules
-const express = require('express');
+//Importing modules
+import express from "express";
 const router = express.Router();
-const passport = require('passport')
+import passport from "passport";
 
 //Controllers
-const userController = require('../controllers/userController');
+import * as userController from "../controllers/userController.js";
 
-//middlewaress
-const userAuthMiddleware = require('../middlewares/userAuthMiddleware');
-const OTPMiddleware = require("../middlewares/OTPMiddleware");
-
+//Middlewares
+import * as userAuthMiddleware from "../middlewares/userAuthMiddleware.js";
+import * as OTPMiddleware from "../middlewares/OTPMiddleware.js";
 
 //Routers
 //Login
-router.get('/login', userAuthMiddleware.checkUserAldreadyAuthenticated, userController.getLogin);
-router.post('/login', userController.postLogin);
-router.post('/logout', userController.postLogout);
-
+router.get(
+  "/login",
+  userAuthMiddleware.checkUserAldreadyAuthenticated,
+  userController.getLogin
+);
+router.post("/login", userController.postLogin);
+router.post("/logout", userController.postLogout);
 
 //Register
-router.get('/register', userAuthMiddleware.checkUserAldreadyAuthenticated, userController.getRegister);
-router.post('/register', userController.postRegister);
-
+router.get(
+  "/register",
+  userAuthMiddleware.checkUserAldreadyAuthenticated,
+  userController.getRegister
+);
+router.post("/register", userController.postRegister);
 
 //Complete Register
-router.get('/completeRegister', [userAuthMiddleware.checkUserAldreadyAuthenticated, OTPMiddleware.checkOTPVerified], userController.getCompleteRegister);
-router.post('/completeRegister', userController.postCompleteRegister);
-
+router.get(
+  "/completeRegister",
+  [
+    userAuthMiddleware.checkUserAldreadyAuthenticated,
+    OTPMiddleware.checkOTPVerified,
+  ],
+  userController.getCompleteRegister
+);
+router.post("/completeRegister", userController.postCompleteRegister);
 
 //google Auth
-router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
-router.get('/google/callback', passport.authenticate('google', { failureRedirect: '/user/login' }), userController.getGoogleCallback)
-
+router.get(
+  "/google",
+  passport.authenticate("google", { scope: ["profile", "email"] })
+);
+router.get(
+  "/google/callback",
+  passport.authenticate("google", { failureRedirect: "/user/login" }),
+  userController.getGoogleCallback
+);
 
 //User account route
-router.get('/account', userAuthMiddleware.checkUserAuthenticated, userController.getAccount);
-router.put('/account/updateProfile', userAuthMiddleware.validUser, userController.putAccount);
-router.post('/account/changePassword', userAuthMiddleware.validUser, userController.postAccountChangePassword)
+router.get(
+  "/account",
+  userAuthMiddleware.checkUserAuthenticated,
+  userController.getAccount
+);
+router.put(
+  "/account/updateProfile",
+  userAuthMiddleware.validUser,
+  userController.putAccount
+);
+router.post(
+  "/account/changePassword",
+  userAuthMiddleware.validUser,
+  userController.postAccountChangePassword
+);
 
-router.get('/forgetPassword', userController.getForgetPassword)
-router.post('/forgetPassword', userController.postForgetPassword)
-router.get('/resetPassword', OTPMiddleware.checkOTPVerified, userController.getResetPassword)
-router.post('/resetPassword', userController.postResetPassword)
+router.get("/forgetPassword", userController.getForgetPassword);
+router.post("/forgetPassword", userController.postForgetPassword);
+router.get(
+  "/resetPassword",
+  OTPMiddleware.checkOTPVerified,
+  userController.getResetPassword
+);
+router.post("/resetPassword", userController.postResetPassword);
 
-
-module.exports = router;
+export default router;

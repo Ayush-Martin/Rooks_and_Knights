@@ -1,88 +1,95 @@
-const productsCollection = require('../models/productsModel')
-const categoryCollection = require('../models/CategoryModel')
-const subCategoryCollection = require('../models/subCategoryModel')
-const orderCollection = require('../models/orderModel')
+import productsCollection from "../models/productsModel.js";
+import categoryCollection from "../models/CategoryModel.js";
+import subCategoryCollection from "../models/subCategoryModel.js";
+import orderCollection from "../models/orderModel.js";
 
-module.exports.TopTenList = async () => {
+export const TopTenList = async () => {
   try {
+    const topTenProductsList = await productsCollection
+      .find({ isListed: true })
+      .sort({ noOfOrders: -1 })
+      .limit(10);
 
-    const topTenProductsList = await productsCollection.find({ isListed: true }).sort({ noOfOrders: -1 }).limit(10)
+    const topTenCategoryList = await categoryCollection
+      .find({ isListed: true })
+      .sort({ noOfOrders: -1 })
+      .limit(10);
 
-    const topTenCategoryList = await categoryCollection.find({ isListed: true }).sort({ noOfOrders: -1 }).limit(10)
+    const topTenSubCategoryList = await subCategoryCollection
+      .find({ isListed: true })
+      .sort({ noOfOrders: -1 })
+      .limit(10);
 
-    const topTenSubCategoryList = await subCategoryCollection.find({ isListed: true }).sort({ noOfOrders: -1 }).limit(10)
-
-    return { topTenProductsList, topTenCategoryList, topTenSubCategoryList }
+    return { topTenProductsList, topTenCategoryList, topTenSubCategoryList };
   } catch (err) {
     console.log(err);
   }
-}
+};
 
-exports.dailySales = async () => {
+export const dailySales = async () => {
   try {
     const dailySales = await orderCollection.aggregate([
-      { $unwind: '$products' },
+      { $unwind: "$products" },
       {
         $group: {
           _id: {
             day: { $dayOfMonth: "$createdAt" },
             month: { $month: "$createdAt" },
-            year: { $year: "$createdAt" }
+            year: { $year: "$createdAt" },
           },
           totalSales: { $sum: 1 },
-        }
+        },
       },
-      { $sort: { "_id.year": 1, "_id.month": 1, "_id.day": 1 } }
+      { $sort: { "_id.year": 1, "_id.month": 1, "_id.day": 1 } },
     ]);
 
-    return dailySales
+    return dailySales;
   } catch (err) {
     console.log(err);
-
   }
-}
+};
 
-exports.monthlySales = async () => {
+export const monthlySales = async () => {
   try {
     const monthlySales = await orderCollection.aggregate([
-      { $unwind: '$products' },
+      { $unwind: "$products" },
       {
         $group: {
           _id: {
             month: { $month: "$createdAt" },
-            year: { $year: "$createdAt" }
+            year: { $year: "$createdAt" },
           },
           totalSales: { $sum: 1 },
-        }
+        },
       },
-      { $sort: { "_id.year": 1, "_id.month": 1 } }
+      { $sort: { "_id.year": 1, "_id.month": 1 } },
     ]);
 
-    return monthlySales
+    return monthlySales;
   } catch (err) {
     console.log(err);
   }
-}
+};
 
-exports.yearlySales = async () => {
+export const yearlySales = async () => {
   try {
     const yearlySales = await orderCollection.aggregate([
-      { $unwind: '$products' },
+      { $unwind: "$products" },
       {
         $group: {
           _id: {
             year: {
-              $year: "$createdAt"
-            }
+              $year: "$createdAt",
+            },
           }, // Group by year
           totalSales: { $sum: 1 },
-        }
+        },
       },
-      { $sort: { "_id": 1 } }
+      { $sort: { _id: 1 } },
     ]);
 
-    return yearlySales
+    return yearlySales;
   } catch (err) {
     console.log(err);
   }
-}
+};

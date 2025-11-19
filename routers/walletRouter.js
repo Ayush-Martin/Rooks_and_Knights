@@ -1,14 +1,26 @@
-const express = require('express');
+import express from "express";
 const router = express.Router();
 
 //controllers
-const walletController = require('../controllers/walletController')
+import * as walletController from "../controllers/walletController.js";
 
 //middlewares
-const userAuthMiddleware = require('../middlewares/userAuthMiddleware')
+import * as userAuthMiddleware from "../middlewares/userAuthMiddleware.js";
 
-router.get('/', userAuthMiddleware.checkUserAuthenticated, walletController.getWallet);
-router.post('/addToWallet', userAuthMiddleware.validUser, walletController.postWallet);
-router.post('/completePayment', userAuthMiddleware.validUser, walletController.completePayment);
+router.get(
+  "/",
+  userAuthMiddleware.checkUserAuthenticated,
+  walletController.getWallet
+);
+router.post(
+  "/addToWallet",
+  userAuthMiddleware.validUser,
+  walletController.postWallet
+);
+router.post(
+  "/completePayment",
+  userAuthMiddleware.validUser,
+  walletController.completePayment
+);
 
-module.exports = router;
+export default router;

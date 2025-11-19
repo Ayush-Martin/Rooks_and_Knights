@@ -1,14 +1,14 @@
 //models
-const productCollection = require("../models/productsModel");
-const categoryCollection = require("../models/CategoryModel");
-const subCategoryCollection = require("../models/subCategoryModel");
+import productCollection from "../models/productsModel.js";
+import categoryCollection from "../models/CategoryModel.js";
+import subCategoryCollection from "../models/subCategoryModel.js";
 
 //requiring modules for saving the uploads
-const fs = require("node:fs");
-const path = require("node:path");
+import fs from "node:fs";
+import path from "node:path";
 
 //get product list
-exports.productList = async (search, currentPage, noOfList, skipPages) => {
+export const productList = async (search, currentPage, noOfList, skipPages) => {
   const findQuery = {};
 
   if (search) {
@@ -34,7 +34,7 @@ exports.productList = async (search, currentPage, noOfList, skipPages) => {
 };
 
 //add new product
-exports.addProduct = async (req, res) => {
+export const addProduct = async (req, res) => {
   try {
     const {
       productName,
@@ -83,7 +83,7 @@ exports.addProduct = async (req, res) => {
 };
 
 //view specif product
-exports.viewProduct = async (productID) => {
+export const viewProduct = async (productID) => {
   try {
     const product = await productCollection
       .findById(productID)
@@ -97,7 +97,7 @@ exports.viewProduct = async (productID) => {
 };
 
 //edit a product
-exports.editProduct = async (req, res, productID) => {
+export const editProduct = async (req, res, productID) => {
   try {
     const {
       productName,
@@ -176,7 +176,7 @@ exports.editProduct = async (req, res, productID) => {
 };
 
 //delete a product
-exports.listUnlistProduct = async (productID, list) => {
+export const listUnlistProduct = async (productID, list) => {
   try {
     await productCollection.updateOne({ _id: productID }, { isListed: list });
   } catch (err) {
@@ -185,7 +185,7 @@ exports.listUnlistProduct = async (productID, list) => {
 };
 
 //get cateogry list
-exports.categories = async () => {
+export const categories = async () => {
   try {
     const categories = await categoryCollection.find({ isListed: true });
 
@@ -196,7 +196,7 @@ exports.categories = async () => {
 };
 
 //get subcategory list
-exports.subCategories = async () => {
+export const subCategories = async () => {
   try {
     const subCategories = await subCategoryCollection.find({ isListed: true });
     return subCategories;

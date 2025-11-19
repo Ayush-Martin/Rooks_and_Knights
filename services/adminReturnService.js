@@ -1,7 +1,7 @@
-const orderCollection = require("../models/orderModel");
-const productCollection = require("../models/productsModel");
+import orderCollection from "../models/orderModel.js";
+import productCollection from "../models/productsModel.js";
 
-exports.returnsList = async (currentPage, noOfList, skipPages) => {
+export const returnsList = async (currentPage, noOfList, skipPages) => {
   try {
     const filter = {
       products: {
@@ -27,7 +27,7 @@ exports.returnsList = async (currentPage, noOfList, skipPages) => {
   }
 };
 
-exports.aproveRejectReturn = async (
+export const aproveRejectReturn = async (
   orderID,
   orderItemID,
   returnStatus,

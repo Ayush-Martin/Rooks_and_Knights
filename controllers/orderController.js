@@ -1,27 +1,27 @@
 //modules
-const pdfKit = require("pdfkit");
+import pdfKit from "pdfkit";
 
 //services
-const addressService = require("../services/addressServices");
-const cartService = require("../services/cartServices");
-const orderService = require("../services/orderServices");
-const walletService = require("../services/walletService");
-const transationService = require("../services/transationService");
-const couponService = require("../services/couponServices");
+import * as addressService from "../services/addressServices.js";
+import * as cartService from "../services/cartServices.js";
+import * as orderService from "../services/orderServices.js";
+import * as walletService from "../services/walletService.js";
+import * as transationService from "../services/transationService.js";
+import * as couponService from "../services/couponServices.js";
 
 //utils
-const { verifyPayment } = require("../utils/razorpayPaymentVerify");
-const { generateInvoice } = require("../utils/pdfUtils");
+import { verifyPayment } from "../utils/razorpayPaymentVerify.js";
+import { generateInvoice } from "../utils/pdfUtils.js";
 
 //razorpay
-const Razorpay = require("razorpay");
+import Razorpay from "razorpay";
 const razorpay = new Razorpay({
   key_id: process.env.RAZORPAY_KEY_ID,
   key_secret: process.env.RAZORPAY_KEY_SECRET,
 });
 
 //geting checkout page
-exports.getCheckout = async (req, res) => {
+export const getCheckout = async (req, res) => {
   try {
     let address = await addressService.viewAddress(req.userID);
     let cart = await cartService.viewCart(req.userID);
@@ -33,7 +33,7 @@ exports.getCheckout = async (req, res) => {
 };
 
 //creating order
-exports.postCheckout = async (req, res) => {
+export const postCheckout = async (req, res) => {
   try {
     const {
       products,
@@ -133,7 +133,7 @@ exports.postCheckout = async (req, res) => {
 };
 
 //checkout for pending payemnts
-exports.postPendingCheckout = async (req, res) => {
+export const postPendingCheckout = async (req, res) => {
   try {
     const { orderID, paymentMethod, totalAmmount } = req.query;
 
@@ -181,7 +181,7 @@ exports.postPendingCheckout = async (req, res) => {
 };
 
 //complete payment using razorpay
-exports.completePayment = async (req, res) => {
+export const completePayment = async (req, res) => {
   try {
     const { razorpay_order_id, razorpay_payment_id, razorpay_signature } =
       req.body;
@@ -216,7 +216,7 @@ exports.completePayment = async (req, res) => {
 };
 
 //apply coupon
-exports.postAddCouponDiscount = async (req, res) => {
+export const postAddCouponDiscount = async (req, res) => {
   try {
     const { totalAmount, couponCode } = req.body;
 
@@ -245,7 +245,7 @@ exports.postAddCouponDiscount = async (req, res) => {
 };
 
 //avaliable coupon list
-exports.getAvaliableCoupon = async (req, res) => {
+export const getAvaliableCoupon = async (req, res) => {
   try {
     const totalAmmount = req.params.id;
 
@@ -259,7 +259,7 @@ exports.getAvaliableCoupon = async (req, res) => {
 };
 
 //cancel an order
-exports.patchCancel = async (req, res) => {
+export const patchCancel = async (req, res) => {
   try {
     const { productID, productQuantity, amountPaid } = req.body;
     const orderProductsID = req.params.id;
@@ -293,7 +293,7 @@ exports.patchCancel = async (req, res) => {
 };
 
 //request for return
-exports.patchReturn = async (req, res) => {
+export const patchReturn = async (req, res) => {
   try {
     const { returnReason } = req.body;
 
@@ -307,7 +307,7 @@ exports.patchReturn = async (req, res) => {
   }
 };
 
-exports.invoiceDownload = async (req, res) => {
+export const invoiceDownload = async (req, res) => {
   try {
     const orderID = req.params.id;
     const { order } = await orderService.getOrder(orderID);

@@ -1,7 +1,7 @@
 //models
-const couponCollection = require("../models/couponModel");
+import couponCollection from "../models/couponModel.js";
 
-exports.couponList = async (search, currentPage, noOfList, skipPages) => {
+export const couponList = async (search, currentPage, noOfList, skipPages) => {
   let findQuery = {};
 
   if (search) {
@@ -25,7 +25,7 @@ exports.couponList = async (search, currentPage, noOfList, skipPages) => {
   }
 };
 
-exports.addCoupon = async (
+export const addCoupon = async (
   couponName,
   couponCode,
   discountAmount,
@@ -57,7 +57,7 @@ exports.addCoupon = async (
   }
 };
 
-exports.deleteCoupon = async (couponID) => {
+export const deleteCoupon = async (couponID) => {
   try {
     await couponCollection.deleteOne({ _id: couponID });
   } catch (err) {
@@ -65,7 +65,7 @@ exports.deleteCoupon = async (couponID) => {
   }
 };
 
-exports.editCoupon = async (
+export const editCoupon = async (
   couponID,
   couponName,
   couponCode,

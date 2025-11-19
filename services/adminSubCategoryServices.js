@@ -1,10 +1,14 @@
 //models
-const subCategoryCollection = require("../models/subCategoryModel");
-const productCollection = require("../models/productsModel");
-const { list } = require("pdfkit");
+import subCategoryCollection from "../models/subCategoryModel.js";
+import productCollection from "../models/productsModel.js";
 
 //get category list
-exports.subCategoryList = async (search, currentPage, noOfList, skipPages) => {
+export const subCategoryList = async (
+  search,
+  currentPage,
+  noOfList,
+  skipPages
+) => {
   let findQuery = {};
 
   if (search) {
@@ -26,7 +30,10 @@ exports.subCategoryList = async (search, currentPage, noOfList, skipPages) => {
 };
 
 //add sub category
-exports.addSubCategory = async (subCategoryName, subCategoryDescription) => {
+export const addSubCategory = async (
+  subCategoryName,
+  subCategoryDescription
+) => {
   try {
     let subCategory = await subCategoryCollection.findOne({
       subCategoryName: { $regex: new RegExp(`^${subCategoryName}$`, "i") },
@@ -58,7 +65,7 @@ exports.addSubCategory = async (subCategoryName, subCategoryDescription) => {
 };
 
 //edit sub category
-exports.editSubCategory = async (
+export const editSubCategory = async (
   subCategoryID,
   subCategoryName,
   subCategoryDescription
@@ -84,7 +91,7 @@ exports.editSubCategory = async (
 };
 
 //deleted subcategory
-exports.listUnlistSubCategory = async (subCategoryID, list) => {
+export const listUnlistSubCategory = async (subCategoryID, list) => {
   try {
     // const productExist = await productCollection.findOne({ subCategoryID: subCategoryID })
 

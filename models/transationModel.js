@@ -1,27 +1,36 @@
-const mongoose = require("mongoose")
+import mongoose from "mongoose";
 const Schema = mongoose.Schema;
 
-const transationSchema = Schema({
+const transationSchema = Schema(
+  {
     userID: {
-        type: mongoose.Types.ObjectId,
-        ref: 'users',
-        required: true
+      type: mongoose.Types.ObjectId,
+      ref: "users",
+      required: true,
     },
     amount: {
-        type: Number,
-        required: true
+      type: Number,
+      required: true,
     },
     transationType: {
-        type: String,
-        enum: ['purchase', 'walletRecharge', 'walletDeduction', 'refund', 'referal'],
-        required: true
+      type: String,
+      enum: [
+        "purchase",
+        "walletRecharge",
+        "walletDeduction",
+        "refund",
+        "referal",
+      ],
+      required: true,
     },
     paymentMethod: {
-        type: String,
-        enum: ['COD', 'Razorpay', 'Wallet']
-    }
-}, { timestamps: true })
+      type: String,
+      enum: ["COD", "Razorpay", "Wallet"],
+    },
+  },
+  { timestamps: true }
+);
 
-const transation = mongoose.model('transations', transationSchema);
+const transation = mongoose.model("transations", transationSchema);
 
-module.exports = transation;
+export default transation;

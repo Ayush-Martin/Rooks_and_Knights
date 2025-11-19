@@ -1,7 +1,7 @@
 //collections
-const userCollection = require("../models/userModel");
+import userCollection from "../models/userModel.js";
 
-exports.userList = async (search, currentPage, noOfList, skipPages) => {
+export const userList = async (search, currentPage, noOfList, skipPages) => {
   let findQuery = { isAdmin: false };
 
   //for search user
@@ -25,7 +25,7 @@ exports.userList = async (search, currentPage, noOfList, skipPages) => {
   }
 };
 
-exports.blockUnblockUser = async (userID) => {
+export const blockUnblockUser = async (userID) => {
   try {
     const user = await userCollection.findById(userID);
     await userCollection.updateOne(
