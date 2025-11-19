@@ -1,6 +1,6 @@
 //services
 import * as walletService from "../services/walletService.js";
-import * as transationService from "../services/transationService.js";
+import * as transationService from "../services/transactionService.js";
 
 //utils
 import { verifyPayment } from "../utils/razorpayPaymentVerify.js";

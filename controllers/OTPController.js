@@ -1,62 +1,51 @@
 //utils
-import * as OTPUtils from "../utils/OTPUtils.js";
+import * as OTPService from "../services/OTPService.js";
+import { StatusCode } from "../constants/statusCodes.js";
 
-//render otp verify page
-export const getVerifyOTP = (req, res) => {
-  res.render("OTP/verifyOTP", { email: req.session.email });
+// Controller to get OTP verification page
+export const verifyOTPPage = (req, res) => {
+  res.render("OTP/verifyOTP", {
+    email: req.session.email,
+  });
 };
 
-//verifies otp
-export const postVerifyOTP = async (req, res) => {
+// Controller to handle OTP verification
+export const verifyOTP = async (req, res) => {
   const { OTP } = req.body;
 
   try {
-    const isOTPVerified = await OTPUtils.verifyOTP(req.session.email, OTP);
+    const result = await OTPService.verifyOTP(req.session.email, OTP);
 
-    if (isOTPVerified) {
+    if (result.success) {
       req.session.isOTPVerified = true;
       req.session.save();
       res
-        .status(200)
-        .json({ redirectUrl: req.session.OTPVerificationRedirect });
+        .status(StatusCode.OK)
+        .json({ successRedirect: req.session.OTPVerificationRedirect });
     } else {
-      res.status(400).json({ error: "Invalid OTP" });
+      res.status(StatusCode.BAD_REQUEST).json({ error: result.message });
     }
   } catch (err) {
     console.log(err);
-    res.status(500).send("Error verifying OTP");
+    res
+      .status(StatusCode.INTERNAL_SERVER_ERROR)
+      .json({ error: "Server Error" });
   }
-};
-
-//render timer for resend otp
-export const getTimer = (req, res) => {
-  if (!req.session.email) {
-    return res.redirect("/user/register");
-  }
-  const remainingTime = req.session.countdownTime || 0;
-  res.json({ remainingTime, email: req.session.email });
 };
 
 //handle resend otp
-export const postResendOTP = async (req, res) => {
+export const resendOTP = async (req, res) => {
   const email = req.session.email;
-  const OTP = OTPUtils.generateOTP();
 
   try {
-    await OTPUtils.storeOTP(email, OTP);
+    await OTPService.resendOTP(email);
 
-    req.session.countdownTime = 30;
-    req.session.save();
-
-    OTPUtils.startCountdown(req);
-
-    await OTPUtils.sendOTP(email, OTP);
     req.session.email = email;
     req.session.save();
 
     res.redirect("/OTP/verifyOTP");
   } catch (err) {
     console.log(err);
-    res.status(500).send("Error sending OTP");
+    res.status(StatusCode.INTERNAL_SERVER_ERROR).render("/serverError");
   }
 };

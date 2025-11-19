@@ -12,32 +12,35 @@ import * as OTPMiddleware from "../middlewares/OTPMiddleware.js";
 
 //Routers
 //Login
-router.get(
-  "/login",
-  userAuthMiddleware.checkUserAldreadyAuthenticated,
-  userController.getLogin
-);
-router.post("/login", userController.postLogin);
-router.post("/logout", userController.postLogout);
+router
+  .get(
+    "/login",
+    userAuthMiddleware.checkUserAlreadyAuthenticated,
+    userController.loginPage
+  )
+  .post("/login", userController.login);
+router.post("/logout", userController.logout);
 
 //Register
-router.get(
-  "/register",
-  userAuthMiddleware.checkUserAldreadyAuthenticated,
-  userController.getRegister
-);
-router.post("/register", userController.postRegister);
+router
+  .get(
+    "/register",
+    userAuthMiddleware.checkUserAlreadyAuthenticated,
+    userController.registerPage
+  )
+  .post("/register", userController.register);
 
 //Complete Register
-router.get(
-  "/completeRegister",
-  [
-    userAuthMiddleware.checkUserAldreadyAuthenticated,
-    OTPMiddleware.checkOTPVerified,
-  ],
-  userController.getCompleteRegister
-);
-router.post("/completeRegister", userController.postCompleteRegister);
+router
+  .get(
+    "/completeRegister",
+    [
+      userAuthMiddleware.checkUserAlreadyAuthenticated,
+      OTPMiddleware.checkOTPVerified,
+    ],
+    userController.completeRegisterPage
+  )
+  .post("/completeRegister", userController.completeRegister);
 
 //google Auth
 router.get(
@@ -47,7 +50,7 @@ router.get(
 router.get(
   "/google/callback",
   passport.authenticate("google", { failureRedirect: "/user/login" }),
-  userController.getGoogleCallback
+  userController.googleCallback
 );
 
 //User account route
@@ -67,13 +70,16 @@ router.post(
   userController.postAccountChangePassword
 );
 
-router.get("/forgetPassword", userController.getForgetPassword);
-router.post("/forgetPassword", userController.postForgetPassword);
-router.get(
-  "/resetPassword",
-  OTPMiddleware.checkOTPVerified,
-  userController.getResetPassword
-);
-router.post("/resetPassword", userController.postResetPassword);
+router
+  .get("/forgetPassword", userController.forgetPasswordPage)
+  .post("/forgetPassword", userController.postForgetPassword);
+
+router
+  .get(
+    "/resetPassword",
+    OTPMiddleware.checkOTPVerified,
+    userController.resetPasswordPage
+  )
+  .post("/resetPassword", userController.resetPassword);
 
 export default router;

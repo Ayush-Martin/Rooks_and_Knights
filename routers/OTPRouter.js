@@ -8,9 +8,10 @@ import * as OTPRouter from "../controllers/OTPController.js";
 //middlewares
 import * as OTPMiddleware from "../middlewares/OTPMiddleware.js";
 
-router.get("/verifyOTP", OTPMiddleware.isEmailEntered, OTPRouter.getVerifyOTP);
-router.post("/verifyOTP", OTPRouter.postVerifyOTP);
-router.get("/timer", OTPRouter.getTimer);
-router.post("/resendOTP", OTPRouter.postResendOTP);
+router
+  .get("/verifyOTP", OTPMiddleware.isEmailEntered, OTPRouter.verifyOTPPage)
+  .post("/verifyOTP", OTPRouter.verifyOTP);
+
+router.post("/resendOTP", OTPRouter.resendOTP);
 
 export default router;

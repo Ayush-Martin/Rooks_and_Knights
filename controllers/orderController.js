@@ -6,7 +6,7 @@ import * as addressService from "../services/addressServices.js";
 import * as cartService from "../services/cartServices.js";
 import * as orderService from "../services/orderServices.js";
 import * as walletService from "../services/walletService.js";
-import * as transationService from "../services/transationService.js";
+import * as transationService from "../services/transactionService.js";
 import * as couponService from "../services/couponServices.js";
 
 //utils

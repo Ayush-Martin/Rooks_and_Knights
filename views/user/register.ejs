@@ -24,8 +24,7 @@
 
                     <div class="w-full m-t-20">
                         <label for="email" class="clblack f-w-600">Email Address</label>
-                        <input class="input_box p-l-15" type="text" id="email" name="email"
-                            placeholder="abc@gmail.com">
+                        <input class="input_box p-l-15" type="text" id="email" name="email" placeholder="abc@gmail.com">
                     </div>
 
                     <div class="w-full m-t-20">
@@ -59,10 +58,116 @@
             </div>
         </div>
 
-
+        <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
         <script src="/public/JS/validation.js"></script>
 
+        <script>
+            document.getElementById('registerForm').addEventListener("submit", register)
+            async function register(e) {
+                e.preventDefault()
+
+                const username = document.getElementById('username').value;
+                const email = document.getElementById('email').value;
+                const phoneNumber = document.getElementById('phoneNumber').value;
+                const password = document.getElementById('password').value;
+                const confirmPassword = document.getElementById('confirmPassword').value;
+
+                const validationError = validate(username, email, phoneNumber, password, confirmPassword)
+
+                if (validationError) {
+                    Swal.fire({
+                        icon: "error",
+                        title: "Validation Error",
+                        text: validationError,
+                    });
+                    return
+                }
+
+                try {
+                    const res = await axios.post("/user/register", {
+                        username,
+                        email,
+                        password,
+                        phoneNumber,
+                        confirmPassword
+                    })
+
+                    await Swal.fire({
+                        icon: "success",
+                        title: "OTP Sent",
+                        text: "An OTP has been sent to your email.",
+                        timer: 2000,
+                        showConfirmButton: false
+                    })
+
+                    window.location.href = res.data.successRedirect;
+
+                } catch (err) {
+                    const errorMessage = err.response?.data?.error || "Something went wrong";
+                    console.error(errorMessage)
+                    Swal.fire({
+                        icon: "error",
+                        text: errorMessage,
+                    });
+                }
+            }
+
+            // document.getElementById('registerForm').addEventListener('submit', function (event) {
+            //     event.preventDefault();
+
+            //     // submitButton.disabled = true;
+
+            //     const username = document.getElementById('username').value;
+            //     const email = document.getElementById('email').value;
+            //     const phoneNumber = document.getElementById('phoneNumber').value;
+            //     const password = document.getElementById('password').value;
+            //     const confirmPassword = document.getElementById('confirmPassword').value;
+
+            //     const error = validate(username, email, phoneNumber, password, confirmPassword)
+
+            //     if (error) {
+            //         Swal.fire({
+            //             icon: "error",
+            //             title: "Validation Error",
+            //             text: error,
+            //         });
+            //         return
+            //     }
+
+            //     fetch('/user/register', {
+            //         method: "POST",
+            //         headers: {
+            //             "Content-Type": "application/json"
+            //         },
+            //         body: JSON.stringify({ username, email, phoneNumber, password, confirmPassword })
+            //     })
+            //         .then(res =>  res.json())
+            //         .then(data => {
+            //             if (data.success) {
+            //                 window.location.href = data.successRedirect;
+            //             } 
+            //             if (data.error) {
+
+            //                 Swal.fire({
+            //                     icon: "error",
+            //                     title: "Validation Error",
+            //                     text: data.error,
+            //                 });
+            //                 return
+            //             }
+            //         })
+            // });
+
+
+            function validate(username, email, phoneNumber, password, confirmPassword) {
+                return checkValidText(username, 'username', 3, 10, false, false, false) ||
+                    checkValidEmail(email) ||
+                    checkValidPhoneNumber(phoneNumber.toString()) ||
+                    checkValidPassword(password, confirmPassword)
+            }
+
+        </script>
 
         <script>
             const togglePassword = document.querySelector('#togglePassword');
@@ -77,62 +182,6 @@
                 this.querySelector('i').classList.toggle('fa-eye');
                 this.querySelector('i').classList.toggle('fa-eye-slash');
             });
-        </script>
-        <script>
-            document.getElementById('registerForm').addEventListener('submit', function (event) {
-                event.preventDefault();
-
-                // submitButton.disabled = true;
-
-                const username = document.getElementById('username').value;
-                const email = document.getElementById('email').value;
-                const phoneNumber = document.getElementById('phoneNumber').value;
-                const password = document.getElementById('password').value;
-                const confirmPassword = document.getElementById('confirmPassword').value;
-
-                const error = validate(username, email, phoneNumber, password, confirmPassword)
-
-                if (error) {
-                    Swal.fire({
-                        icon: "error",
-                        title: "Validation Error",
-                        text: error,
-                    });
-                    return
-                }
-
-                fetch('/user/register', {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify({ username, email, phoneNumber, password, confirmPassword })
-                })
-                    .then(res =>  res.json())
-                    .then(data => {
-                        if (data.success) {
-                            window.location.href = data.successRedirect;
-                        } 
-                        if (data.error) {
-                            
-                            Swal.fire({
-                                icon: "error",
-                                title: "Validation Error",
-                                text: data.error,
-                            });
-                            return
-                        }
-                    })
-            });
-
-
-            function validate(username, email, phoneNumber, password, confirmPassword) {
-                return checkValidText(username, 'username', 3, 10, false, false, false) ||
-                    checkValidEmail(email) ||
-                    checkValidPhoneNumber(phoneNumber.toString()) ||
-                    checkValidPassword(password, confirmPassword)
-            }
-
         </script>
     </body>
 

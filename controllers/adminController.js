@@ -9,7 +9,7 @@ import * as adminOrderService from "../services/adminOrderService.js";
 import * as adminReturnService from "../services/adminReturnService.js";
 import * as adminOfferService from "../services/adminOfferService.js";
 import * as walletService from "../services/walletService.js";
-import * as transationService from "../services/transationService.js";
+import * as transationService from "../services/transactionService.js";
 import * as adminCouponService from "../services/adminCouponServices.js";
 import * as adminSalesService from "../services/adminSalesService.js";
 
@@ -77,6 +77,7 @@ export const getDashboard = async (req, res) => {
       await adminDashboardService.TopTenList();
 
     let salesData = null;
+    let labels = null;
 
     if (graphType === "daily") {
       salesData = await adminDashboardService.dailySales();
@@ -92,7 +93,7 @@ export const getDashboard = async (req, res) => {
       labels = salesData.map((item) => item._id.year);
     }
 
-    totalSales = salesData.map((item) => item.totalSales);
+    const totalSales = salesData.map((item) => item.totalSales);
 
     res.render("admin/dashboard", {
       topTenProductsList,

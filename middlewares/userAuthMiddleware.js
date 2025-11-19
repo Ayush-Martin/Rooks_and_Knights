@@ -77,7 +77,7 @@ export const validUser = async (req, res, next) => {
 };
 
 // Middleware for routes where the user should NOT be authenticated
-export const checkUserAldreadyAuthenticated = async (req, res, next) => {
+export const checkUserAlreadyAuthenticated = async (req, res, next) => {
   const token = req.cookies.token;
 
   if (!token) {

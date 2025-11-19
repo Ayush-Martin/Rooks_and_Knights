@@ -6,7 +6,7 @@ const passwordHasher = (plainPassword) => {
   return bcrypt.hash(plainPassword, saltRounds);
 };
 
-//finction to compare stored hashed password and entered password
+//function to compare stored hashed password and entered password
 const comparePassword = (plainPassword, storedHash) => {
   return bcrypt.compare(plainPassword, storedHash);
 };
