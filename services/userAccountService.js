@@ -1,5 +1,6 @@
 import userCollection from "../models/userModel.js";
 
+// Service to get the user data based on user ID
 export const viewUserProfile = async (_id) => {
   try {
     let userProfile = await userCollection.findById(_id);

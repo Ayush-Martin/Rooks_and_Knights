@@ -13,34 +13,36 @@ import * as OTPMiddleware from "../middlewares/OTPMiddleware.js";
 //Routers
 //Login
 router
+  .route("/login")
   .get(
-    "/login",
     userAuthMiddleware.checkUserAlreadyAuthenticated,
     userController.loginPage
   )
-  .post("/login", userController.login);
+  .post(userController.login);
+
+// Logout
 router.post("/logout", userController.logout);
 
 //Register
 router
+  .route("/register")
   .get(
-    "/register",
     userAuthMiddleware.checkUserAlreadyAuthenticated,
     userController.registerPage
   )
-  .post("/register", userController.register);
+  .post(userController.register);
 
 //Complete Register
 router
+  .route("/completeRegister")
   .get(
-    "/completeRegister",
     [
       userAuthMiddleware.checkUserAlreadyAuthenticated,
       OTPMiddleware.checkOTPVerified,
     ],
     userController.completeRegisterPage
   )
-  .post("/completeRegister", userController.completeRegister);
+  .post(userController.completeRegister);
 
 //google Auth
 router.get(
@@ -64,22 +66,26 @@ router.put(
   userAuthMiddleware.validUser,
   userController.putAccount
 );
-router.post(
-  "/account/changePassword",
-  userAuthMiddleware.validUser,
-  userController.postAccountChangePassword
-);
 
+// Change password
 router
-  .get("/forgetPassword", userController.forgetPasswordPage)
-  .post("/forgetPassword", userController.postForgetPassword);
-
-router
+  .route("/account/changePassword")
   .get(
-    "/resetPassword",
-    OTPMiddleware.checkOTPVerified,
-    userController.resetPasswordPage
+    userAuthMiddleware.checkUserAuthenticated,
+    userController.changePasswordPage
   )
-  .post("/resetPassword", userController.resetPassword);
+  .post(userController.changePassword);
+
+// Forget password
+router
+  .route("/forgetPassword")
+  .get(userController.forgetPasswordPage)
+  .post(userController.forgetPassword);
+
+// Reset password
+router
+  .route("/resetPassword")
+  .get(OTPMiddleware.checkOTPVerified, userController.resetPasswordPage)
+  .post(userController.resetPassword);
 
 export default router;

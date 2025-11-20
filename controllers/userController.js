@@ -202,7 +202,7 @@ export const forgetPasswordPage = (req, res) => {
 };
 
 //Controller to handle forget password
-export const postForgetPassword = async (req, res) => {
+export const forgetPassword = async (req, res) => {
   try {
     const { email } = req.body;
     let result = await resetPasswordServices.forgetPassword(email, req);
@@ -301,17 +301,52 @@ export const putAccount = async (req, res) => {
   }
 };
 
-export const postAccountChangePassword = async (req, res) => {
-  try {
-    let error = await resetPasswordServices.forgetPassword(req.email, req);
+// Controller to get the change password page
+export const changePasswordPage = (req, res) => {
+  res.render("user/changePassword");
+};
 
-    if (error) {
-      return res.json({ success: false, error });
+// Controller to handle change password
+export const changePassword = async (req, res) => {
+  try {
+    const { oldPassword, newPassword } = req.body;
+    const userID = req.userID;
+
+    if (!oldPassword || !newPassword) {
+      return res
+        .status(StatusCode.BAD_REQUEST)
+        .json({ error: "Old password and new password are required" });
     }
-    req.session.userID = req.userID;
-    req.session.OTPVerificationRedirect = "/user/resetPassword";
-    res.status(200).json({ success: true, redirectUrl: "/OTP/verifyOTP" });
+
+    // Get user details to verify old password
+    const user = await accountService.viewUserProfile(userID);
+
+    if (!user) {
+      return res
+        .status(StatusCode.BAD_REQUEST)
+        .json({ error: "User not found" });
+    }
+
+    // Verify old password
+    const isPasswordValid = await userService.validateUserCredentials(
+      oldPassword,
+      user.password
+    );
+
+    if (!isPasswordValid) {
+      return res
+        .status(StatusCode.BAD_REQUEST)
+        .json({ error: "Incorrect old password" });
+    }
+
+    // Update to new password
+    await resetPasswordServices.resetPassword(newPassword, userID);
+
+    res.status(StatusCode.OK).json({ success: true });
   } catch (err) {
-    console.log(err);
+    console.error(err);
+    res
+      .status(StatusCode.INTERNAL_SERVER_ERROR)
+      .json({ error: "Server error" });
   }
 };
