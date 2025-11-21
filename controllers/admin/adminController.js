@@ -1,11 +1,8 @@
 //Services
 import * as adminDashboardService from "../../services/adminDashboardService.js";
-import * as adminUserService from "../../services/adminUserService.js";
-import * as adminProductService from "../../services/adminProductService.js";
 import * as adminService from "../../services/adminService.js";
 import * as adminOrderService from "../../services/adminOrderService.js";
 import * as adminReturnService from "../../services/adminReturnService.js";
-import * as adminOfferService from "../../services/adminOfferService.js";
 import * as walletService from "../../services/walletService.js";
 import * as transationService from "../../services/transactionService.js";
 import * as adminCouponService from "../../services/adminCouponServices.js";
@@ -252,49 +249,6 @@ export const getTransations = async (req, res) => {
   } catch (err) {
     console.log(err);
     res.redirect("/error");
-  }
-};
-
-export const getOffers = async (req, res) => {
-  try {
-    const { search } = req.query;
-
-    const { productList, categoryList, subCategoryList } =
-      await adminOfferService.displayOffers(search);
-    res.render("admin/offers", {
-      productList,
-      categoryList,
-      subCategoryList,
-      searchFilter: search || null,
-    });
-  } catch (err) {
-    console.log(err);
-    res.redirect("/error");
-  }
-};
-
-export const postAddOffer = async (req, res) => {
-  try {
-    const { type, ID, offer } = req.body;
-
-    await adminOfferService.addOffer(type, ID, offer);
-    res.status(200).json({ success: true });
-  } catch (err) {
-    console.log(err);
-    res.status(500).json({ error: "Server Error" });
-  }
-};
-
-export const deleteOffer = async (req, res) => {
-  try {
-    const ID = req.params.id;
-    const { type } = req.body;
-
-    await adminOfferService.deleteOffer(type, ID);
-    res.status(200).json({ success: true });
-  } catch (err) {
-    console.log(err);
-    res.status(500).json({ error: "Server Error" });
   }
 };
 

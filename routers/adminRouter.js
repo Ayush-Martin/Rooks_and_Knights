@@ -8,6 +8,7 @@ import * as adminCategoryController from "../controllers/admin/adminCategoryCont
 import * as adminSubCategoryController from "../controllers/admin/adminSubCategoryController.js";
 import * as adminUserController from "../controllers/admin/adminUserController.js";
 import * as adminProductController from "../controllers/admin/adminProductController.js";
+import * as adminOfferController from "../controllers/admin/adminOfferController.js";
 
 //multer upload middleware
 import upload, { handleUpload } from "../utils/multerUtils.js";
@@ -102,9 +103,13 @@ router.patch("/returns", adminController.patchAproveRejectReturn); //approve or 
 router.get("/transations", adminController.getTransations); //display transations
 
 //offers
-router.get("/offers", adminController.getOffers); //display offers
-router.post("/offers", adminController.postAddOffer); //add new offer
-router.delete("/offers/:id", adminController.deleteOffer); //delete offer
+router
+  .route("/offers")
+  .get(adminOfferController.offersPage)
+  .post(adminOfferController.addOffer);
+
+router.put("/offers/:id", adminOfferController.editOffer);
+router.delete("/offers/:id", adminOfferController.deleteOffer);
 
 //coupons
 router.get("/coupons", adminController.getCoupons); //display coupons
