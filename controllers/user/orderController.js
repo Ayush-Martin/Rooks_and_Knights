@@ -2,16 +2,16 @@
 import pdfKit from "pdfkit";
 
 //services
-import * as addressService from "../services/addressServices.js";
-import * as cartService from "../services/cartServices.js";
-import * as orderService from "../services/orderServices.js";
-import * as walletService from "../services/walletService.js";
-import * as transationService from "../services/transactionService.js";
-import * as couponService from "../services/couponServices.js";
+import * as addressService from "../../services/addressServices.js";
+import * as cartService from "../../services/cartServices.js";
+import * as orderService from "../../services/orderServices.js";
+import * as walletService from "../../services/walletService.js";
+import * as transationService from "../../services/transactionService.js";
+import * as couponService from "../../services/couponServices.js";
 
 //utils
-import { verifyPayment } from "../utils/razorpayPaymentVerify.js";
-import { generateInvoice } from "../utils/pdfUtils.js";
+import { verifyPayment } from "../../utils/razorpayPaymentVerify.js";
+import { generateInvoice } from "../../utils/pdfUtils.js";
 
 //razorpay
 import Razorpay from "razorpay";

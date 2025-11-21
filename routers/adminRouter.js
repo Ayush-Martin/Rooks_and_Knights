@@ -3,7 +3,9 @@ import express from "express";
 const router = express.Router();
 
 //controllers
-import * as adminController from "../controllers/adminController.js";
+import * as adminController from "../controllers/admin/adminController.js";
+import * as adminCategoryController from "../controllers/admin/adminCategoryController.js";
+import * as adminSubCategoryController from "../controllers/admin/adminSubCategoryController.js";
 
 //multer upload middleware
 import upload, { handleUpload } from "../utils/multerUtils.js";
@@ -47,7 +49,11 @@ router.patch("/users/:id", adminController.patchBlockUnblockUser); //block or un
 //Products
 router.get("/products", adminController.getProducts); //display products
 router.get("/products/addProduct", adminController.getAddProduct); //display page to add a new product
-router.post("/products/addProduct", handleUpload, adminController.postAddProduct); //add a new product
+router.post(
+  "/products/addProduct",
+  handleUpload,
+  adminController.postAddProduct
+); //add a new product
 router.get("/products/viewEditProduct/:id", adminController.getViewEditProduct); //view specif product
 router.post(
   "/products/viewEditProduct/:id",
@@ -57,16 +63,26 @@ router.post(
 router.patch("/products/:id", adminController.patchListUnlistProduct); //delete a product
 
 //Categories
-router.get("/categories", adminController.getCategories); //display categories
-router.post("/categories", adminController.addCategory); //add new category
-router.put("/categories/:id", adminController.putEditCategory); //edit a category
-router.patch("/categories/:id", adminController.patchListUnlistCategory); //delete a category
+router
+  .route("/categories")
+  .get(adminCategoryController.categoriesPage)
+  .post(adminCategoryController.addCategory);
+
+router
+  .route("/categories/:id")
+  .put(adminCategoryController.editCategory)
+  .patch(adminCategoryController.listUnlistCategory);
 
 //subCategories
-router.get("/subCategories", adminController.getSubCategory); //display sub categories
-router.post("/subCategories", adminController.addSubCategory); //add new sub category
-router.put("/subCategories/:id", adminController.putEditSubCategory); //edit a sub category
-router.patch("/subCategories/:id", adminController.patchListUnlistSubCategory); //delet a sub category
+router
+  .route("/subCategories")
+  .get(adminSubCategoryController.subCategoriesPage)
+  .post(adminSubCategoryController.addSubCategory);
+
+router
+  .route("/subCategories/:id")
+  .put(adminSubCategoryController.editSubCategory)
+  .patch(adminSubCategoryController.listUnlistSubCategory);
 
 //orders
 router.get("/orders", adminController.getOrders); //display orders

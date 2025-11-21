@@ -6,7 +6,7 @@ const router = express.Router();
 import * as userAuthMiddleware from "../middlewares/userAuthMiddleware.js";
 
 //controllers
-import * as wishlistController from "../controllers/wishlistController.js";
+import * as wishlistController from "../controllers/user/wishlistController.js";
 
 //routers
 router.get(

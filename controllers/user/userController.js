@@ -1,16 +1,16 @@
 //services
-import * as userService from "../services/userService.js";
-import * as accountService from "../services/userAccountService.js";
-import * as resetPasswordServices from "../services/resetPasswordServices.js";
-import * as addressService from "../services/addressServices.js";
-import * as orderService from "../services/orderServices.js";
-import * as walletService from "../services/walletService.js";
-import * as transactionService from "../services/transactionService.js";
+import * as userService from "../../services/userService.js";
+import * as accountService from "../../services/userAccountService.js";
+import * as resetPasswordServices from "../../services/resetPasswordServices.js";
+import * as addressService from "../../services/addressServices.js";
+import * as orderService from "../../services/orderServices.js";
+import * as walletService from "../../services/walletService.js";
+import * as transactionService from "../../services/transactionService.js";
 
 //utils
-import generateAccessToken from "../utils/JWTUtils.js";
-import signupFormValidation from "../utils/registerValidation.js";
-import { StatusCode } from "../constants/statusCodes.js";
+import generateAccessToken from "../../utils/JWTUtils.js";
+import signupFormValidation from "../../utils/registerValidation.js";
+import { StatusCode } from "../../constants/statusCodes.js";
 
 // Controller to get the login page
 export const loginPage = (req, res) => {

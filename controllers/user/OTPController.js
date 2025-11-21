@@ -1,6 +1,6 @@
 //utils
-import * as OTPService from "../services/OTPService.js";
-import { StatusCode } from "../constants/statusCodes.js";
+import * as OTPService from "../../services/OTPService.js";
+import { StatusCode } from "../../constants/statusCodes.js";
 
 // Controller to get OTP verification page
 export const verifyOTPPage = (req, res) => {

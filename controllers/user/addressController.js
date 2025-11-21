@@ -1,5 +1,5 @@
 //services
-import * as addressService from "../services/addressServices.js";
+import * as addressService from "../../services/addressServices.js";
 
 //add new address
 export const postNewAddress = async (req, res) => {

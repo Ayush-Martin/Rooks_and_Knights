@@ -2,7 +2,7 @@ import express from "express";
 const router = express.Router();
 
 //controllers
-import * as walletController from "../controllers/walletController.js";
+import * as walletController from "../controllers/user/walletController.js";
 
 //middlewares
 import * as userAuthMiddleware from "../middlewares/userAuthMiddleware.js";

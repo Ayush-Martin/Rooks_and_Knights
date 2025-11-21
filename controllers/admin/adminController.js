@@ -1,24 +1,24 @@
 //Services
-import * as adminDashboardService from "../services/adminDashboardService.js";
-import * as adminUserService from "../services/adminUserService.js";
-import * as adminCategoryService from "../services/adminCategoryService.js";
-import * as adminSubCategoryService from "../services/adminSubCategoryServices.js";
-import * as adminProductService from "../services/adminProductService.js";
-import * as adminService from "../services/adminService.js";
-import * as adminOrderService from "../services/adminOrderService.js";
-import * as adminReturnService from "../services/adminReturnService.js";
-import * as adminOfferService from "../services/adminOfferService.js";
-import * as walletService from "../services/walletService.js";
-import * as transationService from "../services/transactionService.js";
-import * as adminCouponService from "../services/adminCouponServices.js";
-import * as adminSalesService from "../services/adminSalesService.js";
+import * as adminDashboardService from "../../services/adminDashboardService.js";
+import * as adminUserService from "../../services/adminUserService.js";
+import * as adminCategoryService from "../../services/adminCategoryService.js";
+import * as adminSubCategoryService from "../../services/adminSubCategoryServices.js";
+import * as adminProductService from "../../services/adminProductService.js";
+import * as adminService from "../../services/adminService.js";
+import * as adminOrderService from "../../services/adminOrderService.js";
+import * as adminReturnService from "../../services/adminReturnService.js";
+import * as adminOfferService from "../../services/adminOfferService.js";
+import * as walletService from "../../services/walletService.js";
+import * as transationService from "../../services/transactionService.js";
+import * as adminCouponService from "../../services/adminCouponServices.js";
+import * as adminSalesService from "../../services/adminSalesService.js";
 
 import mongoose from "mongoose";
 import { format } from "date-fns";
 //Utils
-import generateAccessToken from "../utils/JWTUtils.js";
-import { generateSalesPdf } from "../utils/pdfUtils.js";
-import { generateSalesExcel } from "../utils/excelUtils.js";
+import generateAccessToken from "../../utils/JWTUtils.js";
+import { generateSalesPdf } from "../../utils/pdfUtils.js";
+import { generateSalesExcel } from "../../utils/excelUtils.js";
 
 //Render login page
 export const getLogin = (req, res) => {
@@ -247,112 +247,6 @@ export const patchListUnlistProduct = async (req, res) => {
   } catch (err) {
     console.log(err);
     res.redirect("/error");
-  }
-};
-
-//Categories and subCategory get
-export const getCategories = async (req, res) => {
-  try {
-    const { search, page } = req.query;
-    const currentPage = page || 1;
-    const noOfList = 6;
-    const skipPages = (currentPage - 1) * noOfList;
-    const { categoryList, totalNoOfList } =
-      await adminCategoryService.categoryList(
-        search,
-        currentPage,
-        noOfList,
-        skipPages
-      );
-    const totalNoOfPages = Math.ceil(totalNoOfList / noOfList);
-    res.render("admin/categories", {
-      categoryList,
-      searchFilter: search || null,
-      currentPage,
-      totalNoOfPages,
-    });
-  } catch (err) {
-    console.log(err);
-    res.redirect("/error");
-  }
-};
-
-//categories
-//add new category
-export const addCategory = async (req, res) => {
-  try {
-    const { categoryName, categoryDescription } = req.body;
-
-    if (!categoryName || !categoryDescription) {
-      //check categoryName and description are empty
-      return res
-        .status(400)
-        .json({ error: "category name or category name should not be empty" });
-    }
-    const error = await adminCategoryService.addCategory(
-      categoryName,
-      categoryDescription
-    );
-
-    if (error) {
-      req.flash("CategoryError", error);
-      return res.status(400).json({ error });
-    }
-
-    res.status(200).json({ success: true });
-  } catch (err) {
-    console.log(err);
-    res.status(500).json({ error: "Server Error" });
-  }
-};
-
-//edit category
-export const putEditCategory = async (req, res) => {
-  try {
-    const categoryID = req.params.id;
-    const { categoryName, categoryDescription } = req.body;
-
-    if (!categoryName || !categoryDescription) {
-      return res.status(400).json({
-        error: "category name or category description should not be empty",
-      });
-    }
-
-    const error = await adminCategoryService.editCategory(
-      categoryID,
-      categoryName,
-      categoryDescription
-    );
-    if (error) {
-      return res.status(400).json({ error });
-    }
-
-    res.status(200).json({ success: true });
-  } catch (err) {
-    console.log(err);
-    res.status(500).json({ error: "Server Error" });
-  }
-};
-
-//delete specific category
-export const patchListUnlistCategory = async (req, res) => {
-  try {
-    const categoryID = req.params.id;
-    const { list } = req.body;
-
-    const error = await adminCategoryService.listUnlistCategory(
-      categoryID,
-      list
-    );
-
-    if (error) {
-      return res.status(400).json({ error });
-    }
-
-    res.status(200).json({ success: true });
-  } catch (err) {
-    console.log(err);
-    res.status(500).json({ error: "Server Error" });
   }
 };
 

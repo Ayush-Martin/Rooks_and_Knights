@@ -14,7 +14,7 @@
                             <!-- Search Form -->
                             <form action="/admin/subCategories" method="GET" class="search-input-group">
                                 <input type="text" id="search-input" name="search" class="form-control search-input"
-                                placeholder="search" value="<%= searchFilter ? searchFilter:null %>">
+                                    placeholder="search" value="<%= searchFilter ? searchFilter:null %>">
                                 <a href="/admin/subCategories?search=">
                                     <button type="button" class="btn-clear" id="clear-btn">
                                         <i class="fas fa-times"></i>
@@ -49,7 +49,7 @@
                             </thead>
                             <tbody>
                                 <% subCategoryList.forEach(subCategory=> { %>
-                                    <tr>
+                                    <tr id="subCategory-row-<%= subCategory._id %>">
                                         <td>
                                             <%= subCategory.subCategoryName %>
                                         </td>
@@ -63,13 +63,17 @@
                                                 <i class="fas fa-pencil-alt"></i></button>
                                         </td>
                                         <td>
-                                            <button class="btn btn-sm fs-15" onclick="listUnlistsubCategory('<%=subCategory._id%>','<%= !subCategory.isListed %>')">
-                                                <% if(subCategory.isListed){ %>
-                                                    <i class="fas fa-times-circle"></i> Unlist
-                                                    
-                                                <% }else{ %>
-                                                    <i class="fas fa-list"></i> List
-                                                <% } %>
+                                            <button class="btn btn-sm fs-15"
+                                                onclick="listUnlistSubCategory(this, '<%=subCategory._id%>', '<%= !subCategory.isListed %>')">
+                                                <p>
+                                                    <% if(subCategory.isListed){ %>
+                                                        <i class="fas fa-times-circle"></i>
+                                                        Unlist
+                                                        <% }else{ %>
+                                                            <i class="fas fa-list"></i>
+                                                            List
+                                                            <% } %>
+                                                </p>
                                             </button>
                                         </td>
                                     </tr>
@@ -83,7 +87,8 @@
                             class="m-r-20 text-dark">
                             <i class="fas fa-chevron-left"></i> Previous
                         </a>
-                        <P class="m-r-20 text-dark">page : <%= currentPage %> of <%= Math.ceil(totalNoOfPages) %></P>
+                        <P class="m-r-20 text-dark">page : <%= currentPage %> of <%= Math.ceil(totalNoOfPages) %>
+                        </P>
                         <!-- Next Button -->
                         <a href="/admin/subCategories?search=<%= searchFilter %>&&page=<%= (currentPage<totalNoOfPages)? Number(currentPage)+1:currentPage %>"
                             class=" text-dark">
@@ -165,12 +170,7 @@
                 <%- include('./partials/footer') %>
                     <script src="/public/JS/checkCategorySubcategoryValid.js"></script>
                     <script>
-                        function editsubCategory(ID) {
-
-                        }
-                    </script>
-                    <script>
-                        function addSubCategory(event) {
+                        async function addSubCategory(event) {
                             event.preventDefault()
                             const subCategoryName = document.getElementById('subCategoryName').value;
                             const subCategoryDescription = document.getElementById('subCategoryDescription').value;
@@ -183,248 +183,217 @@
                                 });
                                 return
                             }
-                            fetch('/admin/subCategories', {
-                                method: "POST",
-                                headers: {
-                                    'Content-Type': 'application/json'
-                                },
-                                body: JSON.stringify({ subCategoryName, subCategoryDescription })
-                            })
-                                .then(res => res.json())
-                                .then((data) => {
-                                    if (data.validationError) {
-                                        let timerInterval;
-                                        Swal.fire({
-                                            title: "Validation Error",
-                                            html: "You will be redirected to login in <b></b> milliseconds.",
-                                            timer: 2000,
-                                            timerProgressBar: true,
-                                            didOpen: () => {
-                                                Swal.showLoading();
-                                                const timer = Swal.getPopup().querySelector("b");
-                                                timerInterval = setInterval(() => {
-                                                    timer.textContent = `${Swal.getTimerLeft()}`;
-                                                }, 100);
-                                            },
-                                            willClose: () => {
-                                                clearInterval(timerInterval);
-                                            }
-                                        }).then((result) => {
-                                            /* Read more about handling dismissals below */
-                                            if (result.dismiss === Swal.DismissReason.timer) {
-                                                
-                                                window.location.href = data.redirectUrl;
-                                            }
-                                        });
-                                    }
 
-                                    if (data.success) {
-                                        const Toast = Swal.mixin({
-                                            toast: true,
-                                            position: "top-end",
-                                            showConfirmButton: false,
-                                            timer: 2000,
-                                            timerProgressBar: true,
-                                            didOpen: (toast) => {
-                                                toast.onmouseenter = Swal.stopTimer;
-                                                toast.onmouseleave = Swal.resumeTimer;
-                                            }
-                                        });
-                                        Toast.fire({
-                                            icon: "success",
-                                            title: `new subCategory ${subCategoryName} added`
-                                        });
-                                        setTimeout(() => {
-                                            window.location.reload()
-                                        }, 2000)
-
-                                    }
-
-                                    if (data.error) {
-                                        Swal.fire({
-                                            icon: "error",
-                                            title: "Validation Error",
-                                            text: data.error,
-                                        });
-                                    }
+                            try {
+                                const res = await axios.post('/admin/subCategories', {
+                                    subCategoryName,
+                                    subCategoryDescription
                                 })
+
+                                if (res.status === 200) {
+                                    await Swal.fire({
+                                        text: `subCategory has been added`,
+                                        icon: "success",
+                                        timer: 2000,
+                                        showConfirmButton: false
+                                    });
+
+                                    setTimeout(() => {
+                                        window.location.reload()
+                                    }, 2000)
+                                }
+                            } catch (err) {
+                                console.error(err);
+                                const data = err.response?.data;
+                                if (data?.validationError) {
+                                    let timerInterval;
+                                    Swal.fire({
+                                        title: "Validation Error",
+                                        html: "You will be redirected to login in <b></b> milliseconds.",
+                                        timer: 2000,
+                                        timerProgressBar: true,
+                                        didOpen: () => {
+                                            Swal.showLoading();
+                                            const timer = Swal.getPopup().querySelector("b");
+                                            timerInterval = setInterval(() => {
+                                                timer.textContent = `${Swal.getTimerLeft()}`;
+                                            }, 100);
+                                        },
+                                        willClose: () => {
+                                            clearInterval(timerInterval);
+                                        }
+                                    }).then((result) => {
+                                        if (result.dismiss === Swal.DismissReason.timer) {
+                                            window.location.href = data.redirectUrl;
+                                        }
+                                    });
+                                } else {
+                                    Swal.fire({
+                                        icon: "error",
+                                        title: "Error",
+                                        text: data?.error || "An error occurred"
+                                    });
+                                }
+                            }
                         }
 
                         function editSubCategoryModel(e, _id) {
-
                             const subCategorydata = e.target.closest('button');
                             const { subCategoryName, subCategoryDescription } = JSON.parse(subCategorydata.getAttribute('data-subCategory-item'));
 
                             document.getElementById('subCategoryNameEdit').value = subCategoryName;
                             document.getElementById('subCategoryDescriptionEdit').value = subCategoryDescription;
 
-                            // Get the parent div where the button should be appended
                             const editsubCategoryDiv = document.getElementById('editsubCategoryDiv');
+                            let editButton = document.getElementById('editsubCategoryButton');
 
-                            // Check if the edit button already exists
-                            if (!document.getElementById('editsubCategoryButton')) {
-                                var editButton = document.createElement('button');
+                            if (!editButton) {
+                                editButton = document.createElement('button');
                                 editButton.textContent = "Edit";
                                 editButton.id = 'editsubCategoryButton';
-                                editButton.onclick = () => editSubCategory(event, _id);
                                 editButton.classList.add('btn', 'btn-primary');
-
                                 editsubCategoryDiv.appendChild(editButton);
                             }
+
+                            editButton.onclick = (event) => editSubCategory(event, _id);
                         }
 
-
-                        function editSubCategory(event, ID) {
-
+                        async function editSubCategory(event, ID) {
                             event.preventDefault();
                             const subCategoryName = document.getElementById('subCategoryNameEdit').value;
                             const subCategoryDescription = document.getElementById('subCategoryDescriptionEdit').value;
-                            let error = checkCategorySubCategoryValid(subCategoryName, subCategoryDescription)
+
+                            let error = checkCategorySubCategoryValid(subCategoryName, subCategoryDescription);
                             if (error) {
                                 Swal.fire({
                                     icon: "error",
                                     title: "Validation Error",
                                     text: error,
                                 });
-                                return
+                                return;
                             }
-                            fetch(`/admin/subCategories/${ID}`, {
-                                method: "PUT",
-                                headers: {
-                                    'Content-Type': 'application/json'
-                                },
-                                body: JSON.stringify({ subCategoryName, subCategoryDescription })
-                            })
-                                .then(res => res.json())
-                                .then((data) => {
-                                    if (data.validationError) {
-                                        let timerInterval;
-                                        Swal.fire({
-                                            title: "Validation Error",
-                                            html: "You will be redirected to login in <b></b> milliseconds.",
-                                            timer: 2000,
-                                            timerProgressBar: true,
-                                            didOpen: () => {
-                                                Swal.showLoading();
-                                                const timer = Swal.getPopup().querySelector("b");
-                                                timerInterval = setInterval(() => {
-                                                    timer.textContent = `${Swal.getTimerLeft()}`;
-                                                }, 100);
-                                            },
-                                            willClose: () => {
-                                                clearInterval(timerInterval);
-                                            }
-                                        }).then((result) => {
-                                            /* Read more about handling dismissals below */
-                                            if (result.dismiss === Swal.DismissReason.timer) {
-                                                
-                                                window.location.href = data.redirectUrl;
-                                            }
-                                        });
-                                    }
 
-                                    if (data.success) {
-                                        const Toast = Swal.mixin({
-                                            toast: true,
-                                            position: "top-end",
-                                            showConfirmButton: false,
-                                            timer: 2000,
-                                            timerProgressBar: true,
-                                            didOpen: (toast) => {
-                                                toast.onmouseenter = Swal.stopTimer;
-                                                toast.onmouseleave = Swal.resumeTimer;
-                                            }
-                                        });
-                                        Toast.fire({
-                                            icon: "success",
-                                            title: `SubCategory has been edited`
-                                        });
-                                        setTimeout(() => {
-                                            window.location.reload()
-                                        }, 2000)
+                            try {
+                                const response = await axios.put(`/admin/subCategories/${ID}`, {
+                                    subCategoryName,
+                                    subCategoryDescription
+                                });
 
-                                    }
+                                if (response.status === 200 && response.data.success) {
+                                    $('#editSubCategoryModel').modal('hide');
 
-                                    if (data.error) {
-                                        Swal.fire({
-                                            icon: "error",
-                                            title: "Validation Error",
-                                            text: data.error,
-                                        });
+                                    const Toast = Swal.mixin({
+                                        toast: true,
+                                        position: "top-end",
+                                        showConfirmButton: false,
+                                        timer: 2000,
+                                        timerProgressBar: true,
+                                        didOpen: (toast) => {
+                                            toast.onmouseenter = Swal.stopTimer;
+                                            toast.onmouseleave = Swal.resumeTimer;
+                                        }
+                                    });
+                                    Toast.fire({
+                                        icon: "success",
+                                        title: `SubCategory has been edited`
+                                    });
+
+                                    const row = document.getElementById(`subCategory-row-${ID}`);
+                                    if (row) {
+                                        row.cells[0].innerText = subCategoryName;
+                                        row.cells[1].innerText = subCategoryDescription;
+
+                                        const editBtn = row.querySelector('button[data-subCategory-item]');
+                                        if (editBtn) {
+                                            const currentData = JSON.parse(editBtn.getAttribute('data-subCategory-item'));
+                                            currentData.subCategoryName = subCategoryName;
+                                            currentData.subCategoryDescription = subCategoryDescription;
+                                            editBtn.setAttribute('data-subCategory-item', JSON.stringify(currentData));
+                                        }
                                     }
-                                })
+                                }
+                            } catch (err) {
+                                console.error(err);
+                                const data = err.response?.data;
+
+                                if (data?.validationError) {
+                                    let timerInterval;
+                                    Swal.fire({
+                                        title: "Validation Error",
+                                        html: "You will be redirected to login in <b></b> milliseconds.",
+                                        timer: 2000,
+                                        timerProgressBar: true,
+                                        didOpen: () => {
+                                            Swal.showLoading();
+                                            const timer = Swal.getPopup().querySelector("b");
+                                            timerInterval = setInterval(() => {
+                                                timer.textContent = `${Swal.getTimerLeft()}`;
+                                            }, 100);
+                                        },
+                                        willClose: () => {
+                                            clearInterval(timerInterval);
+                                        }
+                                    }).then((result) => {
+                                        if (result.dismiss === Swal.DismissReason.timer) {
+                                            window.location.href = data.redirectUrl;
+                                        }
+                                    });
+                                } else {
+                                    Swal.fire({
+                                        icon: "error",
+                                        title: "Error",
+                                        text: data?.error || "An error occurred",
+                                    });
+                                }
+                            }
                         }
 
+                        async function listUnlistSubCategory(btn, ID, list) {
+                            try {
+                                const isListing = list === 'true' || list === true;
+                                const action = isListing ? 'list' : 'unlist';
 
-                        function listUnlistsubCategory(ID,list) {
-                            Swal.fire({
-                                title: "Are you sure?",
-                                text: `Do you want to ${(eval(list)? 'list':'unlist')} this subCategory`,
-                                icon: "warning",
-                                showCancelButton: true,
-                                confirmButtonColor: "#3085d6",
-                                cancelButtonColor: "#d33",
-                                confirmButtonText: "Yes"
-                            }).then((result) => {
-                                if (result.isConfirmed) {
-                                    fetch(`/admin/subCategories/${ID}`, {
-                                        method: "PATCH",
-                                        headers: {
-                                            'Content-Type': 'application/json'
-                                        },
-                                        body:JSON.stringify({list})
-                                    }).then(res => res.json())
-                                        .then((data) => {
-                                            if (data.validationError) {
-                                                let timerInterval;
-                                                Swal.fire({
-                                                    title: "Validation Error",
-                                                    html: "You will be redirected to login in <b></b> milliseconds.",
-                                                    timer: 2000,
-                                                    timerProgressBar: true,
-                                                    didOpen: () => {
-                                                        Swal.showLoading();
-                                                        const timer = Swal.getPopup().querySelector("b");
-                                                        timerInterval = setInterval(() => {
-                                                            timer.textContent = `${Swal.getTimerLeft()}`;
-                                                        }, 100);
-                                                    },
-                                                    willClose: () => {
-                                                        clearInterval(timerInterval);
-                                                    }
-                                                }).then((result) => {
-                                                    /* Read more about handling dismissals below */
-                                                    if (result.dismiss === Swal.DismissReason.timer) {
-                                                        
-                                                        window.location.href = data.redirectUrl;
-                                                    }
-                                                });
-                                            }
+                                const result = await Swal.fire({
+                                    title: "Are you sure?",
+                                    text: `Do you want to ${action} this subCategory?`,
+                                    icon: "warning",
+                                    showCancelButton: true,
+                                    confirmButtonColor: "#3085d6",
+                                    cancelButtonColor: "#d33",
+                                    confirmButtonText: "Yes"
+                                });
 
-                                            if (data.error) {
-                                                Swal.fire({
-                                                    icon: "error",
-                                                    title: "Validation Error",
-                                                    text: data.error,
-                                                });
-                                            }
+                                if (!result.isConfirmed) return;
 
-                                            if (data.success) {
-                                                Swal.fire({
-                                                    text: `You ${eval(list)? 'listed':'unlisted'} the subCategory`,
-                                                    icon: "success",
-                                                    timer: 2000
-                                                });
+                                const response = await axios.patch(`/admin/subCategories/${ID}`, {
+                                    list: isListing
+                                });
 
-                                                setTimeout(() => {
-                                                    window.location.reload()
-                                                }, 2000)
+                                if (response.status === 200) {
+                                    Swal.fire({
+                                        text: `You ${isListing ? 'listed' : 'unlisted'} the subCategory`,
+                                        icon: "success",
+                                        timer: 2000,
+                                        showConfirmButton: false
+                                    });
 
-                                            }
-                                        })
+                                    const pTag = btn.querySelector('p');
+                                    if (isListing) {
+                                        pTag.innerHTML = '<i class="fas fa-times-circle"></i> Unlist';
+                                        btn.setAttribute('onclick', `listUnlistSubCategory(this, '${ID}', false)`);
+                                    } else {
+                                        pTag.innerHTML = '<i class="fas fa-list"></i> List';
+                                        btn.setAttribute('onclick', `listUnlistSubCategory(this, '${ID}', true)`);
+                                    }
                                 }
-                            });
-
+                            } catch (err) {
+                                console.error(err);
+                                Swal.fire({
+                                    icon: "error",
+                                    title: "Error",
+                                    text: err.response?.data?.error || "An error occurred"
+                                });
+                            }
                         }
                     </script>
 

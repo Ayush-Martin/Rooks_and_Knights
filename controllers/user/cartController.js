@@ -1,5 +1,5 @@
 //services
-import * as cartServices from "../services/cartServices.js";
+import * as cartServices from "../../services/cartServices.js";
 
 //render cartpage
 export const getCart = async (req, res) => {

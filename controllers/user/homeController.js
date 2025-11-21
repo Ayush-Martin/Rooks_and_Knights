@@ -1,5 +1,5 @@
 //services
-import * as homeServices from "../services/homeServices.js";
+import * as homeServices from "../../services/homeServices.js";
 
 export const getHome = async (req, res) => {
   try {

@@ -3,7 +3,7 @@ import express from "express";
 const router = express.Router();
 
 //controllers
-import * as orderController from "../controllers/orderController.js";
+import * as orderController from "../controllers/user/orderController.js";
 
 //middlewares
 import * as userAuthMiddleware from "../middlewares/userAuthMiddleware.js";

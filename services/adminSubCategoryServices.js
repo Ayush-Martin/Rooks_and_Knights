@@ -16,17 +16,14 @@ export const subCategoryList = async (
       $regex: new RegExp(search, "i"),
     };
   }
-  try {
-    let totalNoOfList = await subCategoryCollection.countDocuments(findQuery);
-    let subCategoryList = await subCategoryCollection
-      .find(findQuery)
-      .skip(skipPages)
-      .limit(noOfList);
 
-    return { subCategoryList, currentPage, totalNoOfList };
-  } catch (err) {
-    console.log(err);
-  }
+  let totalNoOfList = await subCategoryCollection.countDocuments(findQuery);
+  let subCategoryList = await subCategoryCollection
+    .find(findQuery)
+    .skip(skipPages)
+    .limit(noOfList);
+
+  return { subCategoryList, currentPage, totalNoOfList };
 };
 
 //add sub category
@@ -34,34 +31,23 @@ export const addSubCategory = async (
   subCategoryName,
   subCategoryDescription
 ) => {
-  try {
-    let subCategory = await subCategoryCollection.findOne({
-      subCategoryName: { $regex: new RegExp(`^${subCategoryName}$`, "i") },
-    });
+  let subCategory = await subCategoryCollection.findOne({
+    subCategoryName: { $regex: new RegExp(`^${subCategoryName}$`, "i") },
+  });
 
-    if (subCategory) {
-      //checks subcategory exist
-      return "subCategory Aldready exists";
-
-      // if (!subCategory.isListed) { //if subcategory not deleted
-      //     return "subCategory Aldready exists"
-      // }
-
-      //if subcategory is not deleted change deletd to false
-      // let oldsubCategory = await subCategoryCollection.findOneAndUpdate({ subCategoryName }, { $set: { isListed: false } })
-      // return
-    }
-
-    //create a new sub cateogry
-    const newsubCategory = new subCategoryCollection({
-      subCategoryName,
-      subCategoryDescription,
-    });
-
-    await newsubCategory.save();
-  } catch (err) {
-    console.log(err);
+  if (subCategory) {
+    //checks subcategory exist
+    return { success: false, error: "subCategory Aldready exists" };
   }
+
+  //create a new sub cateogry
+  const newsubCategory = new subCategoryCollection({
+    subCategoryName,
+    subCategoryDescription,
+  });
+
+  await newsubCategory.save();
+  return { success: true, message: "subCategory added successfully" };
 };
 
 //edit sub category
@@ -70,41 +56,37 @@ export const editSubCategory = async (
   subCategoryName,
   subCategoryDescription
 ) => {
-  try {
-    let subCategory = await subCategoryCollection.findOne({
-      subCategoryName: { $regex: new RegExp(`^${subCategoryName}$`, "i") },
-      _id: { $ne: subCategoryID },
-    });
+  let subCategory = await subCategoryCollection.findOne({
+    subCategoryName: { $regex: new RegExp(`^${subCategoryName}$`, "i") },
+    _id: { $ne: subCategoryID },
+  });
 
-    if (subCategory) {
-      //checks subcateogry exists
-      return "subCategory already exists cannot edit";
-    }
-
-    await subCategoryCollection.updateOne(
-      { _id: subCategoryID },
-      { subCategoryName, subCategoryDescription }
-    );
-  } catch (err) {
-    console.log(err);
+  if (subCategory) {
+    //checks subcateogry exists
+    return { success: false, error: "subCategory already exists cannot edit" };
   }
+
+  await subCategoryCollection.updateOne(
+    { _id: subCategoryID },
+    { subCategoryName, subCategoryDescription }
+  );
+  return { success: true, message: "subCategory edited successfully" };
 };
 
 //deleted subcategory
 export const listUnlistSubCategory = async (subCategoryID, list) => {
-  try {
-    // const productExist = await productCollection.findOne({ subCategoryID: subCategoryID })
+  // const productExist = await productCollection.findOne({ subCategoryID: subCategoryID })
 
-    // if (productExist) { //if product exists aldready the subcategory cannot be deleted
-    //     return "SubCategories with products cannot be deleted"
-    // }
-    await subCategoryCollection.updateOne(
-      { _id: subCategoryID },
-      { isListed: list }
-    );
-    await productCollection.updateMany(
-      { _id: subCategoryID },
-      { isListed: list }
-    );
-  } catch (err) {}
+  // if (productExist) { //if product exists aldready the subcategory cannot be deleted
+  //     return "SubCategories with products cannot be deleted"
+  // }
+  await subCategoryCollection.updateOne(
+    { _id: subCategoryID },
+    { isListed: list }
+  );
+  await productCollection.updateMany(
+    { _id: subCategoryID },
+    { isListed: list }
+  );
+  return { success: true, message: "subCategory status changed successfully" };
 };

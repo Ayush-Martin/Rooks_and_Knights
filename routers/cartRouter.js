@@ -3,7 +3,7 @@ import express from "express";
 const router = express.Router();
 
 //controllers
-import * as cartController from "../controllers/cartController.js";
+import * as cartController from "../controllers/user/cartController.js";
 
 //middlewares
 import * as userAuthMiddleware from "../middlewares/userAuthMiddleware.js";

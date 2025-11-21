@@ -1,5 +1,5 @@
 //services
-import * as wishlistService from "../services/wishlistService.js";
+import * as wishlistService from "../../services/wishlistService.js";
 
 //render wishlist page
 export const getWishlist = async (req, res) => {

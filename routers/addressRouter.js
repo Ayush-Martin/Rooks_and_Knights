@@ -3,7 +3,7 @@ import express from "express";
 const router = express.Router();
 
 //controllers
-import * as addressController from "../controllers/addressController.js";
+import * as addressController from "../controllers/user/addressController.js";
 
 //middlewares
 import * as userAuthMiddleware from "../middlewares/userAuthMiddleware.js";

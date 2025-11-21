@@ -4,7 +4,7 @@ const router = express.Router();
 import passport from "passport";
 
 //Controllers
-import * as userController from "../controllers/userController.js";
+import * as userController from "../controllers/user/userController.js";
 
 //Middlewares
 import * as userAuthMiddleware from "../middlewares/userAuthMiddleware.js";

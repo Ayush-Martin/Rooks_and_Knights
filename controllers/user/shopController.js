@@ -1,6 +1,6 @@
 //services
-import * as shopServices from "../services/shopServices.js";
-import * as wishlistService from "../services/wishlistService.js";
+import * as shopServices from "../../services/shopServices.js";
+import * as wishlistService from "../../services/wishlistService.js";
 
 //render product page
 export const getProductList = async (req, res) => {
