@@ -6,6 +6,7 @@ const router = express.Router();
 import * as adminController from "../controllers/admin/adminController.js";
 import * as adminCategoryController from "../controllers/admin/adminCategoryController.js";
 import * as adminSubCategoryController from "../controllers/admin/adminSubCategoryController.js";
+import * as adminUserController from "../controllers/admin/adminUserController.js";
 
 //multer upload middleware
 import upload, { handleUpload } from "../utils/multerUtils.js";
@@ -45,8 +46,8 @@ router.use((req, res, next) => {
 router.get("/", adminController.getDashboard); //display dashboard
 
 //Users
-router.get("/users", adminController.getUsers); //display user list
-router.patch("/users/:id", adminController.patchBlockUnblockUser); //block or unblock user
+router.get("/users", adminUserController.usersPage); //display user list
+router.patch("/users/:id", adminUserController.blockUnblockUser); //block or unblock user
 
 //Products
 router.get("/products", adminController.getProducts); //display products

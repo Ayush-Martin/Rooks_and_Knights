@@ -1,8 +1,6 @@
 //Services
 import * as adminDashboardService from "../../services/adminDashboardService.js";
 import * as adminUserService from "../../services/adminUserService.js";
-import * as adminCategoryService from "../../services/adminCategoryService.js";
-import * as adminSubCategoryService from "../../services/adminSubCategoryServices.js";
 import * as adminProductService from "../../services/adminProductService.js";
 import * as adminService from "../../services/adminService.js";
 import * as adminOrderService from "../../services/adminOrderService.js";
@@ -256,115 +254,6 @@ export const patchListUnlistProduct = async (req, res) => {
   } catch (err) {
     console.log(err);
     res.redirect("/error");
-  }
-};
-
-//subCategory
-//list sub categories
-export const getSubCategory = async (req, res) => {
-  try {
-    const { search, page } = req.query;
-    const currentPage = page || 1;
-    const noOfList = 6;
-    const skipPages = (currentPage - 1) * noOfList;
-    const { subCategoryList, totalNoOfList } =
-      await adminSubCategoryService.subCategoryList(
-        search,
-        currentPage,
-        noOfList,
-        skipPages
-      );
-
-    const totalNoOfPages = Math.ceil(totalNoOfList / noOfList);
-    res.render("admin/subCategories", {
-      subCategoryList,
-      searchFilter: search || null,
-      currentPage,
-      totalNoOfPages,
-    });
-  } catch (err) {
-    console.log(err);
-    res.redirect("/error");
-  }
-};
-
-//add new subCategory
-export const addSubCategory = async (req, res) => {
-  try {
-    const { subCategoryName, subCategoryDescription } = req.body;
-
-    if (!subCategoryName || !subCategoryDescription) {
-      return res.status(400).json({
-        error:
-          "subCategory name or subCategory description should not be empty",
-      });
-    }
-
-    const error = await adminSubCategoryService.addSubCategory(
-      subCategoryName,
-      subCategoryDescription
-    );
-
-    if (error) {
-      return res.status(400).json({ error });
-    }
-
-    res.status(200).json({ success: true });
-  } catch (err) {
-    console.log(err);
-    res.status(500).json({ error: "Server Error" });
-  }
-};
-
-//edit subcategory
-export const putEditSubCategory = async (req, res) => {
-  try {
-    const subCategoryID = req.params.id;
-
-    const { subCategoryName, subCategoryDescription } = req.body;
-
-    if (!subCategoryName || !subCategoryDescription) {
-      req.flash(
-        "SubCategoryError",
-        "subCategory name or subCategory description should not be empty"
-      );
-      return res.status(400).json({
-        error:
-          "subCategory name or subCategory description should not be empty",
-      });
-    }
-    const error = await adminSubCategoryService.editSubCategory(
-      subCategoryID,
-      subCategoryName,
-      subCategoryDescription
-    );
-    if (error) {
-      return res.status(400).json({ error });
-    }
-
-    res.status(200).json({ success: true });
-  } catch (err) {
-    console.log(err);
-    res.status(500).json({ error: "Server Error" });
-  }
-};
-
-//delete specific subcategory
-export const patchListUnlistSubCategory = async (req, res) => {
-  try {
-    const subCategoryID = req.params.id;
-    const { list } = req.body;
-    const error = await adminSubCategoryService.listUnlistSubCategory(
-      subCategoryID,
-      list
-    );
-    if (error) {
-      return res.status(400).json({ error });
-    }
-    res.status(200).json({ success: true });
-  } catch (err) {
-    console.log(err);
-    res.status(500).json({ error: "Server Error" });
   }
 };
 
