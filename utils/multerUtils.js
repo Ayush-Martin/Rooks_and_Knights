@@ -21,13 +21,31 @@ const storage = multer.diskStorage({
   },
 });
 
-const upload = multer({
+const uploadMiddleware = multer({
   storage,
-  limits: { fileSize: 5 * 1024 * 1024 }, // Adjust limit as needed
+  limits: { fileSize: 5 * 1024 * 1024}, 
 }).fields([
   { name: "img1", maxCount: 1 },
   { name: "img2", maxCount: 1 },
   { name: "img3", maxCount: 1 },
 ]);
 
-export default upload;
+export const handleUpload = (req, res, next) => {
+  uploadMiddleware(req, res, (err) => {
+    if (err) {
+      if (err instanceof multer.MulterError) {
+        if (err.code === "LIMIT_FILE_SIZE") {
+          req.flash("ProductError", "File size too large. Max limit is 5MB.");
+        } else {
+          req.flash("ProductError", err.message);
+        }
+      } else {
+        req.flash("ProductError", "An error occurred during file upload.");
+      }
+      return res.redirect(req.originalUrl);
+    }
+    next();
+  });
+};
+
+export default uploadMiddleware;

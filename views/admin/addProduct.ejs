@@ -56,9 +56,6 @@
                             <div class="card-header text-center">
                                 <h2>Add Product </h2>
                             </div>
-                            <p class="fs-15 text-danger text-center">
-                                <%= error %>
-                            </p>
                             <div class="card-body">
                                 <form action="/admin/products/addProduct" method="post" enctype="multipart/form-data"
                                     id="addProductForm" onsubmit="addProductValidation(event,true)">
@@ -277,6 +274,16 @@
             </script>
 
             <script src="/public/JS/productValidation.js"></script>
+            <script>
+                const error = "<%= error %>";
+                if (error) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops...',
+                        text: error,
+                    });
+                }
+            </script>
     </body>
 
 </html>

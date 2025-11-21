@@ -6,7 +6,7 @@ const router = express.Router();
 import * as adminController from "../controllers/adminController.js";
 
 //multer upload middleware
-import upload from "../utils/multerUtils.js";
+import upload, { handleUpload } from "../utils/multerUtils.js";
 
 //middlewares
 import * as adminMiddleware from "../middlewares/adminAuthMiddleware.js";
@@ -47,11 +47,11 @@ router.patch("/users/:id", adminController.patchBlockUnblockUser); //block or un
 //Products
 router.get("/products", adminController.getProducts); //display products
 router.get("/products/addProduct", adminController.getAddProduct); //display page to add a new product
-router.post("/products/addProduct", upload, adminController.postAddProduct); //add a new product
+router.post("/products/addProduct", handleUpload, adminController.postAddProduct); //add a new product
 router.get("/products/viewEditProduct/:id", adminController.getViewEditProduct); //view specif product
 router.post(
   "/products/viewEditProduct/:id",
-  upload,
+  handleUpload,
   adminController.putViewEditProduct
 ); //edit a product
 router.patch("/products/:id", adminController.patchListUnlistProduct); //delete a product

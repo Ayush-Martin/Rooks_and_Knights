@@ -66,8 +66,8 @@
                                 <h2>Product Form</h2>
                             </div>
                             <div class="card-body">
-                                <form action="/admin/products/viewEditProduct/<%= product._id %>"
-                                    method="post" enctype="multipart/form-data" id="editProductForm"
+                                <form action="/admin/products/viewEditProduct/<%= product._id %>" method="post"
+                                    enctype="multipart/form-data" id="editProductForm"
                                     onsubmit="addProductValidation(event,false)">
                                     <!-- Image Upload Section -->
                                     <div class="form-group text-center">
@@ -140,10 +140,12 @@
                                                 <label for="productCategory">Category</label>
                                                 <select id="productCategory" class="form-control" name="category">
                                                     <% categories.forEach((category)=>{ %>
-                                                        <option <%= (product.categoryID._id.toString() == category._id.toString()) ? 'selected' : '' %>>
+                                                        <option
+                                                            <%=(product.categoryID._id.toString()==category._id.toString())
+                                                            ? 'selected' : '' %>>
                                                             <%= category.categoryName %>
                                                         </option>
-                                                        
+
                                                         <% }) %>
                                                 </select>
                                             </div>
@@ -155,10 +157,12 @@
                                                 <label for="productSubCategory">Sub Category</label>
                                                 <select id="productSubCategory" class="form-control" name="subCategory">
                                                     <% subCategories.forEach((subCategory)=>{ %>
-                                                        <option <%= (product.subCategoryID._id.toString() == subCategory._id.toString()) ? 'selected' : '' %>>
+                                                        <option
+                                                            <%=(product.subCategoryID._id.toString()==subCategory._id.toString())
+                                                            ? 'selected' : '' %>>
                                                             <%= subCategory.subCategoryName %>
                                                         </option>
-                                                        
+
                                                         <% }) %>
                                                 </select>
                                             </div>
@@ -283,6 +287,16 @@
                 });
             </script>
             <script src="/public/JS/productValidation.js"></script>
+            <script>
+                const error = "<%= error %>";
+                if (error) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops...',
+                        text: error,
+                    });
+                }
+            </script>
 
 
     </body>

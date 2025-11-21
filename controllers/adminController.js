@@ -213,7 +213,12 @@ export const getViewEditProduct = async (req, res) => {
     const subCategories = await adminProductService.subCategories();
     const product = await adminProductService.viewProduct(productID);
 
-    res.render("admin/viewEditProduct", { product, categories, subCategories });
+    res.render("admin/viewEditProduct", {
+      product,
+      categories,
+      subCategories,
+      error: req.flash("ProductError") || "",
+    });
   } catch (err) {
     console.log(err);
     res.redirect("/error");
