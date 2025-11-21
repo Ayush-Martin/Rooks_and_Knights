@@ -60,60 +60,60 @@
             <%- include('./partials/slidebar') %>
 
                 <div id="content" class="p-4 p-md-5" style="background-color:#f1f2f5 ;">
-                    <div class="container mt-5">
-                        <div class="card">
-                            <div class="card-header text-center">
-                                <h2>Product Form</h2>
-                            </div>
-                            <div class="card-body">
-                                <form action="/admin/products/viewEditProduct/<%= product._id %>" method="post"
-                                    enctype="multipart/form-data" id="editProductForm"
-                                    onsubmit="addProductValidation(event,false)">
-                                    <!-- Image Upload Section -->
-                                    <div class="form-group text-center">
-                                        <label for="productImages">Image Upload</label>
-                                        <div class="d-flex justify-content-center">
-                                            <!-- Box 1 -->
-                                            <div class="product-image-box mx-2">
-                                                <label for="productImage1" class="image-label">
-                                                    <img id="previewImage1" class="image-preview"
-                                                        src="<%= product.productImage1 || '' %>" alt="">
-                                                    <i class="fa fa-picture-o"></i>
-                                                    <input type="file" class="form-control-file image-input"
-                                                        id="productImage1" accept="image/*"
-                                                        onchange="openCropperModal('productImage1', 'previewImage1')"
-                                                        name="img1">
-                                                </label>
-                                            </div>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="/admin/products">Products</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">Edit Product</li>
+                        </ol>
+                    </nav>
 
-                                            <!-- Box 2 -->
-                                            <div class="product-image-box mx-2">
-                                                <label for="productImage2" class="image-label">
-                                                    <img id="previewImage2" class="image-preview"
-                                                        src="<%= product.productImage2 || '' %>" alt="">
-                                                    <i class="fa fa-picture-o"></i>
-                                                    <input type="file" class="form-control-file image-input"
-                                                        id="productImage2" accept="image/*"
-                                                        onchange="openCropperModal('productImage2', 'previewImage2')"
-                                                        name="img2">
-                                                </label>
-                                            </div>
-
-                                            <!-- Box 3 -->
-                                            <div class="product-image-box mx-2">
-                                                <label for="productImage3" class="image-label">
-                                                    <img id="previewImage3" class="image-preview"
-                                                        src="<%= product.productImage3 || '' %>" alt="">
-                                                    <i class="fa fa-picture-o"></i>
-                                                    <input type="file" class="form-control-file image-input"
-                                                        id="productImage3" accept="image/*"
-                                                        onchange="openCropperModal('productImage3', 'previewImage3')"
-                                                        name="img3">
-                                                </label>
-                                            </div>
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <form id="editProductForm" action="/admin/products/<%= product._id %>" method="post"
+                                    enctype="multipart/form-data"
+                                    onsubmit="submitEditProductForm(event, '<%= product._id %>')">
+                                    <div class="d-flex justify-content-center mb-3">
+                                        <!-- Box 1 -->
+                                        <div class="product-image-box mx-2">
+                                            <label for="productImage1" class="image-label">
+                                                <img id="previewImage1" class="image-preview"
+                                                    src="<%= product.productImage1 || '' %>" alt="">
+                                                <i class="fa fa-picture-o"></i>
+                                                <input type="file" class="form-control-file image-input"
+                                                    id="productImage1" accept="image/*"
+                                                    onchange="openCropperModal('productImage1', 'previewImage1')"
+                                                    name="img1">
+                                            </label>
                                         </div>
-                                        <p id="productImageError" class="text-danger fs-15"></p>
+
+                                        <!-- Box 2 -->
+                                        <div class="product-image-box mx-2">
+                                            <label for="productImage2" class="image-label">
+                                                <img id="previewImage2" class="image-preview"
+                                                    src="<%= product.productImage2 || '' %>" alt="">
+                                                <i class="fa fa-picture-o"></i>
+                                                <input type="file" class="form-control-file image-input"
+                                                    id="productImage2" accept="image/*"
+                                                    onchange="openCropperModal('productImage2', 'previewImage2')"
+                                                    name="img2">
+                                            </label>
+                                        </div>
+
+                                        <!-- Box 3 -->
+                                        <div class="product-image-box mx-2">
+                                            <label for="productImage3" class="image-label">
+                                                <img id="previewImage3" class="image-preview"
+                                                    src="<%= product.productImage3 || '' %>" alt="">
+                                                <i class="fa fa-picture-o"></i>
+                                                <input type="file" class="form-control-file image-input"
+                                                    id="productImage3" accept="image/*"
+                                                    onchange="openCropperModal('productImage3', 'previewImage3')"
+                                                    name="img3">
+                                            </label>
+                                        </div>
                                     </div>
+                                    <p id="productImageError" class="text-danger fs-15"></p>
 
                                     <div class="form-row">
                                         <div class="form-group col-md-6">
@@ -286,6 +286,7 @@
                     }
                 });
             </script>
+            <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
             <script src="/public/JS/productValidation.js"></script>
             <script>
                 const error = "<%= error %>";
@@ -295,6 +296,42 @@
                         title: 'Oops...',
                         text: error,
                     });
+                }
+
+                async function submitEditProductForm(event, productID) {
+                    event.preventDefault();
+                    const isValid = validateProductForm(false); // false for image validation
+                    if (!isValid) return;
+
+                    const form = document.getElementById('editProductForm');
+                    const formData = new FormData(form);
+
+                    try {
+                        const response = await axios.put('/admin/products/' + productID, formData, {
+                            headers: {
+                                'Content-Type': 'multipart/form-data'
+                            }
+                        });
+
+                        if (response.data.success) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Success',
+                                text: 'Product updated successfully',
+                                showConfirmButton: false,
+                                timer: 1500
+                            }).then(() => {
+                                window.location.href = response.data.successRedirect;
+                            });
+                        }
+                    } catch (error) {
+                        console.error(error);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: error.response?.data?.error || 'An error occurred'
+                        });
+                    }
                 }
             </script>
 

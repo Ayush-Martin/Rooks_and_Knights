@@ -7,9 +7,9 @@ import subCategoryCollection from "../models/subCategoryModel.js";
 import fs from "node:fs";
 import path from "node:path";
 
-//get product list
-export const productList = async (search, currentPage, noOfList, skipPages) => {
-  const findQuery = {};
+// Service to get Pagenated product list
+export const getProducts = async (search, currentPage, noOfList, skipPages) => {
+  const findQuery = {}; // Filter query object
 
   if (search) {
     findQuery.productName = {
@@ -17,52 +17,144 @@ export const productList = async (search, currentPage, noOfList, skipPages) => {
     };
   }
 
-  try {
-    const totalNoOfList = await productCollection.countDocuments(findQuery);
-    const productList = await productCollection
-      .find(findQuery)
-      .skip(skipPages)
-      .limit(noOfList)
-      .populate("categoryID")
-      .populate("subCategoryID")
-      .lean();
+  const totalNoOfList = await productCollection.countDocuments(findQuery);
+  const productList = await productCollection
+    .find(findQuery)
+    .skip(skipPages)
+    .limit(noOfList)
+    .populate("categoryID")
+    .populate("subCategoryID")
+    .lean();
 
-    return { productList, currentPage, totalNoOfList };
-  } catch (err) {
-    console.log(err);
-  }
+  return { productList, currentPage, totalNoOfList };
 };
 
-//add new product
+// Service to add new product
 export const addProduct = async (req, res) => {
-  try {
-    const {
-      productName,
-      productDescription,
-      productAbout,
-      stock,
-      price,
-      category,
-      subCategory,
-      offer,
-    } = req.body;
+  const {
+    productName,
+    productDescription,
+    productAbout,
+    stock,
+    price,
+    category,
+    subCategory,
+    offer,
+  } = req.body;
 
-    const product = await productCollection.findOne({ productName });
+  const product = await productCollection.findOne({ productName });
 
-    if (product) {
-      //check the product aldready exists
-      return "Product Aldready exists";
-    }
+  if (product) {
+    return { success: false, error: "Product Already exists" };
+  }
 
-    const categoryID = await categoryCollection.findOne({
-      categoryName: category,
+  const categoryID = await categoryCollection.findOne({
+    categoryName: category,
+  });
+  const subCategoryID = await subCategoryCollection.findOne({
+    subCategoryName: subCategory,
+  });
+
+  const newProduct = new productCollection({
+    productName,
+    productAbout,
+    productDescription,
+    price,
+    stock,
+    categoryID,
+    subCategoryID,
+    offer,
+    productImage1: `/public/upload/${req.files["img1"][0].filename}`,
+    productImage2: `/public/upload/${req.files["img2"][0].filename}`,
+    productImage3: `/public/upload/${req.files["img3"][0].filename}`,
+  });
+
+  await newProduct.save();
+
+  return { success: true };
+};
+
+// Service to get a product by id
+export const getProduct = async (productID) => {
+  const product = await productCollection
+    .findById(productID)
+    .populate("categoryID")
+    .populate("subCategoryID");
+
+  return product;
+};
+
+// Service to edit a product
+export const editProduct = async (req, res, productID) => {
+  const {
+    productName,
+    productDescription,
+    productAbout,
+    stock,
+    price,
+    category,
+    subCategory,
+    offer,
+  } = req.body;
+
+  const product = await productCollection.findOne({
+    productName,
+    _id: { $ne: productID },
+  });
+
+  if (product) {
+    return { success: false, error: "Product with same name exists" };
+  }
+
+  // getting the id of category and subcategory
+  const categoryID = await categoryCollection.findOne({
+    categoryName: category,
+  });
+  const subCategoryID = await subCategoryCollection.findOne({
+    subCategoryName: subCategory,
+  });
+
+  //finding the old product
+  const oldProductData = await productCollection.findById(productID);
+
+  let productImage1 = oldProductData.productImage1;
+  let productImage2 = oldProductData.productImage2;
+  let productImage3 = oldProductData.productImage3;
+
+  //check the images are sent form frontend if there is no image the old image is taken
+  if (req.files["img1"]) {
+    fs.unlink(path.join("./", productImage1), (err) => {
+      if (err) {
+        console.log(err);
+        return;
+      }
     });
-    const subCategoryID = await subCategoryCollection.findOne({
-      subCategoryName: subCategory,
-    });
+    productImage1 = `/public/upload/${req.files["img1"][0].filename}`;
+  }
 
-    const newProduct = new productCollection({
-      //add new product
+  if (req.files["img2"]) {
+    fs.unlink(path.join("./", productImage2), (err) => {
+      if (err) {
+        console.log(err);
+        return;
+      }
+    });
+    productImage2 = `/public/upload/${req.files["img2"][0].filename}`;
+  }
+
+  if (req.files["img3"]) {
+    fs.unlink(path.join("./", productImage3), (err) => {
+      if (err) {
+        console.log(err);
+        return;
+      }
+    });
+    productImage3 = `/public/upload/${req.files["img3"][0].filename}`;
+  }
+
+  await productCollection.updateOne(
+    { _id: productID },
+    {
       productName,
       productAbout,
       productDescription,
@@ -71,111 +163,16 @@ export const addProduct = async (req, res) => {
       categoryID,
       subCategoryID,
       offer,
-      productImage1: `/public/upload/${req.files["img1"][0].filename}`,
-      productImage2: `/public/upload/${req.files["img2"][0].filename}`,
-      productImage3: `/public/upload/${req.files["img3"][0].filename}`,
-    });
+      productImage1,
+      productImage2,
+      productImage3,
+    }
+  );
 
-    await newProduct.save();
-  } catch (err) {
-    console.log(err);
-  }
+  return { success: true };
 };
 
-//view specif product
-export const viewProduct = async (productID) => {
-  try {
-    const product = await productCollection
-      .findById(productID)
-      .populate("categoryID")
-      .populate("subCategoryID");
-
-    return product;
-  } catch (err) {
-    console.log(err);
-  }
-};
-
-//edit a product
-export const editProduct = async (req, res, productID) => {
-  try {
-    const {
-      productName,
-      productDescription,
-      productAbout,
-      stock,
-      price,
-      category,
-      subCategory,
-      offer,
-    } = req.body;
-
-    const categoryID = await categoryCollection.findOne({
-      categoryName: category,
-    });
-    const subCategoryID = await subCategoryCollection.findOne({
-      subCategoryName: subCategory,
-    });
-
-    const oldProductData = await productCollection.findById(productID);
-
-    let productImage1 = oldProductData.productImage1;
-    let productImage2 = oldProductData.productImage2;
-    let productImage3 = oldProductData.productImage3;
-
-    //check the images are sent form frontend if there is no image the old image is taken
-    if (req.files["img1"]) {
-      fs.unlink(path.join("./", productImage1), (err) => {
-        if (err) {
-          console.log(err);
-          return;
-        }
-      });
-      productImage1 = `/public/upload/${req.files["img1"][0].filename}`;
-    }
-
-    if (req.files["img2"]) {
-      fs.unlink(path.join("./", productImage2), (err) => {
-        if (err) {
-          console.log(err);
-          return;
-        }
-      });
-      productImage2 = `/public/upload/${req.files["img1"][0].filename}`;
-    }
-
-    if (req.files["img3"]) {
-      fs.unlink(path.join("./", productImage3), (err) => {
-        if (err) {
-          console.log(err);
-          return;
-        }
-      });
-      productImage3 = `/public/upload/${req.files["img1"][0].filename}`;
-    }
-
-    await productCollection.updateOne(
-      { _id: productID },
-      {
-        productName,
-        productAbout,
-        productDescription,
-        price,
-        stock,
-        categoryID,
-        subCategoryID,
-        offer,
-        productImage1,
-        productImage2,
-        productImage3,
-      }
-    );
-  } catch (err) {
-    console.log(err);
-  }
-};
-
-//delete a product
+//List or unlist a product
 export const listUnlistProduct = async (productID, list) => {
   try {
     await productCollection.updateOne({ _id: productID }, { isListed: list });
@@ -184,7 +181,7 @@ export const listUnlistProduct = async (productID, list) => {
   }
 };
 
-//get cateogry list
+//Service to get all listed categories
 export const categories = async () => {
   try {
     const categories = await categoryCollection.find({ isListed: true });
@@ -195,7 +192,7 @@ export const categories = async () => {
   }
 };
 
-//get subcategory list
+// Service to get all listed subCategories
 export const subCategories = async () => {
   try {
     const subCategories = await subCategoryCollection.find({ isListed: true });

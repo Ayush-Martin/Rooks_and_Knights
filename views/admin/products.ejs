@@ -15,7 +15,7 @@
                             <!-- Search Form -->
                             <form action="/admin/products" method="GET" class="search-input-group">
                                 <input type="text" id="search-input" name="search" class="form-control search-input"
-                                    placeholder="search" value="<%= searchFilter ? searchFilter:null %>" >
+                                    placeholder="search" value="<%= searchFilter ? searchFilter:null %>">
                                 <a href="/admin/products?search=">
                                     <button type="button" class="btn-clear" id="clear-btn">
                                         <i class="fas fa-times"></i>
@@ -27,7 +27,7 @@
                             </form>
 
                         </div>
-                        <a href="/admin/products/addProduct" class="text-decoration-none">
+                        <a href="/admin/products/add" class="text-decoration-none">
                             <button class="btn-add">
                                 <i class="fas fa-plus"></i> New Product
                             </button>
@@ -75,8 +75,7 @@
                                             <%= product.subCategoryID.subCategoryName %>
                                         </td>
                                         <td>
-                                            <form action="/admin/products/viewEditProduct/<%= product._id %>"
-                                                method="get">
+                                            <form action="/admin/products/<%= product._id %>" method="get">
                                                 <button class="btn btn-dark btn-sm"><i class="fas fa-pencil-alt"></i>
                                                 </button>
                                             </form>
@@ -84,13 +83,16 @@
                                         </td>
                                         <td>
 
-                                            <button class="btn btn-sm fs-15" onclick="listUnlistProduct('<%=product._id%>','<%= !product.isListed %>')">
-                                                <% if(product.isListed){ %>
-                                                    <i class="fas fa-times-circle"></i> Unlist
-                                                    
-                                                <% }else{ %>
-                                                    <i class="fas fa-list"></i> List
-                                                <% } %>
+                                            <button class="btn btn-sm fs-15"
+                                                onclick="listUnlistProduct(this, '<%=product._id%>', '<%= !product.isListed %>')">
+                                                <p>
+                                                    <% if(product.isListed){ %>
+                                                        <i class="fas fa-times-circle"></i> Unlist
+
+                                                        <% }else{ %>
+                                                            <i class="fas fa-list"></i> List
+                                                            <% } %>
+                                                </p>
                                             </button>
                                         </td>
                                     </tr>
@@ -105,7 +107,8 @@
                             class="m-r-20 text-dark">
                             <i class="fas fa-chevron-left"></i> Previous
                         </a>
-                        <P class="m-r-20 text-dark">page : <%= currentPage %> of <%= Math.ceil(totalNoOfPages) %></P>
+                        <P class="m-r-20 text-dark">page : <%= currentPage %> of <%= Math.ceil(totalNoOfPages) %>
+                        </P>
                         <!-- Next Button -->
                         <a href="/admin/products?search=<%= searchFilter %>&&page=<%= (currentPage<totalNoOfPages)? Number(currentPage)+1:currentPage %>"
                             class=" text-dark">
@@ -119,6 +122,7 @@
 
         <%- include('./partials/footer') %>
 
+            <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
             <script>
                 function remove(productID) {
                     Swal.fire({
@@ -158,7 +162,7 @@
                                         }).then((result) => {
                                             /* Read more about handling dismissals below */
                                             if (result.dismiss === Swal.DismissReason.timer) {
-                                                
+
                                                 window.location.href = data.redirectUrl;
                                             }
                                         });
@@ -183,74 +187,50 @@
 
                 }
 
-                function listUnlistProduct(ID,list){
-                    Swal.fire({
-                                title: "Are you sure?",
-                                text: `Do you want to ${(eval(list)? 'list':'unlist')} this Product`,
-                                icon: "warning",
-                                showCancelButton: true,
-                                confirmButtonColor: "#3085d6",
-                                cancelButtonColor: "#d33",
-                                confirmButtonText: "Yes"
-                            }).then((result) => {
-                                if (result.isConfirmed) {
-                                    fetch(`/admin/products/${ID}`, {
-                                        method: "PATCH",
-                                        headers: {
-                                            'Content-Type': 'application/json'
-                                        },
-                                        body:JSON.stringify({list})
-                                    }).then(res => res.json())
-                                        .then((data) => {
-                                            if (data.validationError) {
-                                                let timerInterval;
-                                                Swal.fire({
-                                                    title: "Validation Error",
-                                                    html: "You will be redirected to login in <b></b> milliseconds.",
-                                                    timer: 2000,
-                                                    timerProgressBar: true,
-                                                    didOpen: () => {
-                                                        Swal.showLoading();
-                                                        const timer = Swal.getPopup().querySelector("b");
-                                                        timerInterval = setInterval(() => {
-                                                            timer.textContent = `${Swal.getTimerLeft()}`;
-                                                        }, 100);
-                                                    },
-                                                    willClose: () => {
-                                                        clearInterval(timerInterval);
-                                                    }
-                                                }).then((result) => {
-                                                    /* Read more about handling dismissals below */
-                                                    if (result.dismiss === Swal.DismissReason.timer) {
-                                                        
-                                                        window.location.href = data.redirectUrl;
-                                                    }
-                                                });
-                                            }
+                async function listUnlistProduct(btn, ID, list) {
+                    try {
+                        const isListing = list === 'true' || list === true;
+                        const action = isListing ? 'list' : 'unlist';
 
-                                            if (data.error) {
-                                                Swal.fire({
-                                                    icon: "error",
-                                                    title: "Validation Error",
-                                                    text: data.error,
-                                                });
-                                            }
+                        const result = await Swal.fire({
+                            title: "Are you sure?",
+                            text: `Do you want to ${action} this product?`,
+                            icon: "warning",
+                            showCancelButton: true,
+                            confirmButtonColor: "#3085d6",
+                            cancelButtonColor: "#d33",
+                            confirmButtonText: "Yes"
+                        });
 
-                                            if (data.success) {
-                                                Swal.fire({
-                                                    text: `You ${(eval(list)? 'listed':'unlisted')} the Product`,
-                                                    icon: "success",
-                                                    timer: 2000
-                                                });
+                        if (!result.isConfirmed) return;
 
-                                                setTimeout(() => {
-                                                    window.location.reload()
-                                                }, 2000)
+                        const response = await axios.patch(`/admin/products/${ID}?list=${isListing}`);
 
-                                            }
-                                        })
-                                }
+                        if (response.status === 200) {
+                            Swal.fire({
+                                text: `You ${isListing ? 'listed' : 'unlisted'} the product`,
+                                icon: "success",
+                                timer: 2000,
+                                showConfirmButton: false
                             });
+
+                            const pTag = btn.querySelector('p');
+                            if (isListing) {
+                                pTag.innerHTML = '<i class="fas fa-times-circle"></i> Unlist';
+                                btn.setAttribute('onclick', `listUnlistProduct(this, '${ID}', false)`);
+                            } else {
+                                pTag.innerHTML = '<i class="fas fa-list"></i> List';
+                                btn.setAttribute('onclick', `listUnlistProduct(this, '${ID}', true)`);
+                            }
+                        }
+                    } catch (err) {
+                        console.error(err);
+                        Swal.fire({
+                            icon: "error",
+                            title: "Error",
+                            text: err.response?.data?.error || "An error occurred"
+                        });
+                    }
                 }
             </script>
     </body>

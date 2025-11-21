@@ -7,6 +7,7 @@ import * as adminController from "../controllers/admin/adminController.js";
 import * as adminCategoryController from "../controllers/admin/adminCategoryController.js";
 import * as adminSubCategoryController from "../controllers/admin/adminSubCategoryController.js";
 import * as adminUserController from "../controllers/admin/adminUserController.js";
+import * as adminProductController from "../controllers/admin/adminProductController.js";
 
 //multer upload middleware
 import upload, { handleUpload } from "../utils/multerUtils.js";
@@ -50,20 +51,18 @@ router.get("/users", adminUserController.usersPage); //display user list
 router.patch("/users/:id", adminUserController.blockUnblockUser); //block or unblock user
 
 //Products
-router.get("/products", adminController.getProducts); //display products
-router.get("/products/addProduct", adminController.getAddProduct); //display page to add a new product
-router.post(
-  "/products/addProduct",
-  handleUpload,
-  adminController.postAddProduct
-); //add a new product
-router.get("/products/viewEditProduct/:id", adminController.getViewEditProduct); //view specif product
-router.post(
-  "/products/viewEditProduct/:id",
-  handleUpload,
-  adminController.putViewEditProduct
-); //edit a product
-router.patch("/products/:id", adminController.patchListUnlistProduct); //delete a product
+router.get("/products", adminProductController.productsPage);
+
+router
+  .route("/products/add")
+  .get(adminProductController.addProductPage)
+  .post(handleUpload, adminProductController.addProduct);
+
+router
+  .route("/products/:id")
+  .get(adminProductController.productPage)
+  .put(handleUpload, adminProductController.editProduct)
+  .patch(adminProductController.listUnlistProduct);
 
 //Categories
 router

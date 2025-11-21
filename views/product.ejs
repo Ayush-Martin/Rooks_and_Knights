@@ -8,39 +8,40 @@
 <body>
 	<style>
 		.image-container {
-    position: relative;
-    width: 400px;
-    height: 400px;
-    overflow: hidden;
-    border: 1px solid #ddd;
-}
+			position: relative;
+			width: 400px;
+			height: 400px;
+			overflow: hidden;
+			border: 1px solid #ddd;
+		}
 
-.image-container img {
-    width: 100%;
-    height: 100%;
-}
+		.image-container img {
+			width: 100%;
+			height: 100%;
+		}
 
-.zoom-lens {
-    position: absolute;
-    border: 1px solid #000;
-    width: 100px;
-    height: 100px;
-    opacity: 0.4;
-    background-color: rgba(255,255,255,0.5);
-    display: none;
-}
+		.zoom-lens {
+			position: absolute;
+			border: 1px solid #000;
+			width: 100px;
+			height: 100px;
+			opacity: 0.4;
+			background-color: rgba(255, 255, 255, 0.5);
+			display: none;
+		}
 
-.zoomed-image {
-    position: absolute;
-    top: 0;
-    left: 420px; /* Adjust the distance based on your layout */
-    width: 800px; /* Zoomed-in size */
-    height: 800px;
-    background-size: 800px 800px;
-    display: none;
-    z-index: 10;
-}
-
+		.zoomed-image {
+			position: absolute;
+			top: 0;
+			left: 420px;
+			/* Adjust the distance based on your layout */
+			width: 800px;
+			/* Zoomed-in size */
+			height: 800px;
+			background-size: 800px 800px;
+			display: none;
+			z-index: 10;
+		}
 	</style>
 
 	<!-- Header -->
@@ -82,10 +83,11 @@
 								<div class="item-slick3" data-thumb="<%= product.productImage1 %>">
 									<div class="wrap-pic-w pos-relative">
 										<div class="image-container" style="object-fit: cover;">
-											<img src="<%= product.productImage1 %>" alt="Zoomable Image" id="main-image" >
+											<img src="<%= product.productImage1 %>" alt="Zoomable Image"
+												id="main-image">
 											<div class="zoom-lens" id="zoom-lens"></div>
 										</div>
-										
+
 
 										<a class="flex-c-m size-108 how-pos1 bor0 fs-16 cl10 bg0 hov-btn3 trans-04"
 											href="<%= product.productImage1 %>">
@@ -97,7 +99,8 @@
 								<div class="item-slick3" data-thumb="<%= product.productImage2 %>">
 									<div class="wrap-pic-w pos-relative">
 										<div class="image-container" style="object-fit: cover;">
-											<img src="<%= product.productImage2 %>" alt="Zoomable Image" id="main-image" >
+											<img src="<%= product.productImage2 %>" alt="Zoomable Image"
+												id="main-image">
 											<div class="zoom-lens" id="zoom-lens"></div>
 										</div>
 
@@ -111,7 +114,8 @@
 								<div class="item-slick3" data-thumb="<%= product.productImage3 %>">
 									<div class="wrap-pic-w pos-relative">
 										<div class="image-container" style="object-fit: cover;">
-											<img src="<%= product.productImage3 %>" alt="Zoomable Image" id="main-image" >
+											<img src="<%= product.productImage3 %>" alt="Zoomable Image"
+												id="main-image">
 											<div class="zoom-lens" id="zoom-lens"></div>
 										</div>
 
@@ -134,10 +138,12 @@
 
 						<p class="mtext-106 cl2">
 							<% if(product.offer || product.categoryID.offer || product.subCategoryID.offer) {%>
-								<span style="text-decoration: line-through">₹<%= product.price %></span> ₹<%=parseInt( product.price- product.price * Math.max(product.offer,product.categoryID.offer,product.subCategoryID.offer)/100 )%>
-							<% }else{ %>
-								₹<%= product.price %>
-							<% } %>
+								<span style="text-decoration: line-through">₹<%= product.price %></span> ₹<%=parseInt(
+									product.price- product.price *
+									Math.max(product.offer,product.categoryID.offer,product.subCategoryID.offer)/100 )%>
+									<% }else{ %>
+										₹<%= product.price %>
+											<% } %>
 						</p>
 
 						<p class="stext-102 cl3 p-t-23">
@@ -190,13 +196,15 @@
 					<!--  -->
 					<div class="flex-w flex-m  p-t-10 respon7">
 						<div class="flex-m bor9 p-r-10 m-r-11">
-							<button href="#" onclick="addRemoveWishlist(event,'<%= product._id %>','<%= productInWishlist %>','<%= product.categoryID._id %>','<%= product.subCategoryID._id %>')"
+							<button href="#"
+								onclick="addRemoveWishlist(event,'<%= product._id %>','<%= productInWishlist %>','<%= product.categoryID._id %>','<%= product.subCategoryID._id %>')"
 								class="fs-20 cl3 hov-cl1 trans-04 lh-10 p-lr-5 p-tb-2 js-addwish-detail tooltip100"
 								data-tooltip="<%= productInWishlist? 'Remove form wishlist':'Add to wishlist' %>">
-								<i id="wishlistIcon" class="<%= productInWishlist? 'zmdi zmdi-favorite':'zmdi zmdi-favorite-outline' %>"></i>
+								<i id="wishlistIcon"
+									class="<%= productInWishlist? 'zmdi zmdi-favorite':'zmdi zmdi-favorite-outline' %>"></i>
 							</button>
 
-							
+
 						</div>
 					</div>
 				</div>
@@ -281,7 +289,7 @@
 									<% product.reviews.forEach(review=> {%>
 										<div class="flex-w flex-t p-b-68">
 											<div class="wrap-pic-s size-200 bor0 of-hidden m-r-18 m-t-6">
-												
+
 												<i class="fas fa-user"></i>
 
 											</div>
@@ -395,7 +403,7 @@
 
 		<%- include('./partials/scriptBody.ejs') %>
 
-			
+
 			<script>
 				//handle the quantity
 
@@ -431,19 +439,19 @@
 				//sending request to server
 
 				//function ot add prouduct to cart
-				function addToCart(productID,categoryID,subCategoryID , event ) {
+				function addToCart(productID, categoryID, subCategoryID, event) {
 					event.preventDefault();
-				
+
 					let quantity = document.getElementById('productQuantity').value;
-					
-					const error=checkValidNumber(quantity, "quantity", 1, 10)
-					
-					if(error){
+
+					const error = checkValidNumber(quantity, "quantity", 1, 10)
+
+					if (error) {
 						Swal.fire({
-									title: "Error",
-									text: error,
-									icon: "error",
-								})
+							title: "Error",
+							text: error,
+							icon: "error",
+						})
 						return
 					}
 					fetch(`/cart/addToCart/${productID}`, {
@@ -452,7 +460,7 @@
 							'Content-Type': 'application/json'
 						},
 						body: JSON.stringify({
-							quantity,categoryID,subCategoryID
+							quantity, categoryID, subCategoryID
 						})
 					}).then((res) => res.json())
 						.then((data) => {
@@ -501,26 +509,26 @@
 
 				}
 
-				function addRemoveWishlist(event, productID,productInWishlist,categoryID,subCategoryID) {
+				function addRemoveWishlist(event, productID, productInWishlist, categoryID, subCategoryID) {
 					event.preventDefault()
 
-					const  method = (productInWishlist=='true') ? 'DELETE' : 'POST';
-					const  wishlistIcon=document.getElementById('wishlistIcon')
+					const method = (productInWishlist == 'true') ? 'DELETE' : 'POST';
+					const wishlistIcon = document.getElementById('wishlistIcon')
 
-					
+
 					fetch(`/wishlist/${productID}`, {
 						method,
 						headers: {
 							'Content-Type': 'application/json'
 						},
-						body:JSON.stringify({categoryID,subCategoryID})
+						body: JSON.stringify({ categoryID, subCategoryID })
 					}).then((res) => res.json())
 						.then((data) => {
 							if (data.success) {
 
-								
-									window.location.reload()
-								
+
+								window.location.reload()
+
 							} else if (data.authError) {
 								Swal.fire({
 									icon: "error",
@@ -543,43 +551,43 @@
 				}
 
 				const img = document.getElementById("main-image");
-const zoomLens = document.getElementById("zoom-lens");
+				const zoomLens = document.getElementById("zoom-lens");
 
-img.addEventListener("mousemove", function(e) {
-    zoomLens.style.display = "block";
-    
-    // Get the cursor position and set lens position
-    const pos = getCursorPosition(e, img);
-    let x = pos.x - (zoomLens.offsetWidth / 2);
-    let y = pos.y - (zoomLens.offsetHeight / 2);
-    
-    // Prevent the lens from going outside the image
-    if (x > img.width - zoomLens.offsetWidth) {x = img.width - zoomLens.offsetWidth;}
-    if (x < 0) {x = 0;}
-    if (y > img.height - zoomLens.offsetHeight) {y = img.height - zoomLens.offsetHeight;}
-    if (y < 0) {y = 0;}
-    
-    // Set the position of the zoom lens
-    zoomLens.style.left = x + "px";
-    zoomLens.style.top = y + "px";
-    
-    // Show the zoomed-in area
-    document.querySelector(".zoomed-image").style.display = "block";
-    document.querySelector(".zoomed-image").style.backgroundImage = "url('your-image.jpg')";
-    document.querySelector(".zoomed-image").style.backgroundPosition = `-${x * 2}px -${y * 2}px`;
-});
+				img.addEventListener("mousemove", function (e) {
+					zoomLens.style.display = "block";
 
-img.addEventListener("mouseleave", function() {
-    zoomLens.style.display = "none";
-    document.querySelector(".zoomed-image").style.display = "none";
-});
+					// Get the cursor position and set lens position
+					const pos = getCursorPosition(e, img);
+					let x = pos.x - (zoomLens.offsetWidth / 2);
+					let y = pos.y - (zoomLens.offsetHeight / 2);
 
-function getCursorPosition(e, img) {
-    const rect = img.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    return {x: x, y: y};
-}
+					// Prevent the lens from going outside the image
+					if (x > img.width - zoomLens.offsetWidth) { x = img.width - zoomLens.offsetWidth; }
+					if (x < 0) { x = 0; }
+					if (y > img.height - zoomLens.offsetHeight) { y = img.height - zoomLens.offsetHeight; }
+					if (y < 0) { y = 0; }
+
+					// Set the position of the zoom lens
+					zoomLens.style.left = x + "px";
+					zoomLens.style.top = y + "px";
+
+					// Show the zoomed-in area
+					document.querySelector(".zoomed-image").style.display = "block";
+					document.querySelector(".zoomed-image").style.backgroundImage = "url('your-image.jpg')";
+					document.querySelector(".zoomed-image").style.backgroundPosition = `-${x * 2}px -${y * 2}px`;
+				});
+
+				img.addEventListener("mouseleave", function () {
+					zoomLens.style.display = "none";
+					document.querySelector(".zoomed-image").style.display = "none";
+				});
+
+				function getCursorPosition(e, img) {
+					const rect = img.getBoundingClientRect();
+					const x = e.clientX - rect.left;
+					const y = e.clientY - rect.top;
+					return { x: x, y: y };
+				}
 
 			</script>
 
