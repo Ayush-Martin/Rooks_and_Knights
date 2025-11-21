@@ -13,60 +13,69 @@ import * as transationService from "../../services/transactionService.js";
 import * as adminCouponService from "../../services/adminCouponServices.js";
 import * as adminSalesService from "../../services/adminSalesService.js";
 
-import mongoose from "mongoose";
 import { format } from "date-fns";
 //Utils
 import generateAccessToken from "../../utils/JWTUtils.js";
 import { generateSalesPdf } from "../../utils/pdfUtils.js";
 import { generateSalesExcel } from "../../utils/excelUtils.js";
 
-//Render login page
-export const getLogin = (req, res) => {
+import { StatusCode } from "../../constants/statusCodes.js";
+
+// Controller to render admin login page`
+export const loginPage = (req, res) => {
   res.render("admin/login");
 };
 
-//handles user login
-export const postLogin = async (req, res) => {
+// Controller to handle admin login
+export const login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
     if (!email || !password) {
       //when email and password not entered
-      return res.status(400).json({ error: "Email and password are required" });
+      return res
+        .status(StatusCode.BAD_REQUEST)
+        .json({ error: "Email and password are required" });
     }
 
-    const adminData = await adminService.findUserByEmail(email);
+    const adminData = await adminService.findAdminByEmail(email);
 
     if (!adminData) {
       //when email doesnot exist in database
-      return res.status(400).json({ error: "Admin does not exist" });
+      return res
+        .status(StatusCode.BAD_REQUEST)
+        .json({ error: "Admin does not exist" });
     }
 
-    const isValidPassword = await adminService.validateUserCredentials(
+    const isValidPassword = await adminService.validateAdminCredentials(
       password,
       adminData.password
     );
 
     if (!isValidPassword) {
-      //If the password entered is not valid
-      return res.status(400).json({ error: "Incorrect password" });
+      return res
+        .status(StatusCode.BAD_REQUEST)
+        .json({ error: "Incorrect password" });
     }
 
     //creating and storing JWT access token to in the cookie
     const accessToken = generateAccessToken(email);
     res.cookie("token", accessToken, { httpOnly: true, sameSite: "Strict" });
-
-    res.redirect("/admin");
+    res
+      .status(StatusCode.OK)
+      .json({ success: true, successRedirect: "/admin" });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: "Server Error" });
+    res
+      .status(StatusCode.INTERNAL_SERVER_ERROR)
+      .json({ error: "Server Error" });
   }
 };
 
-//handles logout
-export const postLogout = (req, res) => {
+// Controller to handle admin logout
+export const logout = (req, res) => {
   res.clearCookie("token");
-  res.status(200).redirect("/admin/login");
+  res.redirect("/admin/login");
 };
 
 //render dashboard

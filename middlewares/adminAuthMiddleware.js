@@ -12,7 +12,7 @@ export const checkAdminAuthenticated = async (req, res, next) => {
   try {
     const user = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
 
-    const adminData = await adminService.findUserByEmail(user.email);
+    const adminData = await adminService.findAdminByEmail(user.email);
 
     if (!adminData) {
       return res.status(403).redirect("/admin/login");
@@ -38,7 +38,7 @@ export const validAdmin = async (req, res, next) => {
   try {
     const user = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
 
-    const adminData = await adminService.findUserByEmail(user.email);
+    const adminData = await adminService.findAdminByEmail(user.email);
 
     if (!adminData) {
       return res
@@ -69,7 +69,7 @@ export const checkAdminAldreadyAuthenticated = async (req, res, next) => {
 
     req.email = user.email;
 
-    const adminData = await adminService.findUserByEmail(req.email);
+    const adminData = await adminService.findAdminByEmail(req.email);
 
     if (!adminData) {
       return next();

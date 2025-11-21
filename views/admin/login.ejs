@@ -38,45 +38,35 @@
             </form>
         </div>
     </div>
-
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
+        document.getElementById('login-form').addEventListener('submit', login)
 
-        document.getElementById('login-form').addEventListener('submit', postForm)
 
-        function postForm(e) {
+        async function login(e) {
             e.preventDefault()
-            let email = document.getElementById('email').value;
-            let password = document.getElementById('password').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
 
-            fetch("/admin/login", {
-                method: "POST",
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ email, password })
-            })
-                .then((res) => {
-                    if (res.redirected) {
-                        window.location.href = res.url;
-                    } else {
-                        return res.json();
-                    }
-                })
-                .then((data) => {
-                    if (data && data.error) {
-
-                        console.log(data.err);
-
-                        document.getElementById('error-message').innerText = data.error;
-                    }
-                })
-                .catch((err) => {
-                    document.getElementById('error-message').innerText = 'some eorror occured'
-
-
+            try {
+                const res = await axios.post("/admin/login", {
+                    email,
+                    password
                 })
 
+                window.location.href = res.data.successRedirect;
+            } catch (err) {
+                const errorMessage = err.response?.data?.error || "Something went wrong";
+                console.error(errorMessage)
+                Swal.fire({
+                    icon: "error",
+                    text: errorMessage,
+                });
+            }
         }
+
+
 
     </script>
 

@@ -15,13 +15,15 @@ import * as adminMiddleware from "../middlewares/adminAuthMiddleware.js";
 
 //routers
 //Login
-router.get(
-  "/login",
-  adminMiddleware.checkAdminAldreadyAuthenticated,
-  adminController.getLogin
-); //display login page
-router.post("/login", adminController.postLogin); //login
-router.post("/logout", adminController.postLogout); //logout
+router
+  .route("/login")
+  .get(
+    adminMiddleware.checkAdminAldreadyAuthenticated,
+    adminController.loginPage
+  )
+  .post(adminController.login);
+
+router.post("/logout", adminController.logout); //logout
 
 //set up middleware for get request
 router.use((req, res, next) => {
