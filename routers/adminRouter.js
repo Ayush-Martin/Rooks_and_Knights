@@ -21,7 +21,7 @@ import * as adminMiddleware from "../middlewares/adminAuthMiddleware.js";
 router
   .route("/login")
   .get(
-    adminMiddleware.checkAdminAldreadyAuthenticated,
+    adminMiddleware.checkAdminAlreadyAuthenticated,
     adminController.loginPage
   )
   .post(adminController.login);
@@ -102,14 +102,16 @@ router.patch("/returns", adminController.patchAproveRejectReturn); //approve or 
 //transations
 router.get("/transations", adminController.getTransations); //display transations
 
-//offers
+// Offers
 router
   .route("/offers")
   .get(adminOfferController.offersPage)
   .post(adminOfferController.addOffer);
 
-router.put("/offers/:id", adminOfferController.editOffer);
-router.delete("/offers/:id", adminOfferController.deleteOffer);
+router
+  .route("/offers/:id")
+  .put(adminOfferController.editOffer)
+  .delete(adminOfferController.deleteOffer);
 
 //coupons
 router.get("/coupons", adminController.getCoupons); //display coupons

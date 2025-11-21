@@ -8,16 +8,10 @@ import * as shopController from "../controllers/user/shopController.js";
 //middlewares
 import * as userAuthMiddleware from "../middlewares/userAuthMiddleware.js";
 
-router.get("/", shopController.getProductList);
-router.get(
-  "/product/:id",
-  userAuthMiddleware.getUser,
-  shopController.getProduct
-);
-router.post(
-  "/product/addReview/:id",
-  userAuthMiddleware.checkUserAuthenticated,
-  shopController.postReview
-);
+router.get("/", shopController.productsPage);
+router
+  .route("/product/:id")
+  .get(userAuthMiddleware.getUser, shopController.productPage)
+  .post(userAuthMiddleware.checkUserAuthenticated, shopController.addReview);
 
 export default router;

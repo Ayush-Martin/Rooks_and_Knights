@@ -244,8 +244,7 @@
 							<div class="col-sm-10 col-md-8 col-lg-6 m-lr-auto">
 								<div class="p-b-30 m-lr-15-sm">
 									<!-- Add review -->
-									<form class="w-full m-b-100" action="/shop/product/addReview/<%=product._id%>"
-										method="post" onsubmit="addReview(event)">
+									<form class="w-full m-b-100" id="addReviewForm" onsubmit="addReview(event)">
 										<h5 class="mtext-108 cl2 p-b-7">
 											Add a review
 										</h5>
@@ -297,7 +296,7 @@
 											<div class="size-207">
 												<div class="flex-w flex-sb-m p-b-17">
 													<span class="mtext-107 cl2 p-r-20">
-														<%= review.userID.username %>
+														<%= review.userID ? review.userID.username : 'Anonymous' %>
 													</span>
 
 													<span class="fs-18 cl11">
@@ -434,8 +433,6 @@
 
 				}
 
-			</script>
-			<script>
 				//sending request to server
 
 				//function ot add prouduct to cart
@@ -494,19 +491,47 @@
 
 
 				//function to add review
-				function addReview(event) {
+				async function addReview(event) {
 					event.preventDefault();
-					Swal.fire({
-						title: "Good job!",
-						text: "Review added",
-						icon: "success",
-						showConfirmButton: true,
-					}).then((result) => {
-						if (result.isConfirmed) {
-							event.target.submit()
-						}
-					})
+					const form = event.target;
+					const formData = new FormData(form);
+					const ratingStar = formData.get('ratingStar');
+					const comments = formData.get('comments');
 
+					if (!ratingStar || !comments) {
+						Swal.fire({
+							icon: "error",
+							title: "Validation Error",
+							text: "Please provide both a rating and a comment."
+						});
+						return;
+					}
+
+					try {
+						const response = await axios.post(`/shop/product/<%=product._id%>`, {
+							ratingStar,
+							comments
+						});
+
+						if (response.status === 201) {
+							Swal.fire({
+								title: "Good job!",
+								text: "Review added successfully",
+								icon: "success",
+								showConfirmButton: false,
+								timer: 1500
+							}).then(() => {
+								window.location.reload();
+							});
+						}
+					} catch (err) {
+						console.error(err);
+						Swal.fire({
+							icon: "error",
+							title: "Error",
+							text: err.response?.data?.error || "An error occurred while adding the review."
+						});
+					}
 				}
 
 				function addRemoveWishlist(event, productID, productInWishlist, categoryID, subCategoryID) {
@@ -553,34 +578,42 @@
 				const img = document.getElementById("main-image");
 				const zoomLens = document.getElementById("zoom-lens");
 
-				img.addEventListener("mousemove", function (e) {
-					zoomLens.style.display = "block";
+				if (img && zoomLens) {
+					img.addEventListener("mousemove", function (e) {
+						zoomLens.style.display = "block";
 
-					// Get the cursor position and set lens position
-					const pos = getCursorPosition(e, img);
-					let x = pos.x - (zoomLens.offsetWidth / 2);
-					let y = pos.y - (zoomLens.offsetHeight / 2);
+						// Get the cursor position and set lens position
+						const pos = getCursorPosition(e, img);
+						let x = pos.x - (zoomLens.offsetWidth / 2);
+						let y = pos.y - (zoomLens.offsetHeight / 2);
 
-					// Prevent the lens from going outside the image
-					if (x > img.width - zoomLens.offsetWidth) { x = img.width - zoomLens.offsetWidth; }
-					if (x < 0) { x = 0; }
-					if (y > img.height - zoomLens.offsetHeight) { y = img.height - zoomLens.offsetHeight; }
-					if (y < 0) { y = 0; }
+						// Prevent the lens from going outside the image
+						if (x > img.width - zoomLens.offsetWidth) { x = img.width - zoomLens.offsetWidth; }
+						if (x < 0) { x = 0; }
+						if (y > img.height - zoomLens.offsetHeight) { y = img.height - zoomLens.offsetHeight; }
+						if (y < 0) { y = 0; }
 
-					// Set the position of the zoom lens
-					zoomLens.style.left = x + "px";
-					zoomLens.style.top = y + "px";
+						// Set the position of the zoom lens
+						zoomLens.style.left = x + "px";
+						zoomLens.style.top = y + "px";
 
-					// Show the zoomed-in area
-					document.querySelector(".zoomed-image").style.display = "block";
-					document.querySelector(".zoomed-image").style.backgroundImage = "url('your-image.jpg')";
-					document.querySelector(".zoomed-image").style.backgroundPosition = `-${x * 2}px -${y * 2}px`;
-				});
+						// Show the zoomed-in area
+						const zoomedImage = document.querySelector(".zoomed-image");
+						if (zoomedImage) {
+							zoomedImage.style.display = "block";
+							zoomedImage.style.backgroundImage = `url('${img.src}')`;
+							zoomedImage.style.backgroundPosition = `-${x * 2}px -${y * 2}px`;
+						}
+					});
 
-				img.addEventListener("mouseleave", function () {
-					zoomLens.style.display = "none";
-					document.querySelector(".zoomed-image").style.display = "none";
-				});
+					img.addEventListener("mouseleave", function () {
+						zoomLens.style.display = "none";
+						const zoomedImage = document.querySelector(".zoomed-image");
+						if (zoomedImage) {
+							zoomedImage.style.display = "none";
+						}
+					});
+				}
 
 				function getCursorPosition(e, img) {
 					const rect = img.getBoundingClientRect();

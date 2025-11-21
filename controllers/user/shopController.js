@@ -1,9 +1,10 @@
 //services
 import * as shopServices from "../../services/shopServices.js";
 import * as wishlistService from "../../services/wishlistService.js";
+import { StatusCode } from "../../constants/statusCodes.js";
 
-//render product page
-export const getProductList = async (req, res) => {
+// Controller to render products
+export const productsPage = async (req, res) => {
   try {
     const { category, sortby, price, subCategory, search, page } = req.query;
     const currentPage = page || 1;
@@ -40,11 +41,11 @@ export const getProductList = async (req, res) => {
   }
 };
 
-//specific product detailed page
-export const getProduct = async (req, res) => {
+// Controller to render product page
+export const productPage = async (req, res) => {
   let _id = req.params.id;
   try {
-    const { product, relatedProducts } = await shopServices.viewProduct(_id);
+    const { product, relatedProducts } = await shopServices.getProduct(_id);
 
     let productInWishlist = false;
 
@@ -63,7 +64,7 @@ export const getProduct = async (req, res) => {
 };
 
 //add product review
-export const postReview = async (req, res) => {
+export const addReview = async (req, res) => {
   let _id = req.params.id;
   try {
     const { ratingStar, comments } = req.body;
@@ -76,9 +77,11 @@ export const postReview = async (req, res) => {
     };
 
     await shopServices.addReview(_id, newReview);
-    res.redirect(`/shop/product/${_id}`);
+    res.status(StatusCode.CREATED).json({ success: true });
   } catch (err) {
     console.log(err);
-    res.status(500).json({ error: "Server Error" });
+    res
+      .status(StatusCode.INTERNAL_SERVER_ERROR)
+      .json({ error: "Server Error" });
   }
 };

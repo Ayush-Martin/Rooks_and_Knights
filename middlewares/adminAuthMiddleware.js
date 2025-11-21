@@ -57,7 +57,7 @@ export const validAdmin = async (req, res, next) => {
 };
 
 // Middleware to check if the user is already authenticated
-export const checkAdminAldreadyAuthenticated = async (req, res, next) => {
+export const checkAdminAlreadyAuthenticated = async (req, res, next) => {
   const token = req.cookies.token;
 
   if (!token) {

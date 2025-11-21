@@ -40,7 +40,7 @@
 		});
 	});
 </script>
-
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 <!--===============================================================================================-->
 
 <!--===============================================================================================-->
@@ -155,15 +155,15 @@
 
 	function checkValidPhoneNumber(phoneNumber) {
 		if (!phoneNumber || phoneNumber != phoneNumber.trim()) {
-			return `phonenumber should not be empty`
+			return `phone number should not be empty`
 		}
 
 		if (phoneNumber.length != 10) {
-			return `phonenumber should contain 10 digits`
+			return `phone number should contain 10 digits`
 		}
 
 		if (!/^\d+$/.test(phoneNumber)) {
-			return `Invalid phonenumber`;
+			return `Invalid phone number`;
 		}
 	}
 
