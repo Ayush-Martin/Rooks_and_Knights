@@ -114,32 +114,8 @@ export const getDashboard = async (req, res) => {
 
 
 
-//transations
-export const getTransations = async (req, res) => {
-  try {
-    const { page } = req.query;
-    const currentPage = page || 1;
-    const noOfList = 6;
-    const skipPages = (currentPage - 1) * noOfList;
 
-    const { transationList, totalNoOfList } =
-      await transationService.allTransationsList(
-        currentPage,
-        noOfList,
-        skipPages
-      );
-    const totalNoOfPages = Math.ceil(totalNoOfList / noOfList);
 
-    res.render("admin/transations", {
-      transationList,
-      currentPage,
-      totalNoOfPages,
-    });
-  } catch (err) {
-    console.log(err);
-    res.redirect("/error");
-  }
-};
 //sales
 export const getSales = async (req, res) => {
   try {

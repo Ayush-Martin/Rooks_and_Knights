@@ -8,7 +8,7 @@
             <%- include('./partials/slidebar') %>
 
                 <div id="content" class="container-fluid">
-                    <h1 class="m-b-10 admin_title">Transations</h1>
+                    <h1 class="m-b-10 admin_title">Transactions</h1>
 
 
                     <div class="table-responsive">
@@ -18,28 +18,28 @@
                                 <tr>
                                     <th>Date</th>
                                     <th>Email</th>
-                                    <th>Ammount</th>
-                                    <th>Transation Type</th>
+                                    <th>Amount</th>
+                                    <th>Transaction Type</th>
                                     <th>Payment Method</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <% transationList.forEach((transation)=>{ %>
+                                <% transactionList.forEach((transaction)=>{ %>
                                     <tr>
                                         <td>
-                                            <%= transation.createdAt.toLocaleDateString() %>
+                                            <%= transaction.createdAt.toLocaleDateString() %>
                                         </td>
                                         <td>
-                                            <%= transation.userID.email %>
+                                            <%= transaction.userID.email %>
                                         </td>
                                         <td>
-                                            <%= transation.amount %>
+                                            <%= transaction.amount %>
                                         </td>
                                         <td>
-                                            <%= transation.transationType %>
+                                            <%= transaction.transationType %>
                                         </td>
                                         <td>
-                                            <%= transation.paymentMethod %>
+                                            <%= transaction.paymentMethod %>
                                         </td>
                                     </tr>
                                     <% }) %>
@@ -49,13 +49,14 @@
                     </div>
                     <div class="flex-c-m flex-w w-full p-t-45 gap-10">
                         <!-- Previous Button -->
-                        <a href="/admin/transations?page=<%= (currentPage>1)? Number(currentPage)-1:1 %>"
+                        <a href="/admin/transactions?page=<%= (currentPage>1)? Number(currentPage)-1:1 %>"
                             class="m-r-20 text-dark">
                             <i class="fas fa-chevron-left"></i> Previous
                         </a>
-                        <P class="m-r-20 text-dark">page : <%= currentPage %> of <%= Math.ceil(totalNoOfPages) %></P>
+                        <P class="m-r-20 text-dark">page : <%= currentPage %> of <%= Math.ceil(totalNoOfPages) %>
+                        </P>
                         <!-- Next Button -->
-                        <a href="/admin/transations?page=<%= (currentPage<totalNoOfPages)? Number(currentPage)+1:currentPage %>"
+                        <a href="/admin/transactions?page=<%= (currentPage<totalNoOfPages)? Number(currentPage)+1:currentPage %>"
                             class=" text-dark">
                             Next <i class="fas fa-chevron-right"></i>
                         </a>

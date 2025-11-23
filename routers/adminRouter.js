@@ -12,6 +12,7 @@ import * as adminOfferController from "../controllers/admin/adminOfferController
 import * as adminCouponController from "../controllers/admin/adminCouponController.js";
 import * as adminOrderController from "../controllers/admin/adminOrderController.js";
 import * as adminReturnController from "../controllers/admin/adminReturnController.js";
+import * as adminTransactionController from "../controllers/admin/adminTransactionController.js";
 
 //multer upload middleware
 import upload, { handleUpload } from "../utils/multerUtils.js";
@@ -103,8 +104,8 @@ router
   .get(adminReturnController.returnsPage)
   .patch(adminReturnController.approveRejectReturn);
 
-//transations
-router.get("/transations", adminController.getTransations); //display transations
+//transactions
+router.get("/transactions", adminTransactionController.transactionsPage);
 
 // Offers
 router
