@@ -12,17 +12,12 @@ import * as wishlistController from "../controllers/user/wishlistController.js";
 router.get(
   "/",
   userAuthMiddleware.checkUserAuthenticated,
-  wishlistController.getWishlist
+  wishlistController.wishlistPage
 );
-router.post(
-  "/:id",
-  userAuthMiddleware.validUser,
-  wishlistController.addToWihslist
-);
-router.delete(
-  "/:id",
-  userAuthMiddleware.validUser,
-  wishlistController.deleteFromWishlist
-);
+
+router
+  .route("/:id")
+  .post(userAuthMiddleware.validUser, wishlistController.addToWishlist)
+  .delete(userAuthMiddleware.validUser, wishlistController.deleteFromWishlist);
 
 export default router;

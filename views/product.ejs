@@ -534,37 +534,33 @@
 					}
 				}
 
-				function addRemoveWishlist(event, productID, productInWishlist, categoryID, subCategoryID) {
+				async function addRemoveWishlist(event, productID, productInWishlist, categoryID, subCategoryID) {
 					event.preventDefault()
 
-					const method = (productInWishlist == 'true') ? 'DELETE' : 'POST';
+					const method = (productInWishlist == 'true') ? 'delete' : 'post';
 					const wishlistIcon = document.getElementById('wishlistIcon')
 
+					try {
+						const res = await axios({
+							method: method,
+							url: `/wishlist/${productID}`,
+							data: { categoryID, subCategoryID }
+						});
 
-					fetch(`/wishlist/${productID}`, {
-						method,
-						headers: {
-							'Content-Type': 'application/json'
-						},
-						body: JSON.stringify({ categoryID, subCategoryID })
-					}).then((res) => res.json())
-						.then((data) => {
-							if (data.success) {
+						const data = res.data;
 
-
-								window.location.reload()
-
-							} else if (data.authError) {
-								Swal.fire({
-									icon: "error",
-									title: "Oops...",
-									text: data.authError,
-									footer: data.errorRedirect
-								});
-							}
-						}).catch((err) => {
-							console.log(err);
-						})
+						if (data.success) {
+							window.location.reload()
+						}
+					} catch (err) {
+						console.log(err);
+						Swal.fire({
+							icon: "error",
+							title: "Oops...",
+							text: err.response?.data?.error || "Something went wrong!",
+							footer: err.response?.data?.errorRedirect
+						});
+					}
 				}
 			</script>
 

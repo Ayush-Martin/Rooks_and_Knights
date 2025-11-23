@@ -14,9 +14,9 @@
 
     <div class="bg0 p-t-75 p-b-110 ">
         <% if(wishlist.wishlistItems.length) {%>
-        <div class="container">
-            <div class="row">
-                
+            <div class="container">
+                <div class="row">
+
                     <div class="col-lg-11 col-xl-8 m-lr-auto m-b-50">
                         <div class="m-l-15 m-r--30 m-lr-0-xl">
                             <div class="wrap-table-shopping-cart">
@@ -42,7 +42,9 @@
                                                 <%= wishlistItem.productID.productName %>
                                             </td>
                                             <td class="column-3">
-                                                <%= wishlistItem.productID.price - (wishlistItem.productID.price * Math.max(wishlistItem.productID.offer,wishlistItem.categoryID.offer , wishlistItem.subCategoryID.offer)/100) %>
+                                                <%= wishlistItem.productID.price - (wishlistItem.productID.price *
+                                                    Math.max(wishlistItem.productID.offer,wishlistItem.categoryID.offer
+                                                    , wishlistItem.subCategoryID.offer)/100) %>
                                             </td>
 
 
@@ -59,8 +61,8 @@
                                                             </div>
 
                                                             <input class="mtext-104 cl3 txt-center num-product"
-                                                                type="number" name="quantity" value="1" id="productQuantity"
-                                                                disabled>
+                                                                type="number" name="quantity" value="1"
+                                                                id="productQuantity" disabled>
 
                                                             <div class="btn-num-product btn-num-product-up cl8 hov-btn3 trans-04 flex-c-m"
                                                                 onclick="increaseProduct(this,'<%= wishlistItem.productID.stock %>')">
@@ -82,16 +84,17 @@
                                                     </td>
                                                     <td class="column-3"></td>
                                                     <td class="column-3"></td>
-                                                <% } %>
+                                                    <% } %>
 
 
-                                                    <td class="column-2">
+                                                        <td class="column-2">
 
-                                                        <button type="button"
-                                                            onclick="deleteWishlistItem('<%=wishlistItem.productID._id%>',event)"><i class="fa-solid fa-trash"></i>
-                                                        </button>
+                                                            <button type="button"
+                                                                onclick="deleteWishlistItem('<%=wishlistItem.productID._id%>',event)"><i
+                                                                    class="fa-solid fa-trash"></i>
+                                                            </button>
 
-                                                    </td>
+                                                        </td>
                                         </tr>
                                         <% }); %>
 
@@ -101,18 +104,19 @@
 
                         </div>
                     </div>
-                
 
 
 
+
+
+                </div>
             </div>
-        </div>
-        <% }else{ %>
-            <div class="m-tb-104 text-center">
-                <p class="fs-31" style="color: rgba(0, 0, 0, 0.351);">Wishlist is Empty</p>
-                <a href="/shop">Continue shoping</a>
-            </div>
-        <% } %>
+            <% }else{ %>
+                <div class="m-tb-104 text-center">
+                    <p class="fs-31" style="color: rgba(0, 0, 0, 0.351);">Wishlist is Empty</p>
+                    <a href="/shop">Continue shoping</a>
+                </div>
+                <% } %>
     </div>
 
 
@@ -231,9 +235,9 @@
                 //sending request to backend
 
                 //delete cart Item
-                function deleteWishlistItem(productID, event) {
+                async function deleteWishlistItem(productID, event) {
                     event.preventDefault()
-                    Swal.fire({
+                    const result = await Swal.fire({
                         title: "Are you sure?",
                         text: "You won't be able to revert this!",
                         icon: "warning",
@@ -241,39 +245,32 @@
                         confirmButtonColor: "#3085d6",
                         cancelButtonColor: "#d33",
                         confirmButtonText: "Yes, delete it!"
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-
-                            fetch(`/wishlist/${productID}`, {
-                                method: "DELETE",
-                                headers: {
-                                    'Content-Type': 'application/json'
-                                },
-                            }).then((res) => res.json())
-                                .then((data) => {
-                                    if (data.success) {
-                                        Swal.fire({
-                                            title: "Deleted!",
-                                            text: "Product has been removed from wishlist",
-                                            icon: "success",
-                                            timer: 2000
-                                        });
-                                        setTimeout(() => {
-                                            window.location.reload();
-                                        }, 2000)
-                                    }
-                                    else if (data.authError) {
-                                        Swal.fire({
-                                            icon: "error",
-                                            title: "Oops...",
-                                            text: data.authError,
-                                            footer: data.errorRedirect
-                                        });
-                                    }
-                                })
-
-                        }
                     });
+
+                    if (result.isConfirmed) {
+                        try {
+                            const res = await axios.delete(`/wishlist/${productID}`);
+                            const data = res.data;
+                            if (data.success) {
+                                Swal.fire({
+                                    title: "Deleted!",
+                                    text: "Product has been removed from wishlist",
+                                    icon: "success",
+                                    timer: 2000
+                                });
+                                setTimeout(() => {
+                                    window.location.reload();
+                                }, 2000)
+                            }
+                        } catch (err) {
+                            console.log(err);
+                            Swal.fire({
+                                icon: "error",
+                                title: "Error",
+                                text: err.response?.data?.error || "Something went wrong!",
+                            });
+                        }
+                    }
                 }
 
 

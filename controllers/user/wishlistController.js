@@ -1,10 +1,11 @@
 //services
 import * as wishlistService from "../../services/wishlistService.js";
+import { StatusCode } from "../../constants/statusCodes.js";
 
-//render wishlist page
-export const getWishlist = async (req, res) => {
+// Controller for wishlist page
+export const wishlistPage = async (req, res) => {
   try {
-    const wishlist = await wishlistService.viewWishlist(req.userID);
+    const wishlist = await wishlistService.getWishlist(req.userID);
     res.render("wishlist", { wishlist });
   } catch (err) {
     console.log(err);
@@ -12,34 +13,42 @@ export const getWishlist = async (req, res) => {
   }
 };
 
-//add a product to wishlist
-export const addToWihslist = async (req, res) => {
+// Controller for adding a product to wishlist
+export const addToWishlist = async (req, res) => {
   try {
     const productId = req.params.id;
     const { categoryID, subCategoryID } = req.body;
-    let error = await wishlistService.addToWishlist(
+    await wishlistService.addToWishlist(
       req.userID,
       productId,
       categoryID,
       subCategoryID
     );
 
-    res.json({ success: true, successMessage: "product added to wishlist" });
+    res
+      .status(StatusCode.CREATED)
+      .json({ success: true, successMessage: "product added to wishlist" });
   } catch (err) {
     console.log(err);
-    res.json({ error: "server error" });
+    res
+      .status(StatusCode.INTERNAL_SERVER_ERROR)
+      .json({ error: "server error" });
   }
 };
 
-//delete a product form wishlist
+// Controller for deleting a product from wishlist
 export const deleteFromWishlist = async (req, res) => {
   try {
     const productID = req.params.id;
 
     await wishlistService.deleteFromWishlist(req.userID, productID);
-    res.json({ success: true, successMessage: "product removed for wihslist" });
+    res
+      .status(StatusCode.OK)
+      .json({ success: true, successMessage: "product removed for wishlist" });
   } catch (err) {
     console.log(err);
-    res.json({ error: "server error" });
+    res
+      .status(StatusCode.INTERNAL_SERVER_ERROR)
+      .json({ error: "server error" });
   }
 };
