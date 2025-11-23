@@ -1,7 +1,7 @@
 import productCollection from "../models/productsModel.js";
 import categoryCollection from "../models/CategoryModel.js";
-import subCategoryCollection from "../models/subCategoryModel.js";
 
+// Service to get home page data
 export const index = async () => {
   try {
     let categories = await categoryCollection.find({ isListed: true });
