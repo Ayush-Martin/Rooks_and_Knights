@@ -1,11 +1,12 @@
 //services
 import * as addressService from "../../services/addressServices.js";
+import { StatusCode } from "../../constants/statusCodes.js";
 
-//add new address
-export const postNewAddress = async (req, res) => {
+// Controller to add new address
+export const addAddress = async (req, res) => {
   try {
     const { addressTitle, state, city, pinCode, streetAddress } = req.body;
-    await addressService.addNewAddress(
+    const newAddress = await addressService.addNewAddress(
       addressTitle,
       state,
       city,
@@ -13,32 +14,36 @@ export const postNewAddress = async (req, res) => {
       streetAddress,
       req.userID
     );
-    res.status(200).json({ success: true });
+    res.status(StatusCode.OK).json({ success: true, newAddress });
   } catch (err) {
     console.log(err);
-    res.status(500).json({ error: "Server Error" });
+    res
+      .status(StatusCode.INTERNAL_SERVER_ERROR)
+      .json({ error: "Server Error" });
   }
 };
 
-//delete address
+// Controller to delete address
 export const deleteAddress = async (req, res) => {
   try {
     const addressID = req.params.id;
 
     await addressService.deleteAddress(addressID, req.userID);
-    res.status(200).json({ success: true });
+    res.status(StatusCode.OK).json({ success: true });
   } catch (err) {
     console.log(err);
-    res.status(500).json({ error: "Server Error" });
+    res
+      .status(StatusCode.INTERNAL_SERVER_ERROR)
+      .json({ error: "Server Error" });
   }
 };
 
-//change or edit address
-export const putAddress = async (req, res) => {
+// Controller to update address
+export const updateAddress = async (req, res) => {
   try {
     const { addressTitle, state, city, pinCode, streetAddress } = req.body;
     const addressID = req.params.id;
-    await addressService.editAddress(
+    const updatedAddress = await addressService.editAddress(
       addressTitle,
       state,
       city,
@@ -47,9 +52,11 @@ export const putAddress = async (req, res) => {
       addressID,
       req.userID
     );
-    res.status(200).json({ success: true });
+    res.status(StatusCode.OK).json({ success: true, updatedAddress });
   } catch (err) {
     console.log(err);
-    res.status(500).json({ error: "Server Error" });
+    res
+      .status(StatusCode.INTERNAL_SERVER_ERROR)
+      .json({ error: "Server Error" });
   }
 };

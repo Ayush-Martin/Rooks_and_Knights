@@ -56,16 +56,10 @@ router.get(
 );
 
 //User account route
-router.get(
-  "/account",
-  userAuthMiddleware.checkUserAuthenticated,
-  userController.getAccount
-);
-router.put(
-  "/account/updateProfile",
-  userAuthMiddleware.validUser,
-  userController.putAccount
-);
+router
+  .route("/account")
+  .get(userAuthMiddleware.checkUserAuthenticated, userController.accountPage)
+  .put(userAuthMiddleware.validUser, userController.updateAccount);
 
 // Change password
 router

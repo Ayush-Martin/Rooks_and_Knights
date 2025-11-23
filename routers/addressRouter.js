@@ -9,20 +9,13 @@ import * as addressController from "../controllers/user/addressController.js";
 import * as userAuthMiddleware from "../middlewares/userAuthMiddleware.js";
 
 //routers
-router.post(
-  "/add",
-  userAuthMiddleware.validUser,
-  addressController.postNewAddress
-); //add new address
-router.delete(
-  "/delete/:id",
-  userAuthMiddleware.validUser,
-  addressController.deleteAddress
-); //delete address
-router.put(
-  "/edit/:id",
-  userAuthMiddleware.validUser,
-  addressController.putAddress
-); //edit address
+router
+  .route("/")
+  .post(userAuthMiddleware.validUser, addressController.addAddress);
+
+router
+  .route("/:id")
+  .delete(userAuthMiddleware.validUser, addressController.deleteAddress)
+  .put(userAuthMiddleware.validUser, addressController.updateAddress);
 
 export default router;

@@ -273,31 +273,39 @@ export const resetPassword = async (req, res) => {
   }
 };
 
-export const getAccount = async (req, res) => {
+// Controller to get the account page
+export const accountPage = async (req, res) => {
   try {
     const userProfile = await accountService.viewUserProfile(req.userID);
     const address = await addressService.viewAddress(req.userID);
     const orders = await orderService.viewOrders(req.userID);
     res.render("account", { userProfile, address, orders });
   } catch (err) {
-    console.log(err);
+    console.error(err);
+    res.redirect("/error");
   }
 };
 
-export const putAccount = async (req, res) => {
+// Controller to update the account
+export const updateAccount = async (req, res) => {
   try {
     const { username, phoneNumber } = req.body;
-    let error = await accountService.updateUserProfile(
+    let result = await accountService.updateUserProfile(
       username,
       phoneNumber,
       req.userID
     );
-    if (error) {
-      return res.status(400).json({ success: false, error: error.error });
+    if (!result.success) {
+      return res
+        .status(StatusCode.BAD_REQUEST)
+        .json({ success: false, error: result.error });
     }
-    res.status(200).json({ success: true });
+    res.status(StatusCode.OK).json({ success: true, user: result.user });
   } catch (err) {
-    console.log(err);
+    console.error(err);
+    res
+      .status(StatusCode.INTERNAL_SERVER_ERROR)
+      .json({ error: "Server error. Please try again later." });
   }
 };
 

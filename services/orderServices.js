@@ -128,16 +128,13 @@ export const completePayment = async (orderID) => {
   }
 };
 
+// Service to get the orders data based on user ID
 export const viewOrders = async (userID) => {
-  try {
-    let orders = await orderCollection
-      .find({ userID })
-      .sort({ createdAt: -1 })
-      .populate("products.productID");
-    return orders;
-  } catch (err) {
-    console.log(err);
-  }
+  let orders = await orderCollection
+    .find({ userID })
+    .sort({ createdAt: -1 })
+    .populate("products.productID");
+  return orders;
 };
 
 export const getOrder = async (orderID) => {

@@ -55,6 +55,7 @@ export const validUser = async (req, res, next) => {
         });
       }
 
+      console.log(user);
       req.email = user.email;
       req.userID = user._id;
 

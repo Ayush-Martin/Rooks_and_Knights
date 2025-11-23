@@ -4,6 +4,75 @@
 <head>
   <%- include('./partials/head.ejs') %>
     <link rel="stylesheet" href="/public/css/account.css" />
+    <style>
+      .welcome-banner {
+        background: linear-gradient(135deg, #6c63ff 0%, #4834d4 100%);
+        color: white;
+        padding: 30px;
+        border-radius: 15px;
+        margin-bottom: 30px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      }
+
+      .welcome-banner h3 {
+        margin-bottom: 10px;
+        font-weight: 700;
+      }
+
+      .welcome-banner p {
+        opacity: 0.9;
+        margin: 0;
+      }
+
+      .card-custom {
+        border: none;
+        border-radius: 15px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        background: white;
+        height: 100%;
+      }
+
+      .card-custom:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+      }
+
+      .btn-custom-primary {
+        background-color: #6c63ff;
+        border-color: #6c63ff;
+        color: white;
+        border-radius: 30px;
+        padding: 10px 25px;
+        font-weight: 600;
+        transition: all 0.3s;
+      }
+
+      .btn-custom-primary:hover {
+        background-color: #5750e4;
+        border-color: #5750e4;
+        transform: translateY(-2px);
+      }
+
+      .form-control-custom {
+        border-radius: 10px;
+        padding: 12px;
+        border: 1px solid #e0e0e0;
+        background-color: #f8f9fa;
+      }
+
+      .form-control-custom:focus {
+        box-shadow: 0 0 0 3px rgba(108, 99, 255, 0.2);
+        border-color: #6c63ff;
+        background-color: white;
+      }
+
+      .sidebar-menu a.active {
+        background: linear-gradient(90deg, #6c63ff 0%, #8e84ff 100%);
+        border-radius: 10px;
+        box-shadow: 0 4px 10px rgba(108, 99, 255, 0.3);
+      }
+    </style>
 </head>
 
 <body class="">
@@ -14,209 +83,284 @@
     <div class="account-container">
       <!-- Sidebar Menu -->
       <div class="sidebar-menu">
-        <a href="#" id="profile-link" onclick="showSection('profile', this)" class="active"><i class="fa fa-user"></i>
+        <div class="text-center mb-4 pt-3">
+          <% if(userProfile.profilePicture) {%>
+            <img class="profile-image mb-2" src="<% userProfile.profilePicture %>" alt=""
+              style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 3px solid rgba(255,255,255,0.2);">
+            <% }else{ %>
+              <i class="fa fa-user-circle fa-4x mb-2 text-white-50"></i>
+              <% } %>
+                <h5 class="text-white mb-0">
+                  <%= userProfile.username %>
+                </h5>
+        </div>
+        <a href="#" id="profile-link" onclick="showSection('profile', this)" class="active"><i
+            class="fa fa-user me-2"></i>
           Profile</a>
-        <a href="#" id="address-link" onclick="showSection('address', this)"><i class="fa fa-home"></i> Address</a>
-        <a href="#" id="orders-link" onclick="showSection('orders', this)"><i class="fa fa-list"></i> Orders</a>
+        <a href="#" id="address-link" onclick="showSection('address', this)"><i class="fa fa-home me-2"></i> Address</a>
+        <a href="#" id="orders-link" onclick="showSection('orders', this)"><i class="fa fa-list me-2"></i> Orders</a>
 
         <a href="/user/account/changePassword">
-          <i class="fas fa-key"></i> Change Password
+          <i class="fas fa-key me-2"></i> Change Password
         </a>
-        <button onclick="logout()">
-          <i class="fas fa-sign-out-alt"></i> Logout
+        <button onclick="logout()" class="text-start w-100 btn btn-link text-decoration-none text-white p-3">
+          <i class="fas fa-sign-out-alt me-2"></i> Logout
         </button>
       </div>
 
       <!-- Content Area -->
       <div class="main-content">
-        <!-- Profile Section -->
-        <div class="section profile-section" id="profile-section">
-          <div class="profile-card text-center">
-            <!-- <div class="">
-                            <div>
-                                <% if(userProfile.profilePicture) {%>
-                                    <img class="profile-image" src="<% userProfile.profilePicture %>" alt="">
-                                    <% }else{ %>
-                                        <i class="fa fa-user-circle profile-icon">
-                                        </i>
-                                        <% } %>
-                            </div>
+        <!-- Welcome Banner -->
+        <div class="w-100">
+          <!-- Profile Section -->
+          <div class="section profile-section" id="profile-section">
+            <div class="welcome-banner">
+              <h3>Welcome back, <%= userProfile.username %>!</h3>
+              <p>Manage your personal information and security settings.</p>
+            </div>
 
-                            <button class="btn "><i class="fa fa-pencil-alt"></i></button>
-                            <button class="btn"><i class="fa fa-trash-alt"></i></button>
-                        </div> -->
-            <br />
-            <form action="" onsubmit="updateProfile(event) ">
-              <div class="form-group">
-                <label for="name">Name</label>
-                <input type="text" class="form-control" id="username" value="<%= userProfile.username %>" />
-              </div>
-              <div class="form-group">
-                <label for="email">Email</label>
-                <input type="email" class="form-control" id="email" value="<%= userProfile.email %>" readonly />
-              </div>
-              <div class="form-group">
-                <label for="phone">Phone</label>
-                <input type="text" class="form-control" id="phoneNumber" value="<%= userProfile.phoneNumber %>" />
-              </div>
+            <div class="card-custom p-5 mx-auto" style="max-width: 600px;">
+              <h4 class="mb-4 text-center font-weight-bold">Edit Profile</h4>
+              <form action="" onsubmit="updateProfile(event)">
+                <div class="form-group mb-3">
+                  <label for="name" class="form-label text-muted small font-weight-bold">FULL NAME</label>
+                  <input type="text" class="form-control form-control-custom" id="username"
+                    value="<%= userProfile.username %>" />
+                </div>
+                <div class="form-group mb-3">
+                  <label for="email" class="form-label text-muted small font-weight-bold">EMAIL ADDRESS</label>
+                  <input type="email" class="form-control form-control-custom" id="email"
+                    value="<%= userProfile.email %>" readonly />
+                </div>
+                <div class="form-group mb-3">
+                  <label for="phone" class="form-label text-muted small font-weight-bold">PHONE NUMBER</label>
+                  <input type="text" class="form-control form-control-custom" id="phoneNumber"
+                    value="<%= userProfile.phoneNumber %>" />
+                </div>
 
-              <div class="form-group">
-                <label for="referalLink">Referal Link</label>
-                <input type="text" class="form-control" id="referalLink" readonly
-                  value="https://<%= domain %>/user/register?referalID=<%= userProfile.referalID %>" />
-              </div>
-              <button class="btn btn-save">Save Changes</button>
-            </form>
+                <div class="form-group mb-4">
+                  <label for="referalLink" class="form-label text-muted small font-weight-bold">REFERRAL LINK</label>
+                  <div class="input-group">
+                    <input type="text" class="form-control form-control-custom" id="referalLink" readonly
+                      value="https://<%= domain %>/user/register?referalID=<%= userProfile.referalID %>" />
+                    <button class="btn btn-outline-secondary" type="button"
+                      onclick="navigator.clipboard.writeText(document.getElementById('referalLink').value)">
+                      <i class="fa fa-copy"></i>
+                    </button>
+                  </div>
+                </div>
+                <button class="btn btn-custom-primary w-100">Save Changes</button>
+              </form>
+            </div>
           </div>
-        </div>
 
-        <!-- Address Section -->
-        <div class="section hidden address-card-container" id="address-section">
-          <h2>Address Book</h2>
-          <% address.address.forEach((addressItem)=>{ %>
-            <!-- Address Cards -->
-            <div class="address-card">
-              <div class="address-info">
-                <strong>
-                  <%= addressItem.addressTitle %>
-                </strong><br />
-                <%= addressItem.streetAddress %><br />
-                  <%= addressItem.city %>, <%= addressItem.state %><br />
-                      <%= addressItem.pinCode %>
-              </div>
-              <div class="address-actions">
-                <button class="btn btn-dark btn-sm m-b-3" data-address-item="<%= JSON.stringify(addressItem)%>"
-                  onclick="editAddressModel(event,'<%=addressItem._id%>')" data-toggle="modal"
-                  data-target="#editAddressModel">
-                  <i class="fa fa-edit"></i>
-                </button>
-                <button class="btn btn-danger btn-sm m-b-3" onclick=" removeAddress(event,'<%=addressItem._id%>')">
-                  <i class="fa fa-trash"></i>
+          <!-- Address Section -->
+          <div class="section hidden" id="address-section">
+            <div class="welcome-banner" style="background: linear-gradient(135deg, #00b894 0%, #00cec9 100%);">
+              <div class="d-flex justify-content-between align-items-center">
+                <div>
+                  <h3>Address Book</h3>
+                  <p>Manage your shipping and billing addresses.</p>
+                </div>
+                <button class="btn btn-light text-success font-weight-bold shadow-sm" data-toggle="modal"
+                  data-target="#addAddressModel">
+                  <i class="fa fa-plus me-1"></i> Add New
                 </button>
               </div>
             </div>
-            <% }) %>
 
-              <!-- Add New Address Button -->
-              <button class="btn btn-primary" data-toggle="modal" data-target="#addAddressModel">
-                <i class="fa fa-plus"></i> Add New Address
-              </button>
-        </div>
-
-        <!-- Orders Section -->
-        <div id="orders-section" class="section hidden">
-          <h3>My Orders</h3>
-          <!-- When there are no orders -->
-
-          <div class="order-section">
-            <% orders.forEach((order)=>{ %>
-
-              <div class="order-card">
-                <div class="order-header">
-                  <span>
-                    <%= order.createdAt.toLocaleDateString() %>
-                  </span>
+            <div class="row">
+              <% if(address.address.length===0) { %>
+                <div class="col-12 text-center py-5">
+                  <img src="https://cdn-icons-png.flaticon.com/512/535/535239.png" alt="No Address"
+                    style="width: 100px; opacity: 0.5;" class="mb-3">
+                  <h5 class="text-muted">No addresses found</h5>
+                  <p class="text-muted small">Add a new address to get started.</p>
                 </div>
-                <div class="order-info">
-                  <p>
-                    <strong>No of Products : </strong>
-                    <%= order.products.length %>
-                  </p>
-                  <p>
-                    <strong>Base Price : </strong>
-                    <%= order.basePrice %>
-                  </p>
-                  <p>
-                    <strong>Discount : </strong>
-                    <%= order.discount %>
-                  </p>
-                  <p>
-                    <strong>Total Amount : </strong>
-                    <%= order.totalAmmount %>
-                  </p>
-                  <p>
-                    <strong>Order Stauts : </strong>
-                    <%= order.orderStatus %>
-                  </p>
-                  <p>
-                    <strong>Payment Stauts : </strong>
-                    <%= order.paymentStatus %>
-                  </p>
-                  <% if(order.paymentStatus=='pending' ){%>
-                    <button class="btn p-t-10"
-                      onclick="proccedToPayment('<%= order._id %>','<%= order.totalAmmount %>','Wallet')">
-                      <i class="fas fa-wallet"></i> Pay by wallet
-                    </button>
-                    <button class="btn p-t-10"
-                      onclick="proccedToPayment('<%= order._id %>','<%= order.totalAmmount %>','Razorpay')">
-                      <i class="fas fa-credit-card"></i> Pay online
-                    </button>
+                <% } %>
+                  <% address.address.forEach((addressItem)=>{ %>
+                    <div class="col-md-6 mb-4" id="address-card-<%= addressItem._id %>">
+                      <div class="card-custom p-4 h-100 d-flex flex-column justify-content-between">
+                        <div>
+                          <div class="d-flex justify-content-between align-items-start mb-3">
+                            <h5 class="font-weight-bold text-primary">
+                              <i class="fa fa-map-marker-alt me-2"></i>
+                              <%= addressItem.addressTitle %>
+                            </h5>
+                            <span class="badge bg-light text-dark border">
+                              <%= addressItem.pinCode %>
+                            </span>
+                          </div>
+                          <p class="text-muted mb-1">
+                            <%= addressItem.streetAddress %>
+                          </p>
+                          <p class="text-muted">
+                            <%= addressItem.city %>, <%= addressItem.state %>
+                          </p>
+                        </div>
+                        <div class="mt-3 pt-3 border-top d-flex justify-content-end gap-2">
+                          <button class="btn btn-outline-primary btn-sm rounded-pill px-3"
+                            data-address-item="<%= JSON.stringify(addressItem)%>"
+                            onclick="editAddressModel(event,'<%=addressItem._id%>')" data-toggle="modal"
+                            data-target="#editAddressModel">
+                            <i class="fa fa-edit me-1"></i> Edit
+                          </button>
+                          <button class="btn btn-outline-danger btn-sm rounded-pill px-3"
+                            onclick="removeAddress(event,'<%=addressItem._id%>')">
+                            <i class="fa fa-trash me-1"></i> Remove
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                    <% }) %>
+            </div>
+          </div>
 
-                    <%} %>
+          <!-- Orders Section -->
+          <div id="orders-section" class="section hidden">
+            <div class="welcome-banner" style="background: linear-gradient(135deg, #fd79a8 0%, #e84393 100%);">
+              <h3>My Orders</h3>
+              <p>Track your order history and status.</p>
+            </div>
+
+            <div class="order-section">
+              <% if(orders.length===0) { %>
+                <div class="col-12 text-center py-5 card-custom">
+                  <i class="fa fa-shopping-bag fa-4x mb-3 text-muted" style="opacity: 0.3;"></i>
+                  <h5 class="text-muted">No orders yet</h5>
+                  <a href="/shop" class="btn btn-custom-primary mt-3">Start Shopping</a>
                 </div>
-                <div class="order-actions">
-                  <button type="button" onclick="orderViewTable(event)" data-toggle="modal" data-target="#orderModal"
-                    data-order-item="<%= JSON.stringify(order) %>">
-                    <i class="fa fa-eye"></i>View
-                  </button>
+                <% } %>
+                  <% orders.forEach((order)=>{ %>
+                    <div class="order-card mb-4 card-custom p-0 overflow-hidden">
+                      <div
+                        class="card-header bg-light border-bottom-0 p-3 d-flex justify-content-between align-items-center">
+                        <div>
+                          <span class="text-muted small font-weight-bold">ORDER PLACED</span><br>
+                          <span class="font-weight-bold">
+                            <%= order.createdAt.toLocaleDateString() %>
+                          </span>
+                        </div>
+                        <div>
+                          <span class="text-muted small font-weight-bold">TOTAL</span><br>
+                          <span class="font-weight-bold">₹<%= order.totalAmount %></span>
+                        </div>
+                        <div>
+                          <span class="text-muted small font-weight-bold">STATUS</span><br>
+                          <span
+                            class="badge <%= order.orderStatus === 'delivered' ? 'bg-success' : (order.orderStatus === 'cancelled' ? 'bg-danger' : 'bg-warning text-dark') %>">
+                            <%= order.orderStatus.toUpperCase() %>
+                          </span>
+                        </div>
+                      </div>
+                      <div class="p-4">
+                        <div class="row align-items-center">
+                          <div class="col-md-8">
+                            <div class="d-flex align-items-center">
+                              <div class="me-3">
+                                <span class="fa-stack fa-lg">
+                                  <i class="fa fa-circle fa-stack-2x text-light"></i>
+                                  <i class="fa fa-box fa-stack-1x text-primary"></i>
+                                </span>
+                              </div>
+                              <div>
+                                <h6 class="mb-1">Order ID: <span class="text-muted">#<%=
+                                      order._id.toString().slice(-8).toUpperCase() %></span></h6>
+                                <p class="mb-0 text-muted small">
+                                  <%= order.products.length %> Product(s)
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="col-md-4 text-md-end mt-3 mt-md-0">
+                            <button type="button" class="btn btn-outline-secondary btn-sm me-2"
+                              onclick="orderViewTable(event)" data-toggle="modal" data-target="#orderModal"
+                              data-order-item="<%= JSON.stringify(order) %>">
+                              <i class="fa fa-eye me-1"></i> View Details
+                            </button>
 
-                  <% if(order.orderStatus=='delivered' ) {%>
-                    <button onclick="downloadInvoice('<%= order._id %>')">
-                      <i class="fas fa-download"></i> Download Invoice
-                    </button>
+                            <% if(order.orderStatus=='delivered' ) {%>
+                              <button class="btn btn-outline-primary btn-sm"
+                                onclick="downloadInvoice('<%= order._id %>')">
+                                <i class="fas fa-download me-1"></i> Invoice
+                              </button>
+                              <% } %>
+                          </div>
+                        </div>
 
-                    <% } %>
-                </div>
-              </div>
-              <% }) %>
-                <!-- Order Card 1 -->
+                        <% if(order.paymentStatus=='pending' && order.orderStatus !=='cancelled' ){%>
+                          <div class="alert alert-warning mt-3 mb-0 d-flex justify-content-between align-items-center">
+                            <span><i class="fa fa-exclamation-triangle me-2"></i> Payment is pending for this
+                              order.</span>
+                            <div>
+                              <button class="btn btn-sm btn-warning me-2"
+                                onclick="proceedToPayment('<%= order._id %>','<%= order.totalAmount %>','Wallet')">
+                                <i class="fas fa-wallet"></i> Wallet
+                              </button>
+                              <button class="btn btn-sm btn-success"
+                                onclick="proceedToPayment('<%= order._id %>','<%= order.totalAmount %>','Razorpay')">
+                                <i class="fas fa-credit-card"></i> Online
+                              </button>
+                            </div>
+                          </div>
+                          <%} %>
+                      </div>
+                    </div>
+                    <% }) %>
+            </div>
           </div>
         </div>
-
-        <!-- Orders Section -->
       </div>
     </div>
 
     <!-- modal to add new address -->
     <div class="modal fade m-t-50" id="addAddressModel" tabindex="-2" role="dialog">
       <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLabel">New Address</h5>
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 15px;">
+          <div class="modal-header bg-light border-bottom-0">
+            <h5 class="modal-title font-weight-bold" id="exampleModalLabel">New Address</h5>
             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
               <span aria-hidden="true">&times;</span>
             </button>
           </div>
-          <div class="modal-body">
-            <form>
+          <div class="modal-body p-4">
+            <form id="addAddressForm">
               <div class="form-group">
-                <label for="addressTitle" class="col-form-label">Address Title</label>
-                <input type="text" class="form-control" id="addressTitle" />
+                <label for="addressTitle" class="col-form-label text-muted small font-weight-bold">ADDRESS TITLE</label>
+                <input type="text" class="form-control form-control-custom" id="addressTitle"
+                  placeholder="e.g. Home, Work" />
+              </div>
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label for="state" class="col-form-label text-muted small font-weight-bold">STATE</label>
+                    <input type="text" class="form-control form-control-custom" id="state" />
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label for="city" class="col-form-label text-muted small font-weight-bold">CITY</label>
+                    <input type="text" class="form-control form-control-custom" id="city" />
+                  </div>
+                </div>
               </div>
               <div class="form-group">
-                <label for="state" class="col-form-label">State</label>
-                <input type="text" class="form-control" id="state" />
+                <label for="pinCode" class="col-form-label text-muted small font-weight-bold">PIN CODE</label>
+                <input type="text" class="form-control form-control-custom" id="pinCode" />
               </div>
               <div class="form-group">
-                <label for="city" class="col-form-label">City</label>
-                <input type="text" class="form-control" id="city" />
-              </div>
-              <div class="form-group">
-                <label for="pinCode" class="col-form-label">Pin Code</label>
-                <input type="text" class="form-control" id="pinCode" />
-              </div>
-              <div class="form-group">
-                <label for="streetAddress" class="col-form-label">Street Addrress</label>
-                <textarea class="form-control" id="streetAddress"></textarea>
+                <label for="streetAddress" class="col-form-label text-muted small font-weight-bold">STREET
+                  ADDRESS</label>
+                <textarea class="form-control form-control-custom" id="streetAddress" rows="3"></textarea>
               </div>
             </form>
           </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">
-              Close
+          <div class="modal-footer border-top-0">
+            <button type="button" class="btn btn-secondary rounded-pill px-4" data-dismiss="modal">
+              Cancel
             </button>
-            <button type="button" class="btn btn-primary" onclick="addNewAddress(event)">
-              Add
+            <button type="button" class="btn btn-custom-primary rounded-pill px-4" onclick="addNewAddress(event)">
+              Save Address
             </button>
           </div>
         </div>
@@ -226,41 +370,49 @@
     <!-- modal to edit address -->
     <div class="modal fade m-t-50" id="editAddressModel" tabindex="-2" role="dialog">
       <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLabel">Edit Address</h5>
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 15px;">
+          <div class="modal-header bg-light border-bottom-0">
+            <h5 class="modal-title font-weight-bold" id="exampleModalLabel">Edit Address</h5>
             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
               <span aria-hidden="true">&times;</span>
             </button>
           </div>
-          <div class="modal-body">
+          <div class="modal-body p-4">
             <form>
               <div class="form-group">
-                <label for="addressTitle" class="col-form-label">Address Title</label>
-                <input type="text" class="form-control" id="addressTitleEdit" />
+                <label for="addressTitle" class="col-form-label text-muted small font-weight-bold">ADDRESS TITLE</label>
+                <input type="text" class="form-control form-control-custom" id="addressTitleEdit" />
+              </div>
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label for="state" class="col-form-label text-muted small font-weight-bold">STATE</label>
+                    <input type="text" class="form-control form-control-custom" id="stateEdit" />
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label for="city" class="col-form-label text-muted small font-weight-bold">CITY</label>
+                    <input type="text" class="form-control form-control-custom" id="cityEdit" />
+                  </div>
+                </div>
               </div>
               <div class="form-group">
-                <label for="state" class="col-form-label">State</label>
-                <input type="text" class="form-control" id="stateEdit" />
+                <label for="pinCode" class="col-form-label text-muted small font-weight-bold">PIN CODE</label>
+                <input type="text" class="form-control form-control-custom" id="pinCodeEdit" />
               </div>
               <div class="form-group">
-                <label for="city" class="col-form-label">City</label>
-                <input type="text" class="form-control" id="cityEdit" />
-              </div>
-              <div class="form-group">
-                <label for="pinCode" class="col-form-label">Pin Code</label>
-                <input type="text" class="form-control" id="pinCodeEdit" />
-              </div>
-              <div class="form-group">
-                <label for="streetAddress" class="col-form-label">Street Addrress</label>
-                <textarea class="form-control" id="streetAddressEdit"></textarea>
+                <label for="streetAddress" class="col-form-label text-muted small font-weight-bold">STREET
+                  ADDRESS</label>
+                <textarea class="form-control form-control-custom" id="streetAddressEdit" rows="3"></textarea>
               </div>
             </form>
           </div>
-          <div class="modal-footer" id="editAddressDiv">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">
-              Close
+          <div class="modal-footer border-top-0" id="editAddressDiv">
+            <button type="button" class="btn btn-secondary rounded-pill px-4" data-dismiss="modal">
+              Cancel
             </button>
+            <!-- Button will be injected here by JS -->
           </div>
         </div>
       </div>
@@ -271,66 +423,54 @@
 
   <div class="modal fade" id="orderModal" tabindex="-1" aria-labelledby="orderModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="orderModalLabel">Order Details</h5>
+      <div class="modal-content border-0 shadow-lg" style="border-radius: 15px;">
+        <div class="modal-header bg-light border-bottom-0">
+          <h5 class="modal-title font-weight-bold" id="orderModalLabel">Order Details</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
-        <div class="modal-body">
+        <div class="modal-body p-4">
           <!-- Order Summary -->
-          <div class="order-summary">
-            <div class="row mb-3">
+          <div class="order-summary mb-4 p-3 bg-light rounded">
+            <div class="row mb-2">
               <div class="col-6">
-                <strong>Order Date:</strong> <span id="orderDate"></span>
+                <strong class="text-muted small">ORDER DATE</strong><br> <span id="orderDate"
+                  class="font-weight-bold"></span>
               </div>
               <div class="col-6">
-                <strong>Number of Products:</strong>
-                <span id="orderNoOfProducts"></span>
-              </div>
-            </div>
-            <div class="row mb-3">
-              <div class="col-6">
-                <strong>Base Price:</strong> ₹<span id="orderBasePrice"></span>
-              </div>
-              <div class="col-6">
-                <strong>Discount Amount:</strong> ₹<span id="orderDiscountAmount"></span>
+                <strong class="text-muted small">PRODUCTS</strong><br>
+                <span id="orderNoOfProducts" class="font-weight-bold"></span>
               </div>
             </div>
-            <div class="row mb-3">
+            <div class="row mb-2">
               <div class="col-6">
-                <strong>Delivery Charge:</strong> ₹<span id="orderDeliveryCharge"></span>
+                <strong class="text-muted small">TOTAL AMOUNT</strong><br> <span
+                  class="font-weight-bold text-primary">₹<span id="orderTotalAmount"></span></span>
               </div>
               <div class="col-6">
-                <strong>Tax Amount:</strong> ₹<span id="orderTaxAmount"></span>
-              </div>
-            </div>
-            <div class="row mb-3">
-              <div class="col-6">
-                <strong>Total Amount:</strong> ₹<span id="orderTotalAmount"></span>
-              </div>
-              <div class="col-6">
-                <strong>Payment Status:</strong>
-                <span id="orderPaymentStatus"></span>
+                <strong class="text-muted small">PAYMENT STATUS</strong><br>
+                <span id="orderPaymentStatus" class="badge bg-info text-white"></span>
               </div>
             </div>
-            <div class="row mb-3">
+            <div class="row mb-2">
               <div class="col-6">
-                <strong>Order Status:</strong> <span id="orderStatus"></span>
+                <strong class="text-muted small">ORDER STATUS</strong><br> <span id="orderStatus"
+                  class="badge bg-secondary text-white"></span>
               </div>
-              <div class="col-12">
-                <strong>Address:</strong> <span id="orderAddress"></span>
+              <div class="col-12 mt-2">
+                <strong class="text-muted small">SHIPPING ADDRESS</strong><br> <span id="orderAddress"
+                  class="small"></span>
               </div>
             </div>
           </div>
 
           <!-- Products Table -->
-          <div class="order-products">
-            <table class="table table-bordered">
+          <div class="order-products table-responsive">
+            <table class="table table-hover align-middle">
               <thead class="table-light">
                 <tr>
-                  <th>Product Image</th>
-                  <th>Product Name</th>
-                  <th>Quantity</th>
+                  <th>Product</th>
+                  <th>Name</th>
+                  <th>Qty</th>
                   <th>Amount</th>
                   <th>Status</th>
                   <th>Action</th>
@@ -354,9 +494,9 @@
       <script>
         // Function to populate table with orders
         function orderViewTable(e) {
-          const orderdata = e.target.closest("button");
+          const orderData = e.target.closest("button");
 
-          const order = JSON.parse(orderdata.getAttribute("data-order-item"));
+          const order = JSON.parse(orderData.getAttribute("data-order-item"));
           const products = order.products;
           console.log(order.createdAt);
 
@@ -364,26 +504,26 @@
             order.createdAt.split("T")[0];
           document.getElementById("orderNoOfProducts").innerText =
             products.length;
-          document.getElementById("orderBasePrice").innerText = order.basePrice;
-          document.getElementById("orderDiscountAmount").innerText =
-            order.discount;
+          // document.getElementById("orderBasePrice").innerText = order.basePrice;
+          // document.getElementById("orderDiscountAmount").innerText =
+          //   order.discount;
           document.getElementById("orderTotalAmount").innerText =
-            order.totalAmmount;
+            order.totalAmount;
           document.getElementById("orderStatus").innerText = order.orderStatus;
           document.getElementById("orderPaymentStatus").innerText =
             order.paymentStatus;
           document.getElementById(
             "orderAddress"
           ).innerText = `${order.address.addressTitle}:${order.address.state},${order.address.city},${order.address.pinCode},${order.address.streetAddress}`;
-          document.getElementById("orderDeliveryCharge").innerText =
-            order.deliveryCharge;
-          document.getElementById("orderTaxAmount").innerText = order.taxAmmount;
+          // document.getElementById("orderDeliveryCharge").innerText =
+          //   order.deliveryCharge;
+          // document.getElementById("orderTaxAmount").innerText = order.taxAmount;
 
           const tableBody = document.getElementById("orderTableBody");
 
           // Clear existing rows in case this function is called multiple times
           tableBody.innerHTML = "";
-          console.log(order.totalAmmount);
+          console.log(order.totalAmount);
 
           // Loop through each order and create table rows
           products.forEach((order) => {
@@ -392,23 +532,23 @@
 
             // Check order status and set the button accordingly
             if (order.status === "pending") {
-              actionButton = `<button class="btn btn-danger" onclick="cancelOrder('${order._id}', '${order.productID._id}' , ${order.quantity} ,${order.amountPaid})">Cancel</button>`;
+              actionButton = `<button class="btn btn-danger btn-sm" onclick="cancelOrder('${order._id}', '${order.productID._id}' , ${order.quantity} ,${order.amountPaid})">Cancel</button>`;
             } else if (
               order.status === "delivered" &&
               order.returnStatus == "notRequested"
             ) {
-              actionButton = `<button class="btn btn-warning" onclick="returnOrder('${order._id}')">Return</button>`;
+              actionButton = `<button class="btn btn-warning btn-sm" onclick="returnOrder('${order._id}')">Return</button>`;
             } else if (order.status === "delivered") {
-              actionButton = "return " + order.returnStatus;
+              actionButton = `<span class="badge bg-info">Return ${order.returnStatus}</span>`;
             }
 
             // Insert the row with dynamic data
             row.innerHTML = `
-        <td><img src="${order.productID.productImage1}" alt="${order.productName}" width="100px"></td>
+        <td><img src="${order.productID.productImage1}" alt="${order.productName}" width="50px" class="rounded"></td>
         <td>${order.productID.productName}</td>
         <td>${order.quantity}</td>
         <td>${order.amountPaid}</td>
-        <td>${order.status}</td>
+        <td><span class="badge bg-light text-dark border">${order.status}</span></td>
         <td>${actionButton}</td>
       `;
             tableBody.appendChild(row);
@@ -426,32 +566,29 @@
             confirmButtonColor: "#3085d6",
             cancelButtonColor: "#d33",
             confirmButtonText: "Yes,Logout!",
-          }).then((result) => {
+          }).then(async (result) => {
             if (result.isConfirmed) {
-              fetch("/user/logout", {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                },
-              })
-                .then((res) => res.json())
-                .then((data) => {
-                  if (data.success) {
-                    Swal.fire({
-                      title: "Loged Out",
-                      icon: "success",
-                      timer: 2000,
-                    });
-                    setTimeout(() => {
-                      window.location.href = data.successRedirect;
-                    }, 2000);
-                  }
-                });
+              try {
+                const res = await axios.post("/user/logout");
+                const data = res.data;
+                if (data.success) {
+                  Swal.fire({
+                    title: "Logged Out",
+                    icon: "success",
+                    timer: 2000,
+                  });
+                  setTimeout(() => {
+                    window.location.href = data.successRedirect;
+                  }, 2000);
+                }
+              } catch (err) {
+                console.log(err);
+              }
             }
           });
         }
 
-        function updateProfile(event) {
+        async function updateProfile(event) {
           event.preventDefault();
           let username = document.getElementById("username").value;
           let phoneNumber = document.getElementById("phoneNumber").value;
@@ -468,50 +605,38 @@
             });
             return;
           }
-          fetch("/user/account/updateProfile", {
-            method: "PUT",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ username, phoneNumber }),
-          })
-            .then((res) => res.json())
-            .then((data) => {
-              if (data.success) {
-                Swal.fire({
-                  title: "Updated",
-                  text: "Your Profile has been updated",
-                  icon: "success",
-                  timer: 2000,
-                });
-                setTimeout(() => {
-                  window.location.reload();
-                }, 2000);
-              } else if (data.error) {
-                Swal.fire({
-                  title: "Not updated",
-                  text: data.error,
-                  icon: "error",
-                  timer: 2000,
-                });
-                setTimeout(() => {
-                  window.location.reload();
-                }, 2000);
-              } else if (data.authError) {
-                Swal.fire({
-                  icon: "error",
-                  title: "Oops...",
-                  text: data.authError,
-                  footer: data.errorRedirect,
-                });
+          try {
+            const res = await axios.put("/user/account", { username, phoneNumber });
+            const data = res.data;
+            if (data.success) {
+              Swal.fire({
+                title: "Updated",
+                text: "Your Profile has been updated",
+                icon: "success",
+                timer: 2000,
+              });
+
+              // Dynamic UI Update
+              const updatedUser = data.user;
+              if (updatedUser) {
+                const sidebarName = document.querySelector('.sidebar-menu h5');
+                if (sidebarName) sidebarName.textContent = updatedUser.username;
+
+                const welcomeName = document.querySelector('.welcome-banner h3');
+                if (welcomeName) welcomeName.textContent = `Welcome back, ${updatedUser.username}!`;
               }
-            })
-            .catch((err) => console.log(err));
+            }
+          } catch (err) {
+            console.log(err);
+            Swal.fire({
+              icon: "error",
+              title: "Error",
+              text: err.response?.data?.error || "Something went wrong!",
+            });
+          }
         }
 
-
-
-        function addNewAddress(event) {
+        async function addNewAddress(event) {
           event.preventDefault();
 
           let addressTitle = document.getElementById("addressTitle").value;
@@ -536,54 +661,92 @@
             });
             return;
           }
-          fetch("/address/add", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
+          try {
+            const res = await axios.post("/address/", {
               addressTitle,
               state,
               city,
               pinCode,
               streetAddress,
-            }),
-          })
-            .then((res) => res.json())
-            .then((data) => {
-              if (data.success) {
-                Swal.fire({
-                  title: "Added",
-                  text: "New address has been added",
-                  icon: "success",
-                  timer: 2000,
-                });
+            });
+            const data = res.data;
+            if (data.success) {
+              Swal.fire({
+                title: "Added",
+                text: "New address has been added",
+                icon: "success",
+                timer: 2000,
+              });
+
+              // Close modal
+              $('#addAddressModel').modal('hide');
+
+              // Reset form
+              document.getElementById('addAddressForm').reset();
+
+              // Dynamic UI Update: Add new address card
+              const addressSection = document.querySelector('#address-section .row');
+              const noAddressMsg = addressSection.querySelector('.text-center.py-5');
+              if (noAddressMsg) noAddressMsg.remove();
+
+              const newAddress = data.newAddress;
+
+              if (newAddress) {
+                const newCardHtml = `
+                    <div class="col-md-6 mb-4" id="address-card-${newAddress._id}">
+                          <div class="card-custom p-4 h-100 d-flex flex-column justify-content-between">
+                            <div>
+                              <div class="d-flex justify-content-between align-items-start mb-3">
+                                <h5 class="font-weight-bold text-primary">
+                                  <i class="fa fa-map-marker-alt me-2"></i>
+                                  ${newAddress.addressTitle}
+                                </h5>
+                                <span class="badge bg-light text-dark border">
+                                  ${newAddress.pinCode}
+                                </span>
+                              </div>
+                              <p class="text-muted mb-1">
+                                ${newAddress.streetAddress}
+                              </p>
+                              <p class="text-muted">
+                                ${newAddress.city}, ${newAddress.state}
+                              </p>
+                            </div>
+                            <div class="mt-3 pt-3 border-top d-flex justify-content-end gap-2">
+                              <button class="btn btn-outline-primary btn-sm rounded-pill px-3"
+                                data-address-item='${JSON.stringify(newAddress)}'
+                                onclick="editAddressModel(event,'${newAddress._id}')" data-toggle="modal"
+                                data-target="#editAddressModel">
+                                <i class="fa fa-edit me-1"></i> Edit
+                              </button>
+                              <button class="btn btn-outline-danger btn-sm rounded-pill px-3"
+                                onclick="removeAddress(event,'${newAddress._id}')">
+                                <i class="fa fa-trash me-1"></i> Remove
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                  `;
+                addressSection.insertAdjacentHTML('beforeend', newCardHtml);
+              } else {
+                // Fallback if no address returned
                 setTimeout(() => {
                   window.location.reload();
                 }, 2000);
-              } else if (data.error) {
-                Swal.fire({
-                  title: "Not added",
-                  text: data.error,
-                  icon: "error",
-                  timer: 2000,
-                });
-                setTimeout(() => {
-                  window.location.reload();
-                }, 2000);
-              } else if (data.authError) {
-                Swal.fire({
-                  icon: "error",
-                  title: "Oops...",
-                  text: data.authError,
-                  footer: data.errorRedirect,
-                });
               }
-            })
-            .catch((err) => console.log(err));
+
+            }
+          } catch (err) {
+            console.log(err);
+            Swal.fire({
+              icon: "error",
+              title: "Error",
+              text: err.response?.data?.error || "Something went wrong!",
+            });
+          }
         }
 
-        function editAddress(event, _id) {
+        async function editAddress(event, _id) {
           event.preventDefault();
 
           let addressTitle = document.getElementById("addressTitleEdit").value;
@@ -609,56 +772,61 @@
             return;
           }
 
-          fetch(`/address/edit/${_id}`, {
-            method: "PUT",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
+          try {
+            const res = await axios.put(`/address/${_id}`, {
               addressTitle,
               state,
               city,
               pinCode,
               streetAddress,
-            }),
-          })
-            .then((res) => res.json())
-            .then((data) => {
-              if (data.success) {
-                Swal.fire({
-                  title: "Edited",
-                  text: "Address has been edited",
-                  icon: "success",
-                  timer: 2000,
-                });
+            });
+            const data = res.data;
+            if (data.success) {
+              Swal.fire({
+                title: "Edited",
+                text: "Address has been edited",
+                icon: "success",
+                timer: 2000,
+              });
+
+              // Close modal
+              $('#editAddressModel').modal('hide');
+
+              // Dynamic UI Update
+              const updatedAddress = data.updatedAddress;
+              const card = document.getElementById(`address-card-${_id}`);
+              if (card && updatedAddress) {
+                // Update card content
+                card.querySelector('h5').innerHTML = `<i class="fa fa-map-marker-alt me-2"></i> ${updatedAddress.addressTitle}`;
+                card.querySelector('.badge').textContent = updatedAddress.pinCode;
+                const pTags = card.querySelectorAll('p');
+                pTags[0].textContent = updatedAddress.streetAddress;
+                pTags[1].textContent = `${updatedAddress.city}, ${updatedAddress.state}`;
+
+                // Update data attribute on edit button
+                const editBtn = card.querySelector('button[data-address-item]');
+                if (editBtn) editBtn.setAttribute('data-address-item', JSON.stringify(updatedAddress));
+              } else {
+                // Fallback
                 setTimeout(() => {
                   window.location.reload();
                 }, 2000);
-              } else if (data.error) {
-                Swal.fire({
-                  title: "Not Edited",
-                  text: data.error,
-                  icon: "error",
-                  timer: 2000,
-                });
-                setTimeout(() => {
-                  window.location.reload();
-                }, 2000);
-              } else if (data.authError) {
-                Swal.fire({
-                  icon: "error",
-                  title: "Oops...",
-                  text: data.authError,
-                  footer: data.errorRedirect,
-                });
               }
-            })
-            .catch((err) => console.log(err));
+
+            }
+          } catch (err) {
+            console.log(err);
+            Swal.fire({
+              icon: "error",
+              title: "Error",
+              text: err.response?.data?.error || "Something went wrong!",
+            });
+          }
         }
 
-        function removeAddress(event, ID) {
+        async function removeAddress(event, ID) {
           event.preventDefault();
-          Swal.fire({
+          const result = await Swal.fire({
             title: "Are you sure?",
             text: "You want to remove this address",
             icon: "warning",
@@ -666,55 +834,54 @@
             confirmButtonColor: "#3085d6",
             cancelButtonColor: "#d33",
             confirmButtonText: "Yes",
-          }).then((result) => {
-            if (result.isConfirmed) {
-              fetch(`/address/delete/${ID}`, {
-                method: "DELETE",
-                headers: {
-                  "Content-Type": "application/json",
-                },
-              })
-                .then((res) => res.json())
-                .then((data) => {
-                  if (data.success) {
-                    Swal.fire({
-                      title: "Removed",
-                      text: "Address has been removed",
-                      icon: "success",
-                      timer: 2000,
-                    });
-                    setTimeout(() => {
-                      window.location.reload();
-                    }, 2000);
-                  } else if (data.error) {
-                    Swal.fire({
-                      title: "Cannot remove",
-                      text: data.error,
-                      icon: "error",
-                      timer: 2000,
-                    });
-                    setTimeout(() => {
-                      window.location.reload();
-                    }, 2000);
-                  } else if (data.authError) {
-                    Swal.fire({
-                      icon: "error",
-                      title: "Oops...",
-                      text: data.authError,
-                      footer: data.errorRedirect,
-                    });
-                  }
-                })
-                .catch((err) => console.log(err));
-            }
           });
+
+          if (result.isConfirmed) {
+            try {
+              const res = await axios.delete(`/address/${ID}`);
+              const data = res.data;
+              if (data.success) {
+                Swal.fire({
+                  title: "Removed",
+                  text: "Address has been removed",
+                  icon: "success",
+                  timer: 2000,
+                });
+
+                // Dynamic UI Update: Remove card
+                const card = document.getElementById(`address-card-${ID}`);
+                if (card) card.remove();
+
+                // Check if no addresses left
+                const addressSection = document.querySelector('#address-section .row');
+                if (addressSection && addressSection.children.length === 0) {
+                  addressSection.innerHTML = `
+                        <div class="col-12 text-center py-5">
+                          <img src="https://cdn-icons-png.flaticon.com/512/535/535239.png" alt="No Address"
+                            style="width: 100px; opacity: 0.5;" class="mb-3">
+                          <h5 class="text-muted">No addresses found</h5>
+                          <p class="text-muted small">Add a new address to get started.</p>
+                        </div>
+                      `;
+                }
+
+              }
+            } catch (err) {
+              console.log(err);
+              Swal.fire({
+                icon: "error",
+                title: "Error",
+                text: err.response?.data?.error || "Something went wrong!",
+              });
+            }
+          }
         }
 
         function editAddressModel(e, _id) {
-          const addressdata = e.target.closest("button");
+          const addressData = e.target.closest("button");
 
           const { addressTitle, state, city, pinCode, streetAddress } =
-            JSON.parse(addressdata.getAttribute("data-address-item"));
+            JSON.parse(addressData.getAttribute("data-address-item"));
           document.getElementById("addressTitleEdit").value = addressTitle;
           document.getElementById("stateEdit").value = state;
           document.getElementById("cityEdit").value = city;
@@ -724,25 +891,28 @@
           // Get the parent div where the button should be appended
           const editAddressDiv = document.getElementById("editAddressDiv");
 
-          // Check if the edit button already exists
-          if (!document.getElementById("editAddressButton")) {
-            var editButton = document.createElement("button");
-            editButton.textContent = "Edit";
-            editButton.id = "editAddressButton";
-            editButton.onclick = () => editAddress(event, _id);
-            editButton.classList.add("btn", "btn-primary");
-
-            editAddressDiv.appendChild(editButton);
+          // Remove existing button if any to avoid duplicates or stale handlers
+          const existingButton = document.getElementById("editAddressButton");
+          if (existingButton) {
+            existingButton.remove();
           }
+
+          var editButton = document.createElement("button");
+          editButton.textContent = "Update Address";
+          editButton.id = "editAddressButton";
+          editButton.onclick = (event) => editAddress(event, _id);
+          editButton.classList.add("btn", "btn-custom-primary", "rounded-pill", "px-4");
+
+          editAddressDiv.appendChild(editButton);
         }
 
-        function cancelOrder(
+        async function cancelOrder(
           orderProductsID,
           productID,
           productQuantity,
           amountPaid
         ) {
-          Swal.fire({
+          const result = await Swal.fire({
             title: "Are you sure?",
             text: "You want to cancel this order",
             icon: "warning",
@@ -750,53 +920,38 @@
             confirmButtonColor: "#3085d6",
             cancelButtonColor: "#d33",
             confirmButtonText: "Yes",
-          }).then((result) => {
-            if (result.isConfirmed) {
-              fetch(`/order/cancel/${orderProductsID}`, {
-                method: "PATCH",
-                headers: {
-                  "Content-Type": "application/json",
-                },
-                body: JSON.stringify({ productID, productQuantity, amountPaid }),
-              })
-                .then((res) => res.json())
-                .then((data) => {
-                  if (data.success) {
-                    Swal.fire({
-                      title: "Canceled",
-                      text: "Your order has been canceled",
-                      icon: "success",
-                      timer: 2000,
-                    });
-                    setTimeout(() => {
-                      window.location.reload();
-                    }, 2000);
-                  } else if (data.error) {
-                    Swal.fire({
-                      title: "Cannot cancel",
-                      text: data.error,
-                      icon: "error",
-                      timer: 2000,
-                    });
-                    setTimeout(() => {
-                      window.location.reload();
-                    }, 2000);
-                  } else if (data.authError) {
-                    Swal.fire({
-                      icon: "error",
-                      title: "Oops...",
-                      text: data.authError,
-                      footer: data.errorRedirect,
-                    });
-                  }
-                })
-                .catch((err) => console.log(err));
-            }
           });
+
+          if (result.isConfirmed) {
+            try {
+              const res = await axios.patch(`/order/cancel/${orderProductsID}`, { productID, productQuantity, amountPaid });
+              const data = res.data;
+              if (data.success) {
+                Swal.fire({
+                  title: "Canceled",
+                  text: "Your order has been canceled",
+                  icon: "success",
+                  timer: 2000,
+                });
+
+                setTimeout(() => {
+                  window.location.reload();
+                }, 2000);
+
+              }
+            } catch (err) {
+              console.log(err);
+              Swal.fire({
+                icon: "error",
+                title: "Error",
+                text: err.response?.data?.error || "Something went wrong!",
+              });
+            }
+          }
         }
 
-        function returnOrder(orderProductsID) {
-          Swal.fire({
+        async function returnOrder(orderProductsID) {
+          const result = await Swal.fire({
             title: "Select a reason for return",
             input: "select",
             inputOptions: {
@@ -818,106 +973,81 @@
             inputValidator: (value) => {
               return !value ? "You need to select a reason." : null;
             },
-          })
-            .then((result) => {
-              if (result.isConfirmed && result.value) {
-                fetch(`/order/return/returnProduct/${orderProductsID}`, {
-                  method: "PATCH",
-                  headers: {
-                    "Content-Type": "application/json",
-                  },
-                  body: JSON.stringify({
-                    returnReason: result.value,
-                  }),
-                })
-                  .then((res) => res.json())
-                  .then((data) => {
-                    if (data.success) {
-                      Swal.fire({
-                        title: "Sent request",
-                        text: "Your order return request has been sent",
-                        icon: "success",
-                        timer: 2000,
-                      });
-                      setTimeout(() => {
-                        window.location.reload();
-                      }, 2000);
-                    } else if (data.authError) {
-                      Swal.fire({
-                        icon: "error",
-                        title: "Oops...",
-                        text: data.authError,
-                        footer: data.errorRedirect,
-                      });
-                    }
-                  });
-              }
-            })
-            .catch((error) => {
-              console.error("Error:", error);
-            });
-        }
+          });
 
-        function proccedToPayment(orderID, totalAmmount, paymentMethod) {
-          event.preventDefault();
-
-          fetch(
-            `/order/pendingProceedToPayment?orderID=${orderID}&&totalAmmount=${totalAmmount}&&paymentMethod=${paymentMethod}`,
-            {
-              method: "POST",
-              headers: {
-                "Content-type": "application/json",
-              },
-            }
-          )
-            .then((res) => res.json())
-            .then((data) => {
+          if (result.isConfirmed && result.value) {
+            try {
+              const res = await axios.patch(`/order/return/returnProduct/${orderProductsID}`, {
+                returnReason: result.value,
+              });
+              const data = res.data;
               if (data.success) {
                 Swal.fire({
-                  title: "Payment completed",
+                  title: "Sent request",
+                  text: "Your order return request has been sent",
                   icon: "success",
                   timer: 2000,
                 });
                 setTimeout(() => {
-                  window.location.href = data.successRedirect;
+                  window.location.reload();
                 }, 2000);
               }
+            } catch (error) {
+              console.error("Error:", error);
+              Swal.fire({
+                icon: "error",
+                title: "Error",
+                text: error.response?.data?.error || "Something went wrong!",
+              });
+            }
+          }
+        }
 
-              if (data.error) {
-                Swal.fire({
-                  title: "Error",
-                  text: data.error,
-                  icon: "error",
-                });
-              } else if (data.authError) {
-                Swal.fire({
-                  icon: "error",
-                  title: "Oops...",
-                  text: data.authError,
-                  footer: data.errorRedirect,
-                });
-                return;
-              }
+        async function proceedToPayment(orderID, totalAmount, paymentMethod) {
+          // event.preventDefault(); 
 
-              if (data.razorpayOrder) {
-                console.log(data.razorpayOrder);
-                var options = {
-                  key: "rzp_test_RSspzzgBAA2ViI", // Enter the Key ID generated from the Dashboard
-                  name: "Rook & Knights",
-                  description: "Test Transaction",
-                  image:
-                    "https://imgs.search.brave.com/jsPXFiH4YxTvzVbUvQMILb4V32Y6I0DxlC2p3CaqAfA/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9ibG9n/LnBob3RvYWRraW5n/LmNvbS93cC1jb250/ZW50L3VwbG9hZHMv/MjAyMy8wNS8xNjgy/OTQ2NDIzMzgxLTEu/anBn",
-                  order_id: data.razorpayOrder.id, //This is a sample Order ID. Pass the `id` obtained in the response of Step 1
-                  callback_url: "/order/completePayment",
-                  theme: {
-                    color: "#454545",
-                  },
-                };
-                var rzp1 = new Razorpay(options);
+          try {
+            const res = await axios.post(
+              `/order/pendingProceedToPayment?orderID=${orderID}&&totalAmount=${totalAmount}&&paymentMethod=${paymentMethod}`
+            );
+            const data = res.data;
+            if (data.success) {
+              Swal.fire({
+                title: "Payment completed",
+                icon: "success",
+                timer: 2000,
+              });
+              setTimeout(() => {
+                window.location.href = data.successRedirect;
+              }, 2000);
+            }
 
-                rzp1.open();
-              }
+            if (data.razorpayOrder) {
+              console.log(data.razorpayOrder);
+              var options = {
+                key: "rzp_test_RSspzzgBAA2ViI", // Enter the Key ID generated from the Dashboard
+                name: "Rook & Knights",
+                description: "Test Transaction",
+                image:
+                  "https://imgs.search.brave.com/jsPXFiH4YxTvzVbUvQMILb4V32Y6I0DxlC2p3CaqAfA/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9ibG9n/LnBob3RvYWRraW5n/LmNvbS93cC1jb250/ZW50L3VwbG9hZHMv/MjAyMy8wNS8xNjgy/OTQ2NDIzMzgxLTEu/anBn",
+                order_id: data.razorpayOrder.id, //This is a sample Order ID. Pass the `id` obtained in the response of Step 1
+                callback_url: "/order/completePayment",
+                theme: {
+                  color: "#454545",
+                },
+              };
+              var rzp1 = new Razorpay(options);
+
+              rzp1.open();
+            }
+          } catch (err) {
+            console.log(err);
+            Swal.fire({
+              icon: "error",
+              title: "Error",
+              text: err.response?.data?.error || "Something went wrong!",
             });
+          }
         }
       </script>
 
