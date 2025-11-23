@@ -1,6 +1,7 @@
 //models
 import couponCollection from "../models/couponModel.js";
 
+// Service to get coupon list with search and pagenation
 export const couponList = async (search, currentPage, noOfList, skipPages) => {
   let findQuery = {};
 
@@ -13,18 +14,15 @@ export const couponList = async (search, currentPage, noOfList, skipPages) => {
   const now = new Date();
   now.setHours(0, 0, 0, 0);
 
-  try {
-    const totalNoOfList = await couponCollection.countDocuments(findQuery);
-    const couponList = await couponCollection
-      .find(findQuery)
-      .skip(skipPages)
-      .limit(noOfList);
-    return { couponList, currentPage, totalNoOfList };
-  } catch (err) {
-    console.log(err);
-  }
+  const totalNoOfList = await couponCollection.countDocuments(findQuery);
+  const couponList = await couponCollection
+    .find(findQuery)
+    .skip(skipPages)
+    .limit(noOfList);
+  return { couponList, currentPage, totalNoOfList };
 };
 
+// Service to add new coupon
 export const addCoupon = async (
   couponName,
   couponCode,
@@ -34,37 +32,33 @@ export const addCoupon = async (
 ) => {
   const now = new Date();
   now.setHours(0, 0, 0, 0);
-  try {
-    const coupon = await couponCollection.findOne({
-      $or: [{ couponName }, { couponCode }],
-    });
 
-    if (coupon) {
-      return "coupon code or name aldready exist";
-    }
+  const coupon = await couponCollection.findOne({
+    $or: [{ couponName }, { couponCode }],
+  });
 
-    const newCoupon = new couponCollection({
-      couponName,
-      couponCode,
-      discountAmount,
-      minimumOrderAmount,
-      expiryDate,
-    });
-
-    await newCoupon.save();
-  } catch (err) {
-    console.log(err);
+  if (coupon) {
+    return { success: false, error: "coupon code or name already exist" };
   }
+
+  const newCoupon = new couponCollection({
+    couponName,
+    couponCode,
+    discountAmount,
+    minimumOrderAmount,
+    expiryDate,
+  });
+
+  await newCoupon.save();
+  return { success: true, coupon: newCoupon };
 };
 
+// Service to delete coupon
 export const deleteCoupon = async (couponID) => {
-  try {
-    await couponCollection.deleteOne({ _id: couponID });
-  } catch (err) {
-    console.log(err);
-  }
+  await couponCollection.deleteOne({ _id: couponID });
 };
 
+// Service to edit coupon
 export const editCoupon = async (
   couponID,
   couponName,
@@ -73,21 +67,19 @@ export const editCoupon = async (
   minimumOrderAmount,
   expiryDate
 ) => {
-  try {
-    const coupon = await couponCollection.findOne({
-      $or: [{ couponName }, { couponCode }],
-      _id: { $ne: couponID },
-    });
+  const coupon = await couponCollection.findOne({
+    $or: [{ couponName }, { couponCode }],
+    _id: { $ne: couponID },
+  });
 
-    if (coupon) {
-      return "coupon code or name aldready exist";
-    }
-
-    await couponCollection.updateOne(
-      { _id: couponID },
-      { couponName, couponCode, discountAmount, minimumOrderAmount, expiryDate }
-    );
-  } catch (err) {
-    console.log(err);
+  if (coupon) {
+    return { success: false, error: "coupon code or name already exist" };
   }
+
+  await couponCollection.updateOne(
+    { _id: couponID },
+    { couponName, couponCode, discountAmount, minimumOrderAmount, expiryDate }
+  );
+
+  return { success: true };
 };

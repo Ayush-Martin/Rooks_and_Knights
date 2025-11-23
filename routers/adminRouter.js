@@ -9,6 +9,7 @@ import * as adminSubCategoryController from "../controllers/admin/adminSubCatego
 import * as adminUserController from "../controllers/admin/adminUserController.js";
 import * as adminProductController from "../controllers/admin/adminProductController.js";
 import * as adminOfferController from "../controllers/admin/adminOfferController.js";
+import * as adminCouponController from "../controllers/admin/adminCouponController.js";
 
 //multer upload middleware
 import upload, { handleUpload } from "../utils/multerUtils.js";
@@ -114,10 +115,15 @@ router
   .delete(adminOfferController.deleteOffer);
 
 //coupons
-router.get("/coupons", adminController.getCoupons); //display coupons
-router.post("/coupons", adminController.postAddCoupon); //add coupon
-router.delete("/coupons/:id", adminController.deleteCoupon); //delete coupon
-router.put("/coupons/:id", adminController.putEditCoupon); //edit coupon
+router
+  .route("/coupons")
+  .get(adminCouponController.couponsPage)
+  .post(adminCouponController.addCoupon);
+
+router
+  .route("/coupons/:id")
+  .put(adminCouponController.editCoupon)
+  .delete(adminCouponController.deleteCoupon);
 
 //sales
 router.get("/sales", adminController.getSales); //dispaly sales
