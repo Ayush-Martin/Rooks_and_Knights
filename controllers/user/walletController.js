@@ -1,6 +1,7 @@
 //services
 import * as walletService from "../../services/walletService.js";
-import * as transitionService from "../../services/transactionService.js";
+import * as transactionService from "../../services/transactionService.js";
+import { StatusCode } from "../../constants/statusCodes.js";
 
 //utils
 import { verifyPayment } from "../../utils/razorpayPaymentVerify.js";
@@ -16,9 +17,9 @@ const razorpay = new Razorpay({
 export const walletPage = async (req, res) => {
   try {
     const wallet = await walletService.getWalletList(req.userID);
-    const transitionList = await transitionService.transactionsList(req.userID);
+    const transactionList = await transactionService.transactionsList(req.userID);
 
-    res.render("wallet", { wallet, transitionList });
+    res.render("wallet", { wallet, transactionList });
   } catch (err) {
     console.log(err);
     res.redirect("/error");
@@ -69,7 +70,7 @@ export const completePayment = async (req, res) => {
       req.userID,
       req.session.razorpayOrderAmount
     );
-    await transitionService.completeTransaction(
+    await transactionService.completeTransaction(
       req.userID,
       req.session.razorpayOrderAmount,
       "walletRecharge",

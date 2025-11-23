@@ -40,7 +40,7 @@ export const completeTransaction = async (
     const newTransaction = new transactionCollection({
       userID,
       amount,
-      transactionType,
+      transationType: transactionType,
       paymentMethod,
     });
 
