@@ -13,6 +13,7 @@ import * as adminCouponController from "../controllers/admin/adminCouponControll
 import * as adminOrderController from "../controllers/admin/adminOrderController.js";
 import * as adminReturnController from "../controllers/admin/adminReturnController.js";
 import * as adminTransactionController from "../controllers/admin/adminTransactionController.js";
+import * as adminSalesController from "../controllers/admin/adminSalesController.js";
 
 //multer upload middleware
 import upload, { handleUpload } from "../utils/multerUtils.js";
@@ -49,11 +50,11 @@ router.use((req, res, next) => {
 });
 
 //Dashboard
-router.get("/", adminController.getDashboard); //display dashboard
+router.get("/", adminController.dashboardPage);
 
 //Users
-router.get("/users", adminUserController.usersPage); //display user list
-router.patch("/users/:id", adminUserController.blockUnblockUser); //block or unblock user
+router.get("/users", adminUserController.usersPage);
+router.patch("/users/:id", adminUserController.blockUnblockUser);
 
 //Products
 router.get("/products", adminProductController.productsPage);
@@ -130,8 +131,8 @@ router
   .delete(adminCouponController.deleteCoupon);
 
 //sales
-router.get("/sales", adminController.getSales); //dispaly sales
-router.get("/sales/downloadExcel", adminController.getDownloadSalesExcel); //download sales excel
-router.get("/sales/downloadPdf", adminController.getDownloadSalesPdf); //download sales pdf
+router.get("/sales", adminSalesController.salesPage);
+router.get("/sales/downloadExcel", adminSalesController.getDownloadSalesExcel);
+router.get("/sales/downloadPdf", adminSalesController.getDownloadSalesPdf);
 
 export default router;

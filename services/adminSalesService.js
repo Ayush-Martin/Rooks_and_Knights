@@ -2,6 +2,7 @@
 import orderCollection from "../models/orderModel.js";
 import * as dateFns from "date-fns";
 
+// Service to get sales list
 export const salesList = async (
   reportType,
   startDate,
@@ -57,53 +58,50 @@ export const salesList = async (
     };
   }
 
-  try {
-    const totalProductsCount = await orderCollection.aggregate([
-      { $unwind: "$products" },
-      { $count: "totalProducts" },
-    ]);
+  const totalProductsCount = await orderCollection.aggregate([
+    { $unwind: "$products" },
+    { $count: "totalProducts" },
+  ]);
 
-    const totalNoOfList =
-      totalProductsCount.length > 0 ? totalProductsCount[0].totalProducts : 0;
+  const totalNoOfList =
+    totalProductsCount.length > 0 ? totalProductsCount[0].totalProducts : 0;
 
-    const orderList = await orderCollection.find(findQuery);
+  const orderList = await orderCollection.find(findQuery);
 
-    const salesList = await orderCollection.aggregate([
-      { $match: findQuery },
-      { $unwind: "$products" },
-      {
-        $lookup: {
-          from: "products",
-          localField: "products.productID",
-          foreignField: "_id",
-          as: "productDetails",
-        },
+  const salesList = await orderCollection.aggregate([
+    { $match: findQuery },
+    { $unwind: "$products" },
+    {
+      $lookup: {
+        from: "products",
+        localField: "products.productID",
+        foreignField: "_id",
+        as: "productDetails",
       },
-      { $unwind: "$productDetails" },
-      {
-        $lookup: {
-          from: "users",
-          localField: "userID",
-          foreignField: "_id",
-          as: "userDetails",
-        },
+    },
+    { $unwind: "$productDetails" },
+    {
+      $lookup: {
+        from: "users",
+        localField: "userID",
+        foreignField: "_id",
+        as: "userDetails",
       },
-      { $unwind: "$userDetails" },
-      {
-        $sort: {
-          createdAt: -1,
-        },
+    },
+    { $unwind: "$userDetails" },
+    {
+      $sort: {
+        createdAt: -1,
       },
-      { $skip: skipPages },
-      { $limit: noOfList },
-    ]);
+    },
+    { $skip: skipPages },
+    { $limit: noOfList },
+  ]);
 
-    return { salesList, orderList, currentPage, totalNoOfList };
-  } catch (err) {
-    console.log(err);
-  }
+  return { salesList, orderList, currentPage, totalNoOfList };
 };
 
+// Service to get data for download sales report
 export const downloadSalesReport = async (reportType, startDate, endDate) => {
   const findQuery = {};
 
@@ -152,37 +150,33 @@ export const downloadSalesReport = async (reportType, startDate, endDate) => {
     };
   }
 
-  try {
-    const salesList = await orderCollection.aggregate([
-      { $match: findQuery },
-      { $unwind: "$products" },
-      {
-        $lookup: {
-          from: "products",
-          localField: "products.productID",
-          foreignField: "_id",
-          as: "productDetails",
-        },
+  const salesList = await orderCollection.aggregate([
+    { $match: findQuery },
+    { $unwind: "$products" },
+    {
+      $lookup: {
+        from: "products",
+        localField: "products.productID",
+        foreignField: "_id",
+        as: "productDetails",
       },
-      { $unwind: "$productDetails" },
-      {
-        $lookup: {
-          from: "users",
-          localField: "userID",
-          foreignField: "_id",
-          as: "userDetails",
-        },
+    },
+    { $unwind: "$productDetails" },
+    {
+      $lookup: {
+        from: "users",
+        localField: "userID",
+        foreignField: "_id",
+        as: "userDetails",
       },
-      { $unwind: "$userDetails" },
-      {
-        $sort: {
-          createdAt: -1,
-        },
+    },
+    { $unwind: "$userDetails" },
+    {
+      $sort: {
+        createdAt: -1,
       },
-    ]);
+    },
+  ]);
 
-    return salesList;
-  } catch (err) {
-    console.log(err);
-  }
+  return salesList;
 };
