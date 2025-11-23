@@ -30,22 +30,19 @@ export const allTransactionsList = async (currentPage, noOfList, skipPages) => {
   }
 };
 
+// Service to complete transaction
 export const completeTransaction = async (
   userID,
   amount,
   transactionType,
   paymentMethod
 ) => {
-  try {
-    const newTransaction = new transactionCollection({
-      userID,
-      amount,
-      transationType: transactionType,
-      paymentMethod,
-    });
+  const newTransaction = new transactionCollection({
+    userID,
+    amount,
+    transationType: transactionType,
+    paymentMethod,
+  });
 
-    await newTransaction.save();
-  } catch (err) {
-    console.log(err);
-  }
+  await newTransaction.save();
 };

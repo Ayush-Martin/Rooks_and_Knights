@@ -11,12 +11,12 @@ import * as userAuthMiddleware from "../middlewares/userAuthMiddleware.js";
 router.get(
   "/",
   userAuthMiddleware.checkUserAuthenticated,
-  orderController.getCheckout
+  orderController.checkoutPage
 );
 router.post(
   "/proceedToPayment",
   userAuthMiddleware.validUser,
-  orderController.postCheckout
+  orderController.createCheckoutOrder
 );
 router.post(
   "/pendingProceedToPayment",

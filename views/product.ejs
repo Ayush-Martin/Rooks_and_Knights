@@ -451,7 +451,7 @@
 						})
 						return
 					}
-					fetch(`/cart/addToCart/${productID}`, {
+					fetch(`/cart/${productID}`, {
 						method: 'POST',
 						headers: {
 							'Content-Type': 'application/json'

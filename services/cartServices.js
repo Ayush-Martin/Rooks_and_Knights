@@ -123,18 +123,15 @@ export const deleteCartItem = async (cartItemID, userID) => {
   );
 };
 
+// Service for deleting multiple products from cart
 export const deleteManyCartItem = async (cartItemIDs, price, userID) => {
-  try {
-    await cartCollection.updateOne(
-      { userID },
-      {
-        $pull: { cartItems: { _id: { $in: cartItemIDs } } },
-        $inc: { totalPrice: -price },
-      }
-    );
-  } catch (err) {
-    console.log(err);
-  }
+  await cartCollection.updateOne(
+    { userID },
+    {
+      $pull: { cartItems: { _id: { $in: cartItemIDs } } },
+      $inc: { totalPrice: -price },
+    }
+  );
 };
 
 // Helper to calculate offer price

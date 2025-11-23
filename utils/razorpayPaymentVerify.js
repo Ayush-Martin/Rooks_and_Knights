@@ -1,5 +1,6 @@
 import crypto from "crypto";
 
+// Helper function to verify payment
 export const verifyPayment = (
   razorpay_order_id,
   razorpay_payment_id,

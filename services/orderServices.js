@@ -4,7 +4,9 @@ import addressCollection from "../models/addressModel.js";
 import categoryCollection from "../models/CategoryModel.js";
 import subCategoryCollection from "../models/subCategoryModel.js";
 import couponCollection from "../models/couponModel.js";
+import mongoose from "mongoose";
 
+// Service to create an Checkout Order
 export const createOrder = async (
   products,
   addressId,
@@ -12,7 +14,7 @@ export const createOrder = async (
   couponCodes,
   userID
 ) => {
-  const session = await orderCollection.startSession();
+  const session = await mongoose.startSession();
 
   try {
     session.startTransaction();
@@ -65,8 +67,8 @@ export const createOrder = async (
 
     discount += couponDiscount;
 
-    const totalAmmount = basePrice - discount + 100;
-    const taxAmmount = parseInt((totalAmmount * 2) / 100);
+    const totalAmount = basePrice - discount + 100;
+    const taxAmount = parseInt((totalAmount * 2) / 100);
 
     const newOrder = new orderCollection({
       userID,
@@ -74,9 +76,9 @@ export const createOrder = async (
       products,
       paymentMethod,
       basePrice,
-      totalAmmount,
+      totalAmmount: totalAmount,
       discount,
-      taxAmmount,
+      taxAmmount: taxAmount,
     });
 
     for (const product of products) {
@@ -108,24 +110,21 @@ export const createOrder = async (
     await session.commitTransaction();
     session.endSession();
 
-    return { order: newOrder };
+    return { success: true, order: newOrder };
   } catch (err) {
     await session.abortTransaction();
     session.endSession();
     console.log(err);
-    return { error: err.message };
+    return { success: false, error: err.message };
   }
 };
 
+// Service to complete payment
 export const completePayment = async (orderID) => {
-  try {
-    await orderCollection.updateOne(
-      { _id: orderID },
-      { paymentStatus: "completed" }
-    );
-  } catch (err) {
-    console.log(err);
-  }
+  await orderCollection.updateOne(
+    { _id: orderID },
+    { paymentStatus: "completed" }
+  );
 };
 
 // Service to get the orders data based on user ID
