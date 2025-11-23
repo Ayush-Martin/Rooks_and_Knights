@@ -1,5 +1,3 @@
-//modules
-import pdfKit from "pdfkit";
 
 //services
 import * as addressService from "../../services/addressServices.js";

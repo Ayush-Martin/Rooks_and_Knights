@@ -16,21 +16,21 @@
                         <table class="table table-bordered">
                             <thead>
                                 <tr>
-                                    <th>email</th>
+                                    <th>Email</th>
                                     <th>Order Date</th>
-                                    <th>ProductName</th>
+                                    <th>Product Name</th>
                                     <th>Quantity</th>
                                     <th>Amount Paid</th>
                                     <th>Return Reason</th>
                                     <th>Status</th>
-                                    <th></th>
+                                    <th>Action</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <% returnList.forEach((returnItem)=>{ %>
                                     <% returnItem.products.forEach((product)=>{ %>
                                         <% if(product.returnStatus!='notRequested' ) {%>
-                                            <tr>
+                                            <tr id="row_<%= product._id %>">
                                                 <td>
                                                     <%= returnItem.userID.email %>
                                                 </td>
@@ -90,7 +90,8 @@
                             class="m-r-20 text-dark">
                             <i class="fas fa-chevron-left"></i> Previous
                         </a>
-                        <P class="m-r-20 text-dark">page : <%= currentPage %> of <%= Math.ceil(totalNoOfPages) %></P>
+                        <P class="m-r-20 text-dark">page : <%= currentPage %> of <%= Math.ceil(totalNoOfPages) %>
+                        </P>
                         <!-- Next Button -->
                         <a href="/admin/returns?page=<%= (currentPage<totalNoOfPages)? Number(currentPage)+1:currentPage %>"
                             class=" text-dark">
@@ -108,80 +109,76 @@
 
             <script>
 
-                function changeReturnStatus(orderID, orderItemID, event, userID, amount, paymentMethod,productID,quantity) {
+                async function changeReturnStatus(orderID, orderItemID, event, userID, amount, paymentMethod, productID, quantity) {
                     event.preventDefault(); // Prevents the form from submitting
 
-                    let returnStatus = document.getElementById(`returnStatus_${orderID}_${orderItemID}`).value;
+                    const returnStatus = document.getElementById(`returnStatus_${orderID}_${orderItemID}`).value;
 
-                    Swal.fire({
+                    if (!returnStatus) {
+                        Swal.fire({
+                            icon: "warning",
+                            title: "Selection Required",
+                            text: "Please select a status (Approve or Reject).",
+                        });
+                        return;
+                    }
+
+                    const result = await Swal.fire({
                         title: "Are you sure?",
-                        text: `Do you want to ${(returnStatus == 'approved') ? 'approve' : 'reject'} this request?`,
+                        text: `Do you want to ${returnStatus === 'approved' ? 'approve' : 'reject'} this request?`,
                         icon: "warning",
                         showCancelButton: true,
                         confirmButtonColor: "#3085d6",
                         cancelButtonColor: "#d33",
                         confirmButtonText: "Yes"
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            fetch(`/admin/returns`, { // Ensure this URL and endpoint are correct for updating return status
-                                method: "PATCH",
-                                headers: {
-                                    'Content-Type': 'application/json'
-                                },
-                                body: JSON.stringify({ orderID, orderItemID, returnStatus, userID, amount, paymentMethod ,productID , quantity}) // Pass necessary data
-                            }).then(res => res.json())
-                                .then((data) => {
-                                    if (data.validationError) {
-                                        let timerInterval;
-                                        Swal.fire({
-                                            title: "Validation Error",
-                                            html: "You will be redirected to login in <b></b> milliseconds.",
-                                            timer: 2000,
-                                            timerProgressBar: true,
-                                            didOpen: () => {
-                                                Swal.showLoading();
-                                                const timer = Swal.getPopup().querySelector("b");
-                                                timerInterval = setInterval(() => {
-                                                    timer.textContent = `${Swal.getTimerLeft()}`;
-                                                }, 100);
-                                            },
-                                            willClose: () => {
-                                                clearInterval(timerInterval);
-                                            }
-                                        }).then((result) => {
-                                            if (result.dismiss === Swal.DismissReason.timer) {
-                                                
-                                                window.location.href = data.redirectUrl;
-                                            }
-                                        });
-                                    }
+                    });
 
-                                    if (data.success) {
-                                        const Toast = Swal.mixin({
-                                            toast: true,
-                                            position: "top-end",
-                                            showConfirmButton: false,
-                                            timer: 2000,
-                                            timerProgressBar: true,
-                                            didOpen: (toast) => {
-                                                toast.onmouseenter = Swal.stopTimer;
-                                                toast.onmouseleave = Swal.resumeTimer;
-                                            }
-                                        });
-                                        Toast.fire({
-                                            icon: "success",
-                                            title: `Return status has been ${returnStatus}`
-                                        });
-                                        setTimeout(() => {
-                                            window.location.reload()
-                                        }, 2000)
-                                    }
-                                })
+                    if (result.isConfirmed) {
+                        try {
+                            const res = await axios.patch(`/admin/returns`, {
+                                orderID,
+                                orderItemID,
+                                returnStatus,
+                                userID,
+                                amount,
+                                paymentMethod,
+                                productID,
+                                quantity
+                            });
+
+                            const data = res.data;
+
+                            if (data.success) {
+                                await Swal.fire({
+                                    icon: "success",
+                                    title: "Updated",
+                                    text: `Return status has been ${returnStatus}`,
+                                    timer: 2000,
+                                    showConfirmButton: false
+                                });
+
+                                // Dynamic DOM Update
+                                const row = document.getElementById(`row_${orderItemID}`);
+                                if (row) {
+                                    // Update Status Cell (Index 6 based on table header)
+                                    const statusCell = row.cells[6];
+                                    statusCell.innerText = returnStatus;
+
+                                    // Clear Action Cell (Index 7)
+                                    const actionCell = row.cells[7];
+                                    actionCell.innerHTML = '';
+                                }
+                            }
+                        } catch (err) {
+                            console.error(err);
+                            Swal.fire({
+                                icon: "error",
+                                title: "Error",
+                                text: err.response?.data?.error || "Something went wrong!",
+                            });
                         }
-                    })
+                    }
                 }
-
-
 
             </script>
     </body>

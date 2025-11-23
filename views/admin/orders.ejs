@@ -9,7 +9,7 @@
 
                 <div id="content" class="container-fluid">
                     <h1 class="m-b-10 admin_title">Orders</h1>
-                    
+
 
                     <div class="table-responsive">
 
@@ -51,7 +51,7 @@
                                             <%= order.paymentStatus %>
                                         </td>
                                         <td>
-                                            <form action="/admin/orders/viewEditOrder/<%= order._id %>" method="get">
+                                            <form action="/admin/orders/<%= order._id %>" method="get">
                                                 <button class="btn btn-dark btn-sm"><i class="fas fa-pencil-alt"></i>
                                                     View/Edit</button>
                                             </form>
@@ -68,7 +68,8 @@
                             class="m-r-20 text-dark">
                             <i class="fas fa-chevron-left"></i> Previous
                         </a>
-                        <P class="m-r-20 text-dark">page : <%= currentPage %> of <%= totalNoOfPages %></P>
+                        <P class="m-r-20 text-dark">page : <%= currentPage %> of <%= totalNoOfPages %>
+                        </P>
                         <!-- Next Button -->
                         <a href="/admin/orders?page=<%= (currentPage<totalNoOfPages)? Number(currentPage)+1:currentPage %>"
                             class=" text-dark">

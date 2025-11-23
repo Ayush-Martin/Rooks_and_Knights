@@ -10,6 +10,8 @@ import * as adminUserController from "../controllers/admin/adminUserController.j
 import * as adminProductController from "../controllers/admin/adminProductController.js";
 import * as adminOfferController from "../controllers/admin/adminOfferController.js";
 import * as adminCouponController from "../controllers/admin/adminCouponController.js";
+import * as adminOrderController from "../controllers/admin/adminOrderController.js";
+import * as adminReturnController from "../controllers/admin/adminReturnController.js";
 
 //multer upload middleware
 import upload, { handleUpload } from "../utils/multerUtils.js";
@@ -89,16 +91,17 @@ router
   .patch(adminSubCategoryController.listUnlistSubCategory);
 
 //orders
-router.get("/orders", adminController.getOrders); //display orders
-router.get("/orders/viewEditOrder/:id", adminController.getViewEditOrder); //display specific order
-router.patch(
-  "/orders/viewEditOrder/:id",
-  adminController.patchChageProductStatus
-); //update product status
+router.get("/orders", adminOrderController.ordersPage);
+router
+  .route("/orders/:id")
+  .get(adminOrderController.orderPage)
+  .patch(adminOrderController.updateOrderProductStatus);
 
 //returns
-router.get("/returns", adminController.getReturns); //display returns
-router.patch("/returns", adminController.patchAproveRejectReturn); //approve or reject returns
+router
+  .route("/returns")
+  .get(adminReturnController.returnsPage)
+  .patch(adminReturnController.approveRejectReturn);
 
 //transations
 router.get("/transations", adminController.getTransations); //display transations
