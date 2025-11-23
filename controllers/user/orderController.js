@@ -150,51 +150,56 @@ export const createCheckoutOrder = async (req, res) => {
   }
 };
 
-//checkout for pending payemnts
-export const postPendingCheckout = async (req, res) => {
+//checkout for pending payments
+export const createCheckoutOrderForPendingPayment = async (req, res) => {
   try {
-    const { orderID, paymentMethod, totalAmmount } = req.query;
+    const { orderID, paymentMethod, totalAmount } = req.query;
 
-    //if wallet
+    //Payment method is wallet
     if (paymentMethod == "Wallet") {
-      const error = await walletService.payFromWallet(req.userID, totalAmmount);
+      const result = await walletService.payFromWallet(req.userID, totalAmount);
 
-      if (error) {
-        return res.status(400).json({ error });
+      if (!result.success) {
+        return res.status(StatusCode.BAD_REQUEST).json({ error: result.error });
       }
 
       await orderService.completePayment(orderID);
       await transactionService.completeTransaction(
         req.userID,
-        totalAmmount,
+        totalAmount,
         "purchase",
         paymentMethod
       );
 
-      return res.status(200).json({ success: true, successRedirect: "/" });
+      return res
+        .status(StatusCode.OK)
+        .json({ success: true, successRedirect: "/" });
     }
 
-    //if razorpay
+    //Payment method is razorpay
     const options = {
-      amount: totalAmmount * 100,
+      amount: totalAmount * 100,
       currency: "INR",
     };
 
-    console.log(options);
-
-    razorpay.orders.create(options, (err, razorpayOrder) => {
-      if (err) {
-        console.log(`razorpay error:`);
-        console.log(err);
-      }
-
-      req.session.order = { _id: orderID, totalAmmount, paymentMethod };
-      console.log(req.session.order, razorpayOrder);
-      return res.status(200).json({ razorpayOrder });
+    const razorpayOrder = await new Promise((resolve, reject) => {
+      razorpay.orders.create(options, (err, order) => {
+        if (err) return reject(err);
+        resolve(order);
+      });
     });
+
+    req.session.order = {
+      _id: orderID,
+      totalAmmount: totalAmount,
+      paymentMethod,
+    };
+    res.status(StatusCode.OK).json({ razorpayOrder });
   } catch (err) {
     console.log(err);
-    res.status(500).json({ error: "Server Error" });
+    res
+      .status(StatusCode.INTERNAL_SERVER_ERROR)
+      .json({ error: "Server Error" });
   }
 };
 
@@ -229,55 +234,62 @@ export const completePayment = async (req, res) => {
   }
 };
 
-//apply coupon
-export const postAddCouponDiscount = async (req, res) => {
+// Controller to apply coupon discount
+export const addCouponDiscount = async (req, res) => {
   try {
     const { totalAmount, couponCode } = req.body;
 
-    const coupon = await couponService.addCouponDiscount(
+    const result = await couponService.applyCouponDiscount(
       totalAmount,
       couponCode
     );
 
-    if (coupon.error) {
-      return res.status(400).json({ error: coupon.error });
+    if (!result.success) {
+      return res.status(StatusCode.BAD_REQUEST).json({ error: result.error });
     }
 
     req.session.couponDiscount = req.session.couponDiscount
-      ? req.session.couponDiscount + coupon.discount
+      ? req.session.couponDiscount + result.discount
       : req.session.couponDiscount;
 
-    return res.status(200).json({
+    return res.status(StatusCode.OK).json({
       success: true,
-      couponDiscount: coupon.discount,
-      couponID: coupon._id,
+      couponDiscount: result.discount,
+      couponID: result._id,
     });
   } catch (err) {
     console.log(err);
-    res.status(500).json({ error: "Server Error" });
+    res
+      .status(StatusCode.INTERNAL_SERVER_ERROR)
+      .json({ error: "Server Error" });
   }
 };
 
-//avaliable coupon list
-export const getAvaliableCoupon = async (req, res) => {
+// Controller to get available coupon list
+export const getAvailableCoupon = async (req, res) => {
   try {
-    const totalAmmount = req.params.id;
+    const totalAmount = req.params.id;
 
-    const avaliableCouponList = await couponService.avaliableCouponList(
-      totalAmmount
+    const availableCouponList = await couponService.getAvailableCouponList(
+      totalAmount
     );
-    return res.status(200).json({ success: true, avaliableCouponList });
+    return res
+      .status(StatusCode.OK)
+      .json({ success: true, availableCouponList });
   } catch (err) {
     console.log(err);
+    res
+      .status(StatusCode.INTERNAL_SERVER_ERROR)
+      .json({ error: "Server Error" });
   }
 };
 
-//cancel an order
-export const patchCancel = async (req, res) => {
+// Controller to cancel an order
+export const cancelOrder = async (req, res) => {
   try {
     const { productID, productQuantity, amountPaid } = req.body;
     const orderProductsID = req.params.id;
-    const { paymentMethod, paymentStatus, additionlaCharge } =
+    const { paymentMethod, paymentStatus, additionalCharge } =
       await orderService.cancelOrders(
         orderProductsID,
         req.userID,
@@ -291,33 +303,36 @@ export const patchCancel = async (req, res) => {
     ) {
       await transactionService.completeTransaction(
         req.userID,
-        amountPaid + additionlaCharge,
+        amountPaid + additionalCharge,
         "refund"
       );
       await walletService.addToWallet(
         req.userID,
-        amountPaid + additionlaCharge
+        amountPaid + additionalCharge
       );
     }
-    res.json({ success: true });
+    res.status(StatusCode.OK).json({ success: true });
   } catch (err) {
     console.log(err);
-    res.status(500).json({ error: "Server Error" });
+    res
+      .status(StatusCode.INTERNAL_SERVER_ERROR)
+      .json({ error: "Server Error" });
   }
 };
 
-//request for return
-export const patchReturn = async (req, res) => {
+export const returnProduct = async (req, res) => {
   try {
     const { returnReason } = req.body;
 
     const orderProductsID = req.params.id;
     await orderService.returnOrders(req.userID, orderProductsID, returnReason);
 
-    res.status(200).json({ success: true });
+    res.status(StatusCode.OK).json({ success: true });
   } catch (err) {
     console.log(err);
-    res.status(500).json({ error: "Server Error" });
+    res
+      .status(StatusCode.INTERNAL_SERVER_ERROR)
+      .json({ error: "Server Error" });
   }
 };
 
@@ -328,6 +343,8 @@ export const invoiceDownload = async (req, res) => {
     generateInvoice(req, res, order);
   } catch (err) {
     console.log(err);
-    res.status(500).json({ error: "Server Error" });
+    res
+      .status(StatusCode.INTERNAL_SERVER_ERROR)
+      .json({ error: "Server Error" });
   }
 };

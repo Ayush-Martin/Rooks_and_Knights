@@ -460,15 +460,15 @@
                         }
 
                         if (! /^[A-Za-z\d]{6,8}$/.test(couponCode)) {
-                            return "Code mulst be between 6 and 8 character contail only letters and numbers"
+                            return "Code must be between 6 and 8 character contain only letters and numbers"
                         }
 
                         if (discountAmount <= 0 || minimumOrderAmount <= 0) {
-                            return "discount amount and miminum order amount should be greater than 0"
+                            return "discount amount and minimum order amount should be greater than 0"
                         }
 
                         if (new Date(expiryDate) < new Date(new Date().setHours(0, 0, 0, 0))) {
-                            return "exipry date should not be less than date today"
+                            return "expiry date should not be less than date today"
                         }
 
                         if (minimumOrderAmount < discountAmount * 2) {

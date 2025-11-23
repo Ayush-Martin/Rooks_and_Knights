@@ -21,17 +21,17 @@ router.post(
 router.post(
   "/pendingProceedToPayment",
   userAuthMiddleware.validUser,
-  orderController.postPendingCheckout
+  orderController.createCheckoutOrderForPendingPayment
 );
 router.patch(
   "/cancel/:id",
   userAuthMiddleware.validUser,
-  orderController.patchCancel
+  orderController.cancelOrder
 );
 router.patch(
   "/return/returnProduct/:id",
   userAuthMiddleware.validUser,
-  orderController.patchReturn
+  orderController.returnProduct
 );
 
 router.post(
@@ -44,14 +44,14 @@ router.post(
 router.post(
   "/coupon",
   userAuthMiddleware.validUser,
-  orderController.postAddCouponDiscount
+  orderController.addCouponDiscount
 );
 
 //coupon list
 router.get(
   "/coupon/:id",
   userAuthMiddleware.validUser,
-  orderController.getAvaliableCoupon
+  orderController.getAvailableCoupon
 );
 
 //download Invoice pdf

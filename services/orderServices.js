@@ -149,39 +149,37 @@ export const getOrder = async (orderID) => {
   }
 };
 
+// Service to cancel the orders
 export const cancelOrders = async (_id, userID, productID, productQuantity) => {
-  try {
-    let order = await orderCollection.findOneAndUpdate(
-      { userID, "products._id": _id },
-      { $set: { "products.$.status": "canceled" } },
-      { new: true }
-    );
+  let order = await orderCollection.findOneAndUpdate(
+    { userID, "products._id": _id },
+    { $set: { "products.$.status": "canceled" } },
+    { new: true }
+  );
 
-    await productCollection.updateOne(
-      { _id: productID },
-      { $inc: { stock: productQuantity } }
-    );
-    const allCanceled = order.products.every(
-      (product) => product.status === "canceled"
-    );
+  await productCollection.updateOne(
+    { _id: productID },
+    { $inc: { stock: productQuantity } }
+  );
+  const allCanceled = order.products.every(
+    (product) => product.status === "canceled"
+  );
 
-    let additionlaCharge = 0;
-    if (allCanceled) {
-      order.orderStatus = "canceled";
-      additionlaCharge += order.deliveryCharge;
-      await order.save();
-    }
-
-    return {
-      paymentMethod: order.paymentMethod,
-      paymentStatus: order.paymentStatus,
-      additionlaCharge,
-    };
-  } catch (err) {
-    console.log(err);
+  let additionalCharge = 0;
+  if (allCanceled) {
+    order.orderStatus = "canceled";
+    additionalCharge += order.deliveryCharge;
+    await order.save();
   }
+
+  return {
+    paymentMethod: order.paymentMethod,
+    paymentStatus: order.paymentStatus,
+    additionalCharge,
+  };
 };
 
+// Service to return the product
 export const returnOrders = async (userID, orderProductId, returnReason) => {
   try {
     await orderCollection.updateOne(
