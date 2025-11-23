@@ -7,20 +7,13 @@ import * as walletController from "../controllers/user/walletController.js";
 //middlewares
 import * as userAuthMiddleware from "../middlewares/userAuthMiddleware.js";
 
-router.get(
-  "/",
-  userAuthMiddleware.checkUserAuthenticated,
-  walletController.getWallet
-);
-router.post(
-  "/addToWallet",
-  userAuthMiddleware.validUser,
-  walletController.postWallet
-);
-router.post(
-  "/completePayment",
-  userAuthMiddleware.validUser,
-  walletController.completePayment
-);
+router
+  .route("/")
+  .get(userAuthMiddleware.checkUserAuthenticated, walletController.walletPage)
+  .post(userAuthMiddleware.validUser, walletController.addAmountToWallet);
+
+router
+  .route("/completePayment")
+  .post(userAuthMiddleware.validUser, walletController.completePayment);
 
 export default router;

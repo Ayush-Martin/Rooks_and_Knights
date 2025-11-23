@@ -1,72 +1,56 @@
 //models
 import walletCollection from "../models/walletModel.js";
-import userCollection from "../models/userModel.js";
 
-//render walletList
-export const walletList = async (userID) => {
-  try {
-    const wallet = await walletCollection.findOne({ userID });
+// Service to get wallet list
+export const getWalletList = async (userID) => {
+  const wallet = await walletCollection.findOne({ userID });
 
-    if (!wallet) {
-      const newWallet = new walletCollection({
-        userID,
-      });
+  if (!wallet) {
+    const newWallet = new walletCollection({
+      userID,
+    });
 
-      await newWallet.save();
-      return newWallet;
-    }
-    return wallet;
-  } catch (err) {
-    console.log(err);
+    await newWallet.save();
+    return newWallet;
   }
+  return wallet;
 };
 
-//add money to wallet
+// Service to add money to wallet
 export const addToWallet = async (userID, amount) => {
-  try {
-    console.log(userID, amount);
-    await walletCollection.updateOne({ userID }, { $inc: { balance: amount } });
-  } catch (err) {
-    console.log(err);
-  }
+  await walletCollection.updateOne({ userID }, { $inc: { balance: amount } });
 };
 
-//pay form wallet
+// Service to pay from wallet
 export const payFromWallet = async (userID, amount) => {
-  try {
-    const wallet = await walletCollection.findOne({ userID });
+  const wallet = await walletCollection.findOne({ userID });
 
-    if (!wallet) {
-      //checks for wallet exist
-      const newWallet = new walletCollection({
-        userID,
-      });
+  if (!wallet) {
+    //checks for wallet exist
+    const newWallet = new walletCollection({
+      userID,
+    });
 
-      await newWallet.save();
-      return "Not enought money in wallet";
-    }
-
-    if (wallet.balance < amount) {
-      //checks if wallet have enough balance
-      return "Not enought money in wallet";
-    }
-
-    wallet.balance -= amount;
-
-    await wallet.save();
-  } catch (err) {
-    console.log(err);
+    await newWallet.save();
+    return { success: false, error: "Not enough money in wallet" };
   }
+
+  if (wallet.balance < amount) {
+    //checks if wallet have enough balance
+    return { success: false, error: "Not enough money in wallet" };
+  }
+
+  wallet.balance -= amount;
+
+  await wallet.save();
+  return { success: true, newBalance: wallet.balance };
 };
 
-//add referal amount to user wallet
+// Service to add referal amount to user wallet
 export const referal = async (referedUserID) => {
-  try {
-    await walletCollection.updateOne(
-      { userID: referedUserID },
-      { $inc: { balance: 50 } }
-    );
-  } catch (err) {
-    console.log(err);
-  }
+  await walletCollection.updateOne(
+    { userID: referedUserID },
+    { $inc: { balance: 50 } }
+  );
+  return { success: true, newBalance: wallet.balance };
 };

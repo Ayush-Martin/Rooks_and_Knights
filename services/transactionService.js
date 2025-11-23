@@ -1,6 +1,7 @@
 //models
 import transactionCollection from "../models/transactionModel.js";
 
+// Service to get transactions list
 export const transactionsList = async (userID) => {
   try {
     const transactionList = await transactionCollection

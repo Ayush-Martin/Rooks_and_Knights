@@ -1,10 +1,11 @@
 //services
 import * as cartServices from "../../services/cartServices.js";
+import { StatusCode } from "../../constants/statusCodes.js";
 
-//render cartpage
-export const getCart = async (req, res) => {
+// Controller for cart page
+export const cartPage = async (req, res) => {
   try {
-    let cart = await cartServices.viewCart(req.userID);
+    let cart = await cartServices.getCart(req.userID);
 
     res.render("cart", { cart });
   } catch (err) {
@@ -13,7 +14,7 @@ export const getCart = async (req, res) => {
   }
 };
 
-//adding a new product to cart
+// Controller to add product to cart
 export const addToCart = async (req, res) => {
   try {
     const productID = req.params.id;
@@ -21,51 +22,62 @@ export const addToCart = async (req, res) => {
 
     const userID = req.userID;
 
-    const error = await cartServices.addToCart(
+    const result = await cartServices.addToCart(
       userID,
       productID,
       quantity,
       categoryID,
       subCategoryID
     );
-    if (error && error.error) {
-      return res.status(200).json({
-        error: error.error,
+    if (!result.success) {
+      return res.status(StatusCode.BAD_REQUEST).json({
+        error: result.error,
         errorRedirect: `<a href="/cart">Check cart</a>`,
       });
     }
 
-    res.status(200).json({ success: true });
+    res.status(StatusCode.OK).json({ success: true });
   } catch (err) {
     console.log(err);
-    res.status(500).json({ error: "Server Error" });
+    res
+      .status(StatusCode.INTERNAL_SERVER_ERROR)
+      .json({ error: "Server Error" });
   }
 };
 
-//delete cart
+// Controller to delete cart item
 export const deleteCartItem = async (req, res) => {
   try {
     const cartItemID = req.params.id;
     await cartServices.deleteCartItem(cartItemID, req.userID);
 
-    res.status(200).json({ success: true });
+    res.status(StatusCode.OK).json({ success: true });
   } catch (err) {
     console.log(err);
-    res.status(500).json({ error: "Server Error" });
+    res
+      .status(StatusCode.INTERNAL_SERVER_ERROR)
+      .json({ error: "Server Error" });
   }
 };
 
-//increase product quantity
-export const increaseQuantity = async (req, res) => {
+// Controller to update product quantity
+export const updateCartItemQuantity = async (req, res) => {
   try {
     const cartItemId = req.params.id;
-    const result = await cartServices.increaseQuantity(cartItemId, req.userID);
+    const { action } = req.body;
+    const result = await cartServices.updateCartItemQuantity(
+      cartItemId,
+      req.userID,
+      action
+    );
 
-    if (result.error) {
-      return res.status(400).json({ error: result.error });
+    if (!result.success) {
+      return res.status(StatusCode.BAD_REQUEST).json({
+        error: result.error,
+      });
     }
 
-    res.status(200).json({
+    res.status(StatusCode.OK).json({
       success: true,
       newQuantity: result.quantity,
       newTotal: result.total,
@@ -73,28 +85,8 @@ export const increaseQuantity = async (req, res) => {
     });
   } catch (err) {
     console.log(err);
-    res.status(500).json({ error: "Server Error" });
-  }
-};
-
-//decrease product quantity
-export const decreaseQuantity = async (req, res) => {
-  try {
-    const cartItemId = req.params.id;
-    const result = await cartServices.decreaseQuantity(cartItemId, req.userID);
-
-    if (result.error) {
-      return res.status(400).json({ error: result.error });
-    }
-
-    res.status(200).json({
-      success: true,
-      newQuantity: result.quantity,
-      newTotal: result.total,
-      cartTotal: result.cartTotal,
-    });
-  } catch (err) {
-    console.log(err);
-    res.status(500).json({ error: "Server Error" });
+    res
+      .status(StatusCode.INTERNAL_SERVER_ERROR)
+      .json({ error: "Server Error" });
   }
 };
