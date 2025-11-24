@@ -68,7 +68,7 @@ router
     userAuthMiddleware.checkUserAuthenticated,
     userController.changePasswordPage
   )
-  .post(userController.changePassword);
+  .post(userAuthMiddleware.validUser, userController.changePassword);
 
 // Forget password
 router

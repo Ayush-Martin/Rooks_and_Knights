@@ -37,16 +37,16 @@ export const addSubCategory = async (
 
   if (subCategory) {
     //checks subcategory exist
-    return { success: false, error: "subCategory Aldready exists" };
+    return { success: false, error: "subCategory Already exists" };
   }
 
-  //create a new sub cateogry
-  const newsubCategory = new subCategoryCollection({
+  //create a new sub category
+  const newSubCategory = new subCategoryCollection({
     subCategoryName,
     subCategoryDescription,
   });
 
-  await newsubCategory.save();
+  await newSubCategory.save();
   return { success: true, message: "subCategory added successfully" };
 };
 
@@ -62,7 +62,7 @@ export const editSubCategory = async (
   });
 
   if (subCategory) {
-    //checks subcateogry exists
+    //checks subcategory exists
     return { success: false, error: "subCategory already exists cannot edit" };
   }
 
@@ -77,7 +77,7 @@ export const editSubCategory = async (
 export const listUnlistSubCategory = async (subCategoryID, list) => {
   // const productExist = await productCollection.findOne({ subCategoryID: subCategoryID })
 
-  // if (productExist) { //if product exists aldready the subcategory cannot be deleted
+  // if (productExist) { //if product exists already the subcategory cannot be deleted
   //     return "SubCategories with products cannot be deleted"
   // }
   await subCategoryCollection.updateOne(

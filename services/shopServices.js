@@ -13,7 +13,18 @@ export const productList = async (
   noOfProducts,
   skipPages
 ) => {
-  let findQuery = { isListed: true };
+  const categoryList = await categoryCollection.find({ isListed: true });
+  const subCategoryList = await subCategoryCollection.find({ isListed: true });
+
+  const listedCatIDs = categoryList.map((x) => x._id);
+  const listedSubCatIDs = subCategoryList.map((x) => x._id);
+
+  const findQuery = {
+    isListed: true,
+    subCategoryID: { $in: listedSubCatIDs },
+    categoryID: { $in: listedCatIDs },
+  };
+
   if (categoryID) {
     findQuery.categoryID = categoryID;
   }
@@ -65,9 +76,8 @@ export const productList = async (
       break;
   }
 
-  const categoryList = await categoryCollection.find({ isListed: true });
-  const subCategoryList = await subCategoryCollection.find({ isListed: true });
   const totalNoOfProducts = await productCollection.countDocuments(findQuery);
+
   const productList = await productCollection
     .find(findQuery)
     .populate("categoryID")

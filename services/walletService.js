@@ -47,10 +47,19 @@ export const payFromWallet = async (userID, amount) => {
 };
 
 // Service to add referal amount to user wallet
-export const referal = async (referedUserID) => {
-  await walletCollection.updateOne(
-    { userID: referedUserID },
-    { $inc: { balance: 50 } }
+export const referal = async (referredUserID) => {
+  const updatedWallet = await walletCollection.findOneAndUpdate(
+    { userID: referredUserID },
+    { $inc: { balance: 50 } },
+    {
+      upsert: true,
+      returnDocument: "after", // ensures updated wallet returned
+      setDefaultsOnInsert: true,
+    }
   );
-  return { success: true, newBalance: wallet.balance };
+
+  return {
+    success: true,
+    newBalance: updatedWallet.balance,
+  };
 };

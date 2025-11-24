@@ -33,7 +33,7 @@ export const addCategory = async (categoryName, categoryDescription) => {
   });
 
   if (category) {
-    return { success: false, error: "category Aldready exists" };
+    return { success: false, error: "category Already exists" };
   }
 
   //category does not exist
@@ -54,12 +54,12 @@ export const editCategory = async (
   categoryDescription
 ) => {
   let category = await categoryCollection.findOne({
-    categoryName,
+    categoryName: { $regex: new RegExp(`^${categoryName}$`, "i") },
     _id: { $ne: categoryID },
   });
 
   if (category) {
-    //if anoter category with same name exist aldready
+    //if another category with same name exist already
     return { success: false, message: "category already exists cannot edit" };
   }
 
