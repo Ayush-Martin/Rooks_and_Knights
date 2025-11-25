@@ -253,6 +253,7 @@ export const addCouponDiscount = async (req, res) => {
       success: true,
       couponDiscount: result.discount,
       couponID: result._id,
+      couponCode,
     });
   } catch (err) {
     console.log(err);

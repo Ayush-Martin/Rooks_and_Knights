@@ -856,6 +856,16 @@
           const discountAmount = document.getElementById("discountAmount");
           const couponList = document.getElementById("couponList");
 
+          if (document.getElementById(`coupon_${couponCode}`)) {
+            Swal.fire({
+              icon: "error",
+              title: "Oops...",
+              text: "Coupon already applied",
+            });
+
+            return;
+          };
+
           try {
             const res = await axios.post(`/order/coupon`, {
               totalAmount: totalAmount.textContent,
@@ -863,9 +873,10 @@
             });
             const data = res.data;
 
+
             if (data.success) {
               couponCodeIds.push(data.couponID);
-              if (document.getElementById(`coupon_${data.couponID}`)) return;
+
 
               if (couponDiscountAmount.textContent > 0) {
                 discountAmount.innerText =
@@ -883,7 +894,7 @@
                 Number(totalAmount.textContent) - data.couponDiscount;
 
               const newCouponListItem = `
-                    <li class="flex-sb" id="coupon_${data.couponID}">
+                    <li class="flex-sb" id="coupon_${data.couponCode}">
                       <p style="font-family: monospace;">${couponCode} : ₹${data.couponDiscount}</p>
                       <button type="button" onclick="removeCoupon('${data.couponID}',${data.couponDiscount})"><i
                           class="fa-solid fa-trash"></i></button>
@@ -948,12 +959,12 @@
 
             data.availableCouponList.forEach((coupon) => {
               const newCouponListItem = `
-                    <li class="flex-sb" id="coupon_${coupon.couponID}">
+                    <li class="flex-sb" id="coupon_view_${coupon._id}">
                       <p style="font-family: monospace;" class="fs-20">${coupon.couponCode}</p>
                     </li>
                     `;
 
-              if (!document.getElementById(`coupon_${coupon.couponID}`))
+              if (!document.getElementById(`coupon_view_${coupon._id}`))
                 availableCouponList.insertAdjacentHTML(
                   "beforeend",
                   newCouponListItem
