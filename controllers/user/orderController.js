@@ -43,7 +43,6 @@ export const createCheckoutOrder = async (req, res) => {
       cartItemIds,
       discount,
       taxAmount,
-      couponCodeIds,
     } = req.body;
 
     // Payment method is cash on delivery
@@ -52,7 +51,10 @@ export const createCheckoutOrder = async (req, res) => {
         products,
         addressId,
         paymentMethod,
-        couponCodeIds,
+        basePrice,
+        discount,
+        taxAmount,
+        totalAmount,
         req.userID
       );
 
@@ -83,7 +85,10 @@ export const createCheckoutOrder = async (req, res) => {
         products,
         addressId,
         paymentMethod,
-        couponCodeIds,
+        basePrice,
+        discount,
+        taxAmount,
+        totalAmount,
         req.userID
       );
 
@@ -112,7 +117,10 @@ export const createCheckoutOrder = async (req, res) => {
       products,
       addressId,
       paymentMethod,
-      couponCodeIds,
+      basePrice,
+      discount,
+      taxAmount,
+      totalAmount,
       req.userID
     );
 
@@ -151,6 +159,8 @@ export const createCheckoutOrder = async (req, res) => {
 export const createCheckoutOrderForPendingPayment = async (req, res) => {
   try {
     const { orderID, paymentMethod, totalAmount } = req.query;
+
+    console.log(orderID, paymentMethod, totalAmount);
 
     //Payment method is wallet
     if (paymentMethod == "Wallet") {

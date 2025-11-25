@@ -11,7 +11,10 @@ export const createOrder = async (
   products,
   addressId,
   paymentMethod,
-  couponCodes,
+  basePrice,
+  discount,
+  taxAmount,
+  totalAmount,
   userID
 ) => {
   const session = await mongoose.startSession();
@@ -29,46 +32,46 @@ export const createOrder = async (
       throw new Error("Address not found");
     }
 
-    const productIDs = products.map((product) => product.productID);
-    const orderedProducts = await productCollection
-      .find({ _id: { $in: productIDs } })
-      .populate("categoryID")
-      .populate("subCategoryID")
-      .session(session);
+    // const productIDs = products.map((product) => product.productID);
+    // const orderedProducts = await productCollection
+    //   .find({ _id: { $in: productIDs } })
+    //   .populate("categoryID")
+    //   .populate("subCategoryID")
+    //   .session(session);
 
-    if (orderedProducts.some((product) => product.isListed === false)) {
-      throw new Error("One or more products do not exist");
-    }
+    // if (orderedProducts.some((product) => product.isListed === false)) {
+    //   throw new Error("One or more products do not exist");
+    // }
 
-    const coupons = await couponCollection
-      .find({ _id: { $in: couponCodes } })
-      .session(session);
+    // const coupons = await couponCollection
+    //   .find({ _id: { $in: couponCodes } })
+    //   .session(session);
 
-    let discount = 0;
-    let basePrice = 0;
-    const couponDiscount = coupons.reduce(
-      (discount, coupon) => discount + coupon.discountAmount,
-      0
-    );
+    // let discount = 0;
+    // let basePrice = 0;
+    // const couponDiscount = coupons.reduce(
+    //   (discount, coupon) => discount + coupon.discountAmount,
+    //   0
+    // );
 
-    for (let i = 0; i < products.length; i++) {
-      basePrice += parseInt(orderedProducts[i].price * products[i].quantity);
-      discount += parseInt(
-        (orderedProducts[i].price *
-          Math.max(
-            orderedProducts[i].offer,
-            orderedProducts[i].subCategoryID.offer,
-            orderedProducts[i].categoryID.offer
-          ) *
-          products[i].quantity) /
-          100
-      );
-    }
+    // for (let i = 0; i < products.length; i++) {
+    //   basePrice += parseInt(orderedProducts[i].price * products[i].quantity);
+    //   discount += parseInt(
+    //     (orderedProducts[i].price *
+    //       Math.max(
+    //         orderedProducts[i].offer,
+    //         orderedProducts[i].subCategoryID.offer,
+    //         orderedProducts[i].categoryID.offer
+    //       ) *
+    //       products[i].quantity) /
+    //       100
+    //   );
+    // }
 
-    discount += couponDiscount;
+    // discount += couponDiscount;
 
-    const totalAmount = basePrice - discount + 100;
-    const taxAmount = parseInt((totalAmount * 2) / 100);
+    // const totalAmount = basePrice - discount + 100;
+    // const taxAmount = parseInt((totalAmount * 2) / 100);
 
     const newOrder = new orderCollection({
       userID,
@@ -192,6 +195,6 @@ export const returnOrders = async (userID, orderProductId, returnReason) => {
       }
     );
   } catch (err) {
-    console.log(err)
+    console.log(err);
   }
 };
