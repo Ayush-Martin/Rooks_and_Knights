@@ -114,7 +114,7 @@
             <% }else{ %>
                 <div class="m-tb-104 text-center">
                     <p class="fs-31" style="color: rgba(0, 0, 0, 0.351);">Wishlist is Empty</p>
-                    <a href="/shop">Continue shoping</a>
+                    <a href="/shop">Continue shopping</a>
                 </div>
                 <% } %>
     </div>
@@ -189,44 +189,28 @@
 
                 }
 
-                function addToCart(productID, categoryID, subCategoryID, event) {
+                async function addToCart(productID, categoryID, subCategoryID, event) {
                     event.preventDefault();
-                    let quantity = document.getElementById('productQuantity').value;
-                    fetch(`/cart/addToCart/${productID}`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({
+                    const quantity = document.getElementById('productQuantity').value;
+                    try {
+                        const res = await axios.post(`/cart/${productID}`, {
                             quantity, categoryID, subCategoryID
                         })
-                    }).then((res) => res.json())
-                        .then((data) => {
-                            if (data.success) {
-                                Swal.fire({
-                                    title: "Good job!",
-                                    text: "Product added to cart",
-                                    icon: "success",
-                                    footer: `<a href="/cart">Go to cart</a>`,
-                                })
-                            } else if (data.error) {
-                                Swal.fire({
-                                    icon: "error",
-                                    title: "Oops...",
-                                    text: data.error,
-                                    footer: data.errorRedirect
-                                });
-                            } else if (data.authError) {
-                                Swal.fire({
-                                    icon: "error",
-                                    title: "Oops...",
-                                    text: data.authError,
-                                    footer: data.errorRedirect
-                                });
-                            }
-                        }).catch((err) => {
-                            console.log(err);
+
+                        Swal.fire({
+                            title: "Good job!",
+                            text: "Product added to cart",
+                            icon: "success",
+                            footer: `<a href="/cart">Go to cart</a>`,
                         })
+                    } catch (err) {
+                        console.log(err);
+                        Swal.fire({
+                            icon: "error",
+                            title: "Error",
+                            text: err.response?.data?.error || "Something went wrong!",
+                        });
+                    }
                 }
 
             </script>

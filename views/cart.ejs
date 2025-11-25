@@ -47,18 +47,21 @@
                         </td>
 
                         <td class="column-4">
-                          <% if (!cartItem.productID.isListed) { %>
-                            <p>Product unavailable</p>
-                            <% } else if (cartItem.productID.stock> 0) { %>
-                              <p id="stock-Left_<%= cartItem._id %>"></p>
 
+                          <% if (!cartItem.productID.isListed || !cartItem.categoryID.isListed ||
+                            !cartItem.subCategoryID.isListed) { %>
+                            <p style="color:red;">Product Unavailable</p>
+
+                            <% } else if (cartItem.productID.stock> 0) { %>
+
+                              <p id="stock-Left_<%= cartItem._id %>"></p>
                               <div class="wrap-num-product flex-w m-l-auto m-r-0">
                                 <div class="btn-num-product-down cl8 hov-btn3 trans-04 flex-c-m"
                                   onclick="updateQuantity('<%= cartItem._id %>', 'decrease')">
                                   <i class="fs-16 zmdi zmdi-minus"></i>
                                 </div>
 
-                                <input class="mtext-104 cl3 txt-center num-product" type="number" name="num-product1"
+                                <input class="mtext-104 cl3 txt-center num-product"
                                   value="<%= (cartItem.quantity <= cartItem.productID.stock) ? cartItem.quantity : 1 %>"
                                   id="productQuantity_<%= cartItem._id %>" readonly />
 
@@ -67,9 +70,12 @@
                                   <i class="fs-16 zmdi zmdi-plus"></i>
                                 </div>
                               </div>
+
                               <% } else { %>
-                                <p>Out of Stock</p>
+                                <p style="color:orange;">Out of Stock</p>
                                 <% } %>
+                        </td>
+
 
                         <td class="column-5 cart-product-total" id="cartProductTotal_<%= cartItem._id %>">
                           <%= Math.round(itemTotal) %>

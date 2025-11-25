@@ -192,6 +192,6 @@ export const returnOrders = async (userID, orderProductId, returnReason) => {
       }
     );
   } catch (err) {
-    console.log(err);
+    console.log(err)
   }
 };

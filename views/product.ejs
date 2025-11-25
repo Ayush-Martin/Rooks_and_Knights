@@ -157,37 +157,39 @@
 						<div class="p-b-10">
 							<div class="size-204 respon6-next">
 
+								<% if(!product.isListed || !product.categoryID.isListed ||
+									!product.subCategoryID.isListed ){%>
+									<p class="fs-20">Product not available</p>
+									<% }else if(product.stock>0){%>
+										<form id="addToCartForm"
+											onsubmit="addToCart('<%= product._id %>','<%= product.categoryID._id%>','<%= product.subCategoryID._id%>' ,event )">
+											<p id="stock-Left"></p>
+											<div class="wrap-num-product flex-w  m-tb-10">
 
-								<% if(product.stock>0){%>
-									<form id="addToCartForm"
-										onsubmit="addToCart('<%= product._id %>','<%= product.categoryID._id%>','<%= product.subCategoryID._id%>' ,event )">
-										<p id="stock-Left"></p>
-										<div class="wrap-num-product flex-w  m-tb-10">
+												<div class="btn-num-product-down btn-num-product-down cl8 hov-btn3 trans-04 flex-c-m"
+													onclick="decreaseProduct(this)">
+													<i class="fs-16 zmdi zmdi-minus"></i>
+												</div>
 
-											<div class="btn-num-product-down btn-num-product-down cl8 hov-btn3 trans-04 flex-c-m"
-												onclick="decreaseProduct(this)">
-												<i class="fs-16 zmdi zmdi-minus"></i>
+												<input class="mtext-104 cl3 txt-center num-product" type="number"
+													name="quantity" value="1" id="productQuantity" readonly>
+
+												<div class="btn-num-product btn-num-product-up cl8 hov-btn3 trans-04 flex-c-m"
+													onclick="increaseProduct(this,'<%= product.stock %>')">
+													<i class="fs-16 zmdi zmdi-plus"></i>
+												</div>
 											</div>
 
-											<input class="mtext-104 cl3 txt-center num-product" type="number"
-												name="quantity" value="1" id="productQuantity" readonly>
+											<button
+												class="flex-c-m stext-101 cl0 size-101 bg1 bor1 hov-btn1 p-lr-15 trans-04 js-addcart-detail"
+												type="submit">
+												Add to cart
+											</button>
 
-											<div class="btn-num-product btn-num-product-up cl8 hov-btn3 trans-04 flex-c-m"
-												onclick="increaseProduct(this,'<%= product.stock %>')">
-												<i class="fs-16 zmdi zmdi-plus"></i>
-											</div>
-										</div>
-
-										<button
-											class="flex-c-m stext-101 cl0 size-101 bg1 bor1 hov-btn1 p-lr-15 trans-04 js-addcart-detail"
-											type="submit">
-											Add to cart
-										</button>
-
-									</form>
-									<% }else{ %>
-										<p class="fs-20">Out Of Stock</p>
-										<% } %>
+										</form>
+										<% }else{ %>
+											<p class="fs-20">Out Of Stock</p>
+											<% } %>
 
 							</div>
 						</div>

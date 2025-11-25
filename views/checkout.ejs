@@ -42,7 +42,8 @@
                     </td>
 
                     <td class="column-4 text-center">
-                      <% if(!cartItem.productID.isListed){%>
+                      <% if(!cartItem.productID.isListed || !cartItem.categoryID.isListed ||
+                        !cartItem.subCategoryID.isListed){%>
                         <p>Product unavailable</p>
                         <% } else if(cartItem.quantity<=cartItem.productID.stock) {%>
 
@@ -700,7 +701,7 @@
               });
             }
 
-            if (!cartItem.productID.isListed) {
+            if (!cartItem.productID.isListed || !cartItem.subCategoryID.isListed || !cartItem.categoryID.isListed) {
               unavailableProduct = true;
               Swal.fire({
                 title: "Cannot Proceed to payment",
