@@ -43,10 +43,7 @@ export const approveRejectReturn = async (req, res) => {
       quantity
     );
 
-    if (
-      returnStatus == "approved" &&
-      (paymentMethod == "Wallet" || paymentMethod == "Razorpay")
-    ) {
+    if (returnStatus == "approved") {
       await walletService.addToWallet(userID, amount);
       await transactionService.completeTransaction(userID, amount, "refund");
     }
