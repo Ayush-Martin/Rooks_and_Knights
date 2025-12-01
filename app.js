@@ -1,15 +1,17 @@
-//Requiring modules
-require("dotenv").config();
-const express = require("express");
+//Importing modules
+import dotenv from "dotenv";
+dotenv.config();
+import express from "express";
+import nocache from "nocache";
+import cookieParser from "cookie-parser";
+import session from "express-session";
+import methodOverride from "method-override";
+import flash from "connect-flash";
+import passport from "passport";
+import morgan from "morgan";
+import "./config/passport.js";
+
 const app = express();
-const nocache = require("nocache");
-const cookieParser = require("cookie-parser");
-const session = require("express-session");
-const methodOverride = require("method-override");
-const flash = require("connect-flash");
-const passport = require("passport");
-const morgan = require("morgan");
-require("./config/passport");
 
 //Setting view engine
 app.set("view engine", "ejs");
@@ -42,19 +44,19 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 //Routers
-const userRouter = require("./routers/userRoute");
-const OTPRouter = require("./routers/OTPRouter");
-const adminRouter = require("./routers/adminRouter");
-const homeRouter = require("./routers/homeRouter");
-const shopRouter = require("./routers/shopRouter");
-const cartRouter = require("./routers/cartRouter");
-const wishlistRouter = require("./routers/wishlistRouter");
-const addressRouter = require("./routers/addressRouter");
-const orderRouter = require("./routers/orderRouter");
-const walletRouter = require("./routers/walletRouter");
+import userRouter from "./routers/userRoute.js";
+import OTPRouter from "./routers/OTPRouter.js";
+import adminRouter from "./routers/adminRouter.js";
+import homeRouter from "./routers/homeRouter.js";
+import shopRouter from "./routers/shopRouter.js";
+import cartRouter from "./routers/cartRouter.js";
+import wishlistRouter from "./routers/wishlistRouter.js";
+import addressRouter from "./routers/addressRouter.js";
+import orderRouter from "./routers/orderRouter.js";
+import walletRouter from "./routers/walletRouter.js";
 
 //Database
-const connectDb = require("./config/database");
+import connectDb from "./config/database.js";
 connectDb();
 
 //Running Server

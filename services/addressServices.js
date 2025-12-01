@@ -1,86 +1,96 @@
 //models
-const address = require('../models/addressModel');
-const addressCollection = require('../models/addressModel')
+import addressCollection from "../models/addressModel.js";
 
-//new address
-exports.addNewAddress = async (addressTitle, state, city, pinCode, streetAddress, userID) => {
-    try {
-        const address = await addressCollection.findOne({ userID })
+// Service to add new address
+export const addNewAddress = async (
+  addressTitle,
+  state,
+  city,
+  pinCode,
+  streetAddress,
+  userID
+) => {
+  const address = await addressCollection.findOne({ userID });
 
-        if (!address) {
-            //check an address collection exist aldready for the given user if not create one
-            const newaddress = new addressCollection({
-                userID,
-                address: [{
-                    addressTitle,
-                    state,
-                    city,
-                    pinCode,
-                    streetAddress
-                }]
-            })
+  if (!address) {
+    //check an address collection exist already for the given user if not create one
+    const newAddress = new addressCollection({
+      userID,
+      address: [
+        {
+          addressTitle,
+          state,
+          city,
+          pinCode,
+          streetAddress,
+        },
+      ],
+    });
 
-            return newaddress.save()
-        }
+    const savedDoc = await newAddress.save();
+    return savedDoc.address[0];
+  }
 
-        //if address collection exist for the given user add a new address to the address array
-        address.address.push({ addressTitle, state, city, pinCode, streetAddress })
+  //if address collection exist for the given user add a new address to the address array
+  address.address.push({ addressTitle, state, city, pinCode, streetAddress });
 
-        await address.save()
-    } catch (err) {
-        console.log(err);
-    }
-}
+  const savedDoc = await address.save();
+  return savedDoc.address[savedDoc.address.length - 1];
+};
 
-//display all adress of the user
-exports.viewAddress = async (userID) => {
-    try {
-        const address = await addressCollection.findOne({ userID })
+// Service to get the address data based on user ID
+export const viewAddress = async (userID) => {
+  const address = await addressCollection.findOne({ userID });
 
-        if (!address) {
-            //check an address collection exist aldready for the given user if not create one empty address
-            const newaddress = new addressCollection({
-                userID,
-                address: []
-            })
+  if (!address) {
+    //check an address collection exist already for the given user if not create one empty address
+    const newAddress = new addressCollection({
+      userID,
+      address: [],
+    });
 
-            await newaddress.save()
-            return newaddress;
-        }
+    await newAddress.save();
+    return newAddress;
+  }
 
-        //if address collection exist for the given user return the address data
-        return address
-    } catch (err) {
-        console.log(err);
+  //if address collection exist for the given user return the address data
+  return address;
+};
 
-    }
-}
+// Service to delete address
+export const deleteAddress = async (addressID, userID) => {
+  await addressCollection.updateOne(
+    { userID },
+    { $pull: { address: { _id: addressID } } }
+  );
+};
 
-//delete an address
-exports.deleteAddress = async (addressID, userID) => {
-    try {
-        await addressCollection.updateOne({ userID }, { $pull: { address: { _id: addressID } } })
-    } catch (err) {
-        console.log(err);
-    }
-}
+// Service to edit address
+export const editAddress = async (
+  addressTitle,
+  state,
+  city,
+  pinCode,
+  streetAddress,
+  addressID,
+  userID
+) => {
+  const updatedDoc = await addressCollection.findOneAndUpdate(
+    { userID: userID, "address._id": addressID },
+    {
+      $set: {
+        "address.$.addressTitle": addressTitle,
+        "address.$.state": state,
+        "address.$.city": city,
+        "address.$.pinCode": pinCode,
+        "address.$.streetAddress": streetAddress,
+      },
+    },
+    { new: true }
+  );
 
-//edit an address
-exports.editAddress = async (addressTitle, state, city, pinCode, streetAddress, addressID, userID) => {
-    try {
-
-        await addressCollection.updateOne(
-            { userID: userID, 'address._id': addressID },
-            {
-                $set: {
-                    'address.$.addressTitle': addressTitle, 'address.$.state': state, 'address.$.city': city, 'address.$.pinCode': pinCode,
-                    'address.$.streetAddress': streetAddress
-                }
-            }
-        );
-
-    } catch (err) {
-        console.log(err);
-
-    }
-}
+  if (updatedDoc) {
+    return updatedDoc.address.find((addr) => addr._id.toString() === addressID);
+  }
+  return null;
+};

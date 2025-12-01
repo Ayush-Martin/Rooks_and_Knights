@@ -1,37 +1,36 @@
-const mongoose = require('mongoose');
+import mongoose from "mongoose";
 const Schema = mongoose.Schema;
 
-const subCategorySchema = new Schema({
+const subCategorySchema = new Schema(
+  {
+    subCategoryName: {
+      type: String,
+      unique: true,
+      required: true,
+    },
+    subCategoryDescription: {
+      type: String,
+      required: true,
+    },
+    noOfOrders: {
+      type: Number,
+      default: 0,
+    },
 
-  subCategoryName: {
-    type: String,
-    unique: true,
-    required: true
+    isListed: {
+      type: Boolean,
+      required: true,
+      default: true,
+    },
+
+    offer: {
+      type: Number,
+      default: 0,
+    },
   },
-  subCategoryDescription: {
-    type: String,
-    required: true
-  },
-  noOfOrders: {
-    type: Number,
-    default: 0
-  },
+  { timestamps: true }
+);
 
-  isListed: {
-    type: Boolean,
-    required: true,
-    default: true
-  },
+const subCategory = mongoose.model("subCategories", subCategorySchema);
 
-  offer: {
-    type: Number,
-    default: 0
-  }
-
-}, { timestamps: true });
-
-
-const subCategory = mongoose.model('subCategories', subCategorySchema);
-
-module.exports = subCategory;
-
+export default subCategory;

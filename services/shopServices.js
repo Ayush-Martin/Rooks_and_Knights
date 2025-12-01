@@ -1,9 +1,9 @@
-const productCollection = require("../models/productsModel");
-const categoryCollection = require("../models/CategoryModel");
-const subCategoryCollection = require("../models/subCategoryModel");
-const wishlistCollection = require("../models/wishlistModel");
+import productCollection from "../models/productsModel.js";
+import categoryCollection from "../models/CategoryModel.js";
+import subCategoryCollection from "../models/subCategoryModel.js";
 
-exports.productList = async (
+// Service to get products with pagenation , filter and search
+export const productList = async (
   categoryID,
   sortby,
   price,
@@ -13,7 +13,18 @@ exports.productList = async (
   noOfProducts,
   skipPages
 ) => {
-  let findQuery = { isListed: true };
+  const categoryList = await categoryCollection.find({ isListed: true });
+  const subCategoryList = await subCategoryCollection.find({ isListed: true });
+
+  const listedCatIDs = categoryList.map((x) => x._id);
+  const listedSubCatIDs = subCategoryList.map((x) => x._id);
+
+  const findQuery = {
+    isListed: true,
+    subCategoryID: { $in: listedSubCatIDs },
+    categoryID: { $in: listedCatIDs },
+  };
+
   if (categoryID) {
     findQuery.categoryID = categoryID;
   }
@@ -46,7 +57,7 @@ exports.productList = async (
       break;
   }
 
-  let sortQuery = {};
+  const sortQuery = {};
   switch (sortby) {
     case "newArrivals":
       sortQuery.createdAt = -1;
@@ -65,58 +76,44 @@ exports.productList = async (
       break;
   }
 
-  try {
-    let categoryList = await categoryCollection.find({ isListed: true });
-    let subCategoryList = await subCategoryCollection.find({ isListed: true });
-    let totalNoOfProducts = await productCollection.countDocuments(findQuery);
-    let productList = await productCollection
-      .find(findQuery)
-      .populate("categoryID")
-      .populate("subCategoryID")
-      .collation({ locale: "en", strength: 2 })
-      .sort(sortQuery)
-      .skip(skipPages)
-      .limit(noOfProducts);
-    return { productList, categoryList, subCategoryList, totalNoOfProducts };
-  } catch (err) {
-    console.log(err);
-  }
+  const totalNoOfProducts = await productCollection.countDocuments(findQuery);
+
+  const productList = await productCollection
+    .find(findQuery)
+    .populate("categoryID")
+    .populate("subCategoryID")
+    .collation({ locale: "en", strength: 2 })
+    .sort(sortQuery)
+    .skip(skipPages)
+    .limit(noOfProducts);
+  return { productList, categoryList, subCategoryList, totalNoOfProducts };
 };
 
-exports.viewProduct = async (_id, userID) => {
-  try {
-    const product = await productCollection
-      .findById(_id)
-      .populate({
-        path: "categoryID",
-      })
-      .populate({
-        path: "subCategoryID",
-      })
-      .populate({
-        path: "reviews.userID",
-      })
-      .exec();
+// Service to get product data and related products
+export const getProduct = async (_id, userID) => {
+  const product = await productCollection
+    .findById(_id)
+    .populate({
+      path: "categoryID",
+    })
+    .populate({
+      path: "subCategoryID",
+    })
+    .populate({
+      path: "reviews.userID",
+    })
+    .exec();
 
-    const relatedProducts = await productCollection.find({
-      isListed: true,
-      categoryID: product.categoryID._id,
-      _id: { $ne: product._id },
-    });
+  const relatedProducts = await productCollection.find({
+    isListed: true,
+    categoryID: product.categoryID._id,
+    _id: { $ne: product._id },
+  });
 
-    return { product, relatedProducts };
-  } catch (err) {
-    console.log(err);
-  }
+  return { product, relatedProducts };
 };
 
-exports.addReview = async (_id, newReview) => {
-  try {
-    await productCollection.updateOne(
-      { _id },
-      { $push: { reviews: newReview } }
-    );
-  } catch (err) {
-    console.log(err);
-  }
+// Service to add review
+export const addReview = async (_id, newReview) => {
+  await productCollection.updateOne({ _id }, { $push: { reviews: newReview } });
 };

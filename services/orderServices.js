@@ -1,18 +1,23 @@
-const orderCollection = require("../models/orderModel");
-const productCollection = require("../models/productsModel");
-const addressCollection = require("../models/addressModel");
-const categoryCollection = require("../models/CategoryModel");
-const subCategoryCollection = require("../models/subCategoryModel");
-const couponCollection = require("../models/couponModel");
+import orderCollection from "../models/orderModel.js";
+import productCollection from "../models/productsModel.js";
+import addressCollection from "../models/addressModel.js";
+import categoryCollection from "../models/CategoryModel.js";
+import subCategoryCollection from "../models/subCategoryModel.js";
+import couponCollection from "../models/couponModel.js";
+import mongoose from "mongoose";
 
-exports.createOrder = async (
+// Service to create an Checkout Order
+export const createOrder = async (
   products,
   addressId,
   paymentMethod,
-  couponCodes,
+  basePrice,
+  discount,
+  taxAmount,
+  totalAmount,
   userID
 ) => {
-  const session = await orderCollection.startSession();
+  const session = await mongoose.startSession();
 
   try {
     session.startTransaction();
@@ -27,46 +32,46 @@ exports.createOrder = async (
       throw new Error("Address not found");
     }
 
-    const productIDs = products.map((product) => product.productID);
-    const orderedProducts = await productCollection
-      .find({ _id: { $in: productIDs } })
-      .populate("categoryID")
-      .populate("subCategoryID")
-      .session(session);
+    // const productIDs = products.map((product) => product.productID);
+    // const orderedProducts = await productCollection
+    //   .find({ _id: { $in: productIDs } })
+    //   .populate("categoryID")
+    //   .populate("subCategoryID")
+    //   .session(session);
 
-    if (orderedProducts.some((product) => product.isListed === false)) {
-      throw new Error("One or more products do not exist");
-    }
+    // if (orderedProducts.some((product) => product.isListed === false)) {
+    //   throw new Error("One or more products do not exist");
+    // }
 
-    const coupons = await couponCollection
-      .find({ _id: { $in: couponCodes } })
-      .session(session);
+    // const coupons = await couponCollection
+    //   .find({ _id: { $in: couponCodes } })
+    //   .session(session);
 
-    let discount = 0;
-    let basePrice = 0;
-    const couponDiscount = coupons.reduce(
-      (discount, coupon) => discount + coupon.discountAmount,
-      0
-    );
+    // let discount = 0;
+    // let basePrice = 0;
+    // const couponDiscount = coupons.reduce(
+    //   (discount, coupon) => discount + coupon.discountAmount,
+    //   0
+    // );
 
-    for (let i = 0; i < products.length; i++) {
-      basePrice += parseInt(orderedProducts[i].price * products[i].quantity);
-      discount += parseInt(
-        (orderedProducts[i].price *
-          Math.max(
-            orderedProducts[i].offer,
-            orderedProducts[i].subCategoryID.offer,
-            orderedProducts[i].categoryID.offer
-          ) *
-          products[i].quantity) /
-          100
-      );
-    }
+    // for (let i = 0; i < products.length; i++) {
+    //   basePrice += parseInt(orderedProducts[i].price * products[i].quantity);
+    //   discount += parseInt(
+    //     (orderedProducts[i].price *
+    //       Math.max(
+    //         orderedProducts[i].offer,
+    //         orderedProducts[i].subCategoryID.offer,
+    //         orderedProducts[i].categoryID.offer
+    //       ) *
+    //       products[i].quantity) /
+    //       100
+    //   );
+    // }
 
-    discount += couponDiscount;
+    // discount += couponDiscount;
 
-    const totalAmmount = basePrice - discount + 100;
-    const taxAmmount = parseInt((totalAmmount * 2) / 100);
+    // const totalAmount = basePrice - discount + 100;
+    // const taxAmount = parseInt((totalAmount * 2) / 100);
 
     const newOrder = new orderCollection({
       userID,
@@ -74,9 +79,9 @@ exports.createOrder = async (
       products,
       paymentMethod,
       basePrice,
-      totalAmmount,
+      totalAmmount: totalAmount,
       discount,
-      taxAmmount,
+      taxAmmount: taxAmount,
     });
 
     for (const product of products) {
@@ -108,39 +113,33 @@ exports.createOrder = async (
     await session.commitTransaction();
     session.endSession();
 
-    return { order: newOrder };
+    return { success: true, order: newOrder };
   } catch (err) {
     await session.abortTransaction();
     session.endSession();
     console.log(err);
-    return { error: err.message };
+    return { success: false, error: err.message };
   }
 };
 
-exports.completePayment = async (orderID) => {
-  try {
-    await orderCollection.updateOne(
-      { _id: orderID },
-      { paymentStatus: "completed" }
-    );
-  } catch (err) {
-    console.log(err);
-  }
+// Service to complete payment
+export const completePayment = async (orderID) => {
+  await orderCollection.updateOne(
+    { _id: orderID },
+    { paymentStatus: "completed" }
+  );
 };
 
-exports.viewOrders = async (userID) => {
-  try {
-    let orders = await orderCollection
-      .find({ userID })
-      .sort({ createdAt: -1 })
-      .populate("products.productID");
-    return orders;
-  } catch (err) {
-    console.log(err);
-  }
+// Service to get the orders data based on user ID
+export const viewOrders = async (userID) => {
+  let orders = await orderCollection
+    .find({ userID })
+    .sort({ createdAt: -1 })
+    .populate("products.productID");
+  return orders;
 };
 
-exports.getOrder = async (orderID) => {
+export const getOrder = async (orderID) => {
   try {
     const order = await orderCollection
       .findOne({ _id: orderID })
@@ -153,40 +152,38 @@ exports.getOrder = async (orderID) => {
   }
 };
 
-exports.cancelOrders = async (_id, userID, productID, productQuantity) => {
-  try {
-    let order = await orderCollection.findOneAndUpdate(
-      { userID, "products._id": _id },
-      { $set: { "products.$.status": "canceled" } },
-      { new: true }
-    );
+// Service to cancel the orders
+export const cancelOrders = async (_id, userID, productID, productQuantity) => {
+  let order = await orderCollection.findOneAndUpdate(
+    { userID, "products._id": _id },
+    { $set: { "products.$.status": "canceled" } },
+    { new: true }
+  );
 
-    await productCollection.updateOne(
-      { _id: productID },
-      { $inc: { stock: productQuantity } }
-    );
-    const allCanceled = order.products.every(
-      (product) => product.status === "canceled"
-    );
+  await productCollection.updateOne(
+    { _id: productID },
+    { $inc: { stock: productQuantity } }
+  );
+  const allCanceled = order.products.every(
+    (product) => product.status === "canceled"
+  );
 
-    let additionlaCharge = 0;
-    if (allCanceled) {
-      order.orderStatus = "canceled";
-      additionlaCharge += order.deliveryCharge;
-      await order.save();
-    }
-
-    return {
-      paymentMethod: order.paymentMethod,
-      paymentStatus: order.paymentStatus,
-      additionlaCharge,
-    };
-  } catch (err) {
-    console.log(err);
+  let additionalCharge = 0;
+  if (allCanceled) {
+    order.orderStatus = "canceled";
+    additionalCharge += order.deliveryCharge;
+    await order.save();
   }
+
+  return {
+    paymentMethod: order.paymentMethod,
+    paymentStatus: order.paymentStatus,
+    additionalCharge,
+  };
 };
 
-exports.returnOrders = async (userID, orderProductId, returnReason) => {
+// Service to return the product
+export const returnOrders = async (userID, orderProductId, returnReason) => {
   try {
     await orderCollection.updateOne(
       { userID, "products._id": orderProductId },

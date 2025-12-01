@@ -1,53 +1,51 @@
-const mongoose = require('mongoose');
-const { referal } = require('../services/walletService');
+import mongoose from "mongoose";
 
 const Schema = mongoose.Schema;
 
 //user schema
-const userShema = Schema({
+const userShema = Schema(
+  {
     username: {
-        type: String,
-        required: true
+      type: String,
+      required: true,
     },
     password: {
-        type: String,
+      type: String,
     },
     email: {
-        type: String,
-        unique: true,
-        required: true,
-
+      type: String,
+      unique: true,
+      required: true,
     },
     phoneNumber: {
-        type: String,
-        unique: true,
-        sparse: true
-
+      type: String,
+      unique: true,
+      sparse: true,
     },
     profilePicture: {
-        type: String
+      type: String,
     },
 
     googleID: {
-        type: String,
-        unique: true,
-        sparse: true
+      type: String,
+      unique: true,
+      sparse: true,
     },
 
     isblocked: {
-        type: Boolean,
-        default: false
+      type: Boolean,
+      default: false,
     },
     isAdmin: {
-        type: Boolean,
-        default: false
+      type: Boolean,
+      default: false,
     },
     referalID: {
-        type: String
-    }
-}, { timestamps: true })
+      type: String,
+    },
+  },
+  { timestamps: true }
+);
 
-
-
-const User = mongoose.model('users', userShema);
-module.exports = User;
+const User = mongoose.model("users", userShema);
+export default User;

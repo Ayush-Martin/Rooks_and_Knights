@@ -15,7 +15,7 @@
                             <!-- Search Form -->
                             <form action="/admin/users" method="GET" class="search-input-group">
                                 <input type="text" id="search-input" name="search" class="form-control search-input"
-                                placeholder="search" value="<%= searchFilter ? searchFilter:null %>">
+                                    placeholder="search" value="<%= searchFilter ? searchFilter:null %>">
                                 <a href="/admin/users?search=">
                                     <button type="button" class="btn-clear" id="clear-btn">
                                         <i class="fas fa-times"></i>
@@ -56,12 +56,12 @@
                                         <td>
                                             <%if(user.isblocked){ %>
                                                 <button class="btn btn-success btn-sm"
-                                                    onclick="blockUnblockUser(event,'<%= user._id %>','Unblock','<%=searchFilter%>')"><i
+                                                    onclick="blockUnblockUser(this,'<%= user._id %>',true)"><i
                                                         class="fa fa-check"></i> Unblock</button>
 
                                                 <% }else{ %>
                                                     <button class="btn btn-dark btn-sm"
-                                                        onclick="blockUnblockUser(event,'<%= user._id %>','block','<%=searchFilter%>')"><i
+                                                        onclick="blockUnblockUser(this,'<%= user._id %>',false)"><i
                                                             class="fa fa-ban"></i> Block</button>
                                                     <%}%>
 
@@ -78,7 +78,8 @@
                             class="m-r-20 text-dark">
                             <i class="fas fa-chevron-left"></i> Previous
                         </a>
-                        <P class="m-r-20 text-dark">page : <%= currentPage %> of <%= Math.ceil(totalNoOfPages) %></P>
+                        <P class="m-r-20 text-dark">page : <%= currentPage %> of <%= Math.ceil(totalNoOfPages) %>
+                        </P>
                         <!-- Next Button -->
                         <a href="/admin/users?search=<%= searchFilter %>&&page=<%= (currentPage<totalNoOfPages)? Number(currentPage)+1:currentPage %>"
                             class=" text-dark">
@@ -96,82 +97,70 @@
 
         <%- include('./partials/footer') %>
 
+            <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
             <script>
 
-                function blockUnblockUser(event, userID, message, search) {
-                    event.preventDefault()
+                async function blockUnblockUser(btn, userID, isBlocked) {
+                    const action = isBlocked ? 'Unblock' : 'block';
+                    const newStatus = !isBlocked;
 
-                    Swal.fire({
+                    const result = await Swal.fire({
                         title: "Are you sure?",
-                        text: `Do you want to ${message} this user`,
+                        text: `Do you want to ${action} this user?`,
                         icon: "warning",
                         showCancelButton: true,
                         confirmButtonColor: "#3085d6",
                         cancelButtonColor: "#d33",
                         confirmButtonText: "Yes"
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            fetch(`/admin/users/${userID}?search=${search}`, {
-                                method: "PATCH",
-                                headers: {
-                                    'Content-Type': 'application/json'
-                                }
-                            }).then(res => res.json())
-                                .then((data) => {
-                                    if (data.validationError) {
-                                        let timerInterval;
-                                        Swal.fire({
-                                            title: "Validation Error",
-                                            html: "You will be redirected to login in <b></b> milliseconds.",
-                                            timer: 2000,
-                                            timerProgressBar: true,
-                                            didOpen: () => {
-                                                Swal.showLoading();
-                                                const timer = Swal.getPopup().querySelector("b");
-                                                timerInterval = setInterval(() => {
-                                                    timer.textContent = `${Swal.getTimerLeft()}`;
-                                                }, 100);
-                                            },
-                                            willClose: () => {
-                                                clearInterval(timerInterval);
-                                            }
-                                        }).then((result) => {
-                                            /* Read more about handling dismissals below */
-                                            if (result.dismiss === Swal.DismissReason.timer) {
-                                                
-                                                window.location.href = data.redirectUrl;
-                                            }
-                                        });
-                                    }
-
-                                    if (data.success) {
-                                        const Toast = Swal.mixin({
-                                            toast: true,
-                                            position: "top-end",
-                                            showConfirmButton: false,
-                                            timer: 2000,
-                                            timerProgressBar: true,
-                                            didOpen: (toast) => {
-                                                toast.onmouseenter = Swal.stopTimer;
-                                                toast.onmouseleave = Swal.resumeTimer;
-                                            }
-                                        });
-                                        Toast.fire({
-                                            icon: "success",
-                                            title: `user has been ${message}ed`
-                                        });
-                                        setTimeout(() => {
-                                            window.location.reload()
-                                        }, 2000)
-
-                                    }
-                                })
-                        }
                     });
+
+                    if (result.isConfirmed) {
+                        try {
+                            // Pass isblocked as query parameter as requested
+                            const response = await axios.patch(`/admin/users/${userID}?isblocked=${newStatus}`);
+
+                            if (response.status === 200) {
+                                const Toast = Swal.mixin({
+                                    toast: true,
+                                    position: "top-end",
+                                    showConfirmButton: false,
+                                    timer: 2000,
+                                    timerProgressBar: true,
+                                    didOpen: (toast) => {
+                                        toast.onmouseenter = Swal.stopTimer;
+                                        toast.onmouseleave = Swal.resumeTimer;
+                                    }
+                                });
+                                Toast.fire({
+                                    icon: "success",
+                                    title: `User has been ${action}ed`
+                                });
+
+                                // Update button UI without reload
+                                if (newStatus) {
+                                    // User is now BLOCKED (isblocked=true)
+                                    // Button should show "Unblock"
+                                    btn.className = 'btn btn-success btn-sm';
+                                    btn.innerHTML = '<i class="fa fa-check"></i> Unblock';
+                                    btn.setAttribute('onclick', `blockUnblockUser(this, '${userID}', true)`);
+                                } else {
+                                    // User is now UNBLOCKED (isblocked=false)
+                                    // Button should show "Block"
+                                    btn.className = 'btn btn-dark btn-sm';
+                                    btn.innerHTML = '<i class="fa fa-ban"></i> Block';
+                                    btn.setAttribute('onclick', `blockUnblockUser(this, '${userID}', false)`);
+                                }
+                            }
+                        } catch (err) {
+                            console.error(err);
+                            Swal.fire({
+                                icon: "error",
+                                title: "Error",
+                                text: err.response?.data?.error || "An error occurred"
+                            });
+                        }
+                    }
                 }
-
-
-
             </script>
     </body>
 

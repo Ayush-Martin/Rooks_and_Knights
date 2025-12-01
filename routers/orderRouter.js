@@ -1,28 +1,64 @@
-//requiring modules
-const express = require('express')
-const router = express.Router()
+//importing modules
+import express from "express";
+const router = express.Router();
 
 //controllers
-const orderController = require('../controllers/orderController');
+import * as orderController from "../controllers/user/orderController.js";
 
 //middlewares
-const userAuthMiddleware = require('../middlewares/userAuthMiddleware')
+import * as userAuthMiddleware from "../middlewares/userAuthMiddleware.js";
 
-router.get('/', userAuthMiddleware.checkUserAuthenticated, orderController.getCheckout);
-router.post('/proceedToPayment', userAuthMiddleware.validUser, orderController.postCheckout);
-router.post('/pendingProceedToPayment', userAuthMiddleware.validUser, orderController.postPendingCheckout);
-router.patch('/cancel/:id', userAuthMiddleware.validUser, orderController.patchCancel)
-router.patch('/return/returnProduct/:id', userAuthMiddleware.validUser, orderController.patchReturn);
+router.get(
+  "/",
+  userAuthMiddleware.checkUserAuthenticated,
+  orderController.checkoutPage
+);
+router.post(
+  "/proceedToPayment",
+  userAuthMiddleware.validUser,
+  orderController.createCheckoutOrder
+);
+router.post(
+  "/pendingProceedToPayment",
+  userAuthMiddleware.validUser,
+  orderController.createCheckoutOrderForPendingPayment
+);
+router.patch(
+  "/cancel/:id",
+  userAuthMiddleware.validUser,
+  orderController.cancelOrder
+);
+router.patch(
+  "/return/returnProduct/:id",
+  userAuthMiddleware.validUser,
+  orderController.returnProduct
+);
 
-router.post('/completePayment', userAuthMiddleware.checkUserAuthenticated, orderController.completePayment)
+router.post(
+  "/completePayment",
+  userAuthMiddleware.checkUserAuthenticated,
+  orderController.completePayment
+);
 
 //add coupon
-router.post('/coupon', userAuthMiddleware.validUser, orderController.postAddCouponDiscount)
+router.post(
+  "/coupon",
+  userAuthMiddleware.validUser,
+  orderController.addCouponDiscount
+);
 
 //coupon list
-router.get('/coupon/:id', userAuthMiddleware.validUser , orderController.getAvaliableCoupon)
+router.get(
+  "/coupon/:id",
+  userAuthMiddleware.validUser,
+  orderController.getAvailableCoupon
+);
 
 //download Invoice pdf
-router.get('/downloadInvoicePdf/:id', userAuthMiddleware.checkUserAuthenticated, orderController.invoiceDownload)
+router.get(
+  "/downloadInvoicePdf/:id",
+  userAuthMiddleware.checkUserAuthenticated,
+  orderController.invoiceDownload
+);
 
-module.exports = router;
+export default router;

@@ -1,27 +1,34 @@
 <nav id="sidebar" class="minimized">
     <div class="sidebar-header">
         <img src="/public/images/logo2.png" alt="" width="35px" class="logo1">
-        
+
         <button type="button" id="sidebarCollapse" class="btn btn-info mt-3">
             <i class="fa fa-bars"></i>
         </button>
     </div>
     <ul class="list-unstyled components">
-        <li><a href="/admin?graphType=yearly"><i class="fa fa-dashboard"></i> <span class="sidebar-title">Dashboard</span></a></li>
+        <li><a href="/admin?graphType=yearly"><i class="fa fa-dashboard"></i> <span
+                    class="sidebar-title">Dashboard</span></a></li>
         <li><a href="/admin/users"><i class="fa fa-users"></i> <span class="sidebar-title">Users</span></a></li>
         <li><a href="/admin/products"><i class="fa fa-cube"></i> <span class="sidebar-title">Products</span></a></li>
-        <li><a href="/admin/categories"><i class="fas fa-list-alt"></i> <span class="sidebar-title">Categories</span></a></li>
-        <li><a href="/admin/subCategories"><i class="fas fa-layer-group"></i> <span class="sidebar-title">Sub Categories</span></a></li>
-        <li><a href="/admin/orders"><i class="fa fa-shopping-cart"></i> <span class="sidebar-title">Orders</span></a></li>
-        <li><a href="/admin/transations"><i class="fas fa-credit-card"></i> <span class="sidebar-title">Transations</span></a></li>
+        <li><a href="/admin/categories"><i class="fas fa-list-alt"></i> <span
+                    class="sidebar-title">Categories</span></a></li>
+        <li><a href="/admin/subCategories"><i class="fas fa-layer-group"></i> <span class="sidebar-title">Sub
+                    Categories</span></a></li>
+        <li><a href="/admin/orders"><i class="fa fa-shopping-cart"></i> <span class="sidebar-title">Orders</span></a>
+        </li>
+        <li><a href="/admin/transactions"><i class="fas fa-credit-card"></i> <span
+                    class="sidebar-title">Transactions</span></a></li>
         <li><a href="/admin/returns"><i class="fa fa-undo"></i><span class="sidebar-title">Returns</span></a></li>
         <li><a href="/admin/coupons"><i class="fa fa-tag"></i> <span class="sidebar-title">Coupons</span></a></li>
         <li><a href="/admin/offers"><i class="fa fa-gift"></i> <span class="sidebar-title">Offers</span></a></li>
-        <li><a href="/admin/sales/?reportType=all&&startDate=null&&endDate=null"><i class="fa fa-line-chart"></i> <span class="sidebar-title">Sales</span></a></li>
+        <li><a href="/admin/sales/?reportType=all&&startDate=null&&endDate=null"><i class="fa fa-line-chart"></i> <span
+                    class="sidebar-title">Sales</span></a></li>
         <li class="p-0">
-            <a href="" class="w-full" >
+            <a href="" class="w-full">
                 <form action="/admin/logout" method="post" class="w-full ">
-                    <button class="text-white m-l-10 p-r-100"><i class="fa fa-sign-out"></i> <span class="sidebar-title" >Logout</span></button>
+                    <button class="text-white m-l-10 p-r-100"><i class="fa fa-sign-out"></i> <span
+                            class="sidebar-title">Logout</span></button>
                 </form>
             </a>
         </li>

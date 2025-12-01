@@ -51,61 +51,55 @@
             <%- include('./partials/slidebar') %>
 
                 <div id="content" class="p-4 p-md-5" style="background-color:#f1f2f5 ;">
-                    <div class="container mt-5">
-                        <div class="card">
-                            <div class="card-header text-center">
-                                <h2>Add Product </h2>
-                            </div>
-                            <p class="fs-15 text-danger text-center">
-                                <%= error %>
-                            </p>
-                            <div class="card-body">
-                                <form action="/admin/products/addProduct" method="post" enctype="multipart/form-data"
-                                    id="addProductForm" onsubmit="addProductValidation(event,true)">
-                                    <!-- Image Upload Section -->
-                                    <div class="form-group text-center">
-                                        <label for="productImages">Image Upload</label>
-                                        <div class="d-flex justify-content-center">
-                                            <!-- Box 1 -->
-                                            <div class="product-image-box mx-2">
-                                                <label for="productImage1" class="image-label">
-                                                    <img id="previewImage1" class="image-preview" src="" alt="">
-                                                    <i class="fa fa-picture-o"></i>
-                                                    <input type="file" class="form-control-file image-input"
-                                                        id="productImage1" accept="image/*"
-                                                        onchange="openCropperModal('productImage1', 'previewImage1')"
-                                                        name="img1">
-                                                </label>
-                                            </div>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="/admin/products">Products</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">Add Product</li>
+                        </ol>
+                    </nav>
 
-                                            <!-- Box 2 -->
-                                            <div class="product-image-box mx-2">
-                                                <label for="productImage2" class="image-label">
-                                                    <img id="previewImage2" class="image-preview" src="" alt="">
-                                                    <i class="fa fa-picture-o"></i>
-                                                    <input type="file" class="form-control-file image-input"
-                                                        id="productImage2" accept="image/*"
-                                                        onchange="openCropperModal('productImage2', 'previewImage2')"
-                                                        name="img2">
-                                                </label>
-                                            </div>
-                                            <!-- Box 3 -->
-                                            <div class="product-image-box mx-2">
-                                                <label for="productImage3" class="image-label">
-                                                    <img id="previewImage3" class="image-preview" src="" alt="">
-                                                    <i class="fa fa-picture-o"></i>
-                                                    <input type="file" class="form-control-file image-input"
-                                                        id="productImage3" accept="image/*"
-                                                        onchange="openCropperModal('productImage3', 'previewImage3')"
-                                                        name="img3">
-                                                </label>
-                                            </div>
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <form id="addProductForm" action="/admin/products/add" method="post"
+                                    enctype="multipart/form-data" onsubmit="submitProductForm(event)">
+                                    <div class="d-flex justify-content-center mb-3">
+                                        <!-- Box 1 -->
+                                        <div class="product-image-box mx-2">
+                                            <label for="productImage1" class="image-label">
+                                                <img id="previewImage1" class="image-preview" src="" alt="">
+                                                <i class="fa fa-picture-o"></i>
+                                                <input type="file" class="form-control-file image-input"
+                                                    id="productImage1" accept="image/*"
+                                                    onchange="openCropperModal('productImage1', 'previewImage1')"
+                                                    name="img1">
+                                            </label>
                                         </div>
-                                        <p id="productImageError" class="text-danger fs-15"></p>
+
+                                        <!-- Box 2 -->
+                                        <div class="product-image-box mx-2">
+                                            <label for="productImage2" class="image-label">
+                                                <img id="previewImage2" class="image-preview" src="" alt="">
+                                                <i class="fa fa-picture-o"></i>
+                                                <input type="file" class="form-control-file image-input"
+                                                    id="productImage2" accept="image/*"
+                                                    onchange="openCropperModal('productImage2', 'previewImage2')"
+                                                    name="img2">
+                                            </label>
+                                        </div>
+                                        <!-- Box 3 -->
+                                        <div class="product-image-box mx-2">
+                                            <label for="productImage3" class="image-label">
+                                                <img id="previewImage3" class="image-preview" src="" alt="">
+                                                <i class="fa fa-picture-o"></i>
+                                                <input type="file" class="form-control-file image-input"
+                                                    id="productImage3" accept="image/*"
+                                                    onchange="openCropperModal('productImage3', 'previewImage3')"
+                                                    name="img3">
+                                            </label>
+                                        </div>
                                     </div>
-
-
-
+                                    <p id="productImageError" class="text-danger fs-15"></p>
 
                                     <div class="form-row">
                                         <div class="form-group col-md-6">
@@ -123,7 +117,7 @@
                                         <div class="form-group col-md-6">
                                             <label for="productOffer">Offer(%)</label>
                                             <input type="number" class="form-control" id="productOffer" name="offer"
-                                                placeholder="ex. 1000">
+                                                placeholder="ex. 10">
                                             <p id="offersError" class="text-danger fs-15"></p>
                                         </div>
 
@@ -276,7 +270,54 @@
                 });
             </script>
 
+            <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
             <script src="/public/JS/productValidation.js"></script>
+            <script>
+                const error = "<%= error %>";
+                if (error) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops...',
+                        text: error,
+                    });
+                }
+
+                async function submitProductForm(event) {
+                    event.preventDefault();
+                    const isValid = validateProductForm(true); // true for image validation
+                    if (!isValid) return;
+
+                    const form = document.getElementById('addProductForm');
+                    const formData = new FormData(form);
+
+                    try {
+                        const response = await axios.post('/admin/products/add', formData, {
+                            headers: {
+                                'Content-Type': 'multipart/form-data'
+                            }
+                        });
+
+                        if (response.data.success) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Success',
+                                text: 'Product added successfully',
+                                showConfirmButton: false,
+                                timer: 1500
+                            }).then(() => {
+                                window.location.href = response.data.successRedirect;
+                            });
+                        }
+                    } catch (error) {
+                        console.error(error);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: error.response?.data?.error || 'An error occurred'
+                        });
+                    }
+                }
+            </script>
     </body>
 
 </html>

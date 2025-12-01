@@ -1,39 +1,39 @@
 //models
-const couponCollection = require('../models/couponModel')
+import couponCollection from "../models/couponModel.js";
 
-exports.addCouponDiscount = async (totalAmount, couponCode) => {
-    const now = new Date()
-    now.setHours(0, 0, 0, 0)
-    try {
-        const coupon = await couponCollection.findOne({ couponCode })
+// Service to apply coupon discount
+export const applyCouponDiscount = async (totalAmount, couponCode) => {
+  const now = new Date();
+  now.setHours(0, 0, 0, 0);
 
-        if (!coupon) {
-            return { error: "coupon not found" }
-        }
+  const coupon = await couponCollection.findOne({ couponCode });
 
-        if (coupon.expiryDate < now) {
-            return { error: "coupon expired" }
-        }
+  if (!coupon) {
+    return { success: false, error: "coupon not found" };
+  }
 
-        if (totalAmount < coupon.minimumOrderAmount) {
-            return { error: `To use this coupon there must me total amount of ${coupon.minimumOrderAmount}` }
-        }
+  if (coupon.expiryDate < now) {
+    return { success: false, error: "coupon expired" };
+  }
 
-        return { discount: coupon.discountAmount, _id: coupon._id }
+  if (totalAmount < coupon.minimumOrderAmount) {
+    return {
+      success: false,
+      error: `To use this coupon there must me total amount of ${coupon.minimumOrderAmount}`,
+    };
+  }
 
-    } catch (err) {
-        console.log(err);
-    }
-}
+  return { success: true, discount: coupon.discountAmount, _id: coupon._id };
+};
 
-exports.avaliableCouponList = async(totalAmount) =>{
-    const now = new Date()
-    now.setHours(0, 0, 0, 0)
+// Service to get available coupon list
+export const getAvailableCouponList = async (totalAmount) => {
+  const now = new Date();
+  now.setHours(0, 0, 0, 0);
 
-    try{
-        const avaliableCouponList=await couponCollection.find({minimumOrderAmount:{$lte:totalAmount},expiryDate:{$gte:now}})
-        return avaliableCouponList;
-    }catch(err){
-        console.log(err);
-    }
-}
+  const availableCouponList = await couponCollection.find({
+    minimumOrderAmount: { $lte: totalAmount },
+    expiryDate: { $gte: now },
+  });
+  return availableCouponList;
+};

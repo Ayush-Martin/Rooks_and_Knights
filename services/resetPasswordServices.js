@@ -1,47 +1,54 @@
-const userCollection = require('../models/userModel');
-const OTPUtils = require('../utils/OTPUtils');
-const { hashPassword, passwordHasher } = require('../utils/passwordUtils')
+import userCollection from "../models/userModel.js";
+import OTPCollection from "../models/OTPModel.js";
+import * as OTPUtils from "../utils/OTPUtils.js";
+import { passwordHasher } from "../utils/passwordUtils.js";
 
-exports.forgetPassword = async (email, req) => {
-    try {
-        let user = await userCollection.findOne({ email });
-        if (!user) {
-            return "user doesnot exist"
-        }
+/**
+ * Service function for forget password
+ * - check if the user is valid
+ * - generate and store OTP
+ * - send the otp
+ */
+export const forgetPassword = async (email, req) => {
+  const user = await userCollection.findOne({ email });
+  if (!user) {
+    return {
+      success: false,
+      message: "User does not exist",
+    };
+  }
 
+  req.session.email = email;
+  req.session.userID = user._id;
 
-        // Generate and store OTP
-        const OTP = OTPUtils.generateOTP();
-        req.session.countdownTime = 30;
-        req.session.email = email;
-        req.session.userID = user._id;
+  // Generate and store OTP
+  const OTP = OTPUtils.generateOTP();
 
-        await OTPUtils.storeOTP(email, OTP);
+  const expires = new Date(
+    Date.now() + process.env.OTP_EXPIRY_MINUTES * 60 * 1000
+  );
 
-        // Send OTP
-        try {
-            await OTPUtils.sendOTP(email, OTP);
-        } catch (otpError) {
-            console.error('Failed to send OTP:', otpError);
-            return 'Failed to send OTP. Please try again.';
-        }
+  try {
+    await OTPCollection.findOneAndUpdate(
+      { email },
+      { email, OTP, expires },
+      { upsert: true, new: true }
+    );
 
-        // Start countdown
-        OTPUtils.startCountdown(req);
+    await OTPUtils.sendOTP(email, OTP);
+  } catch (error) {
+    console.error("Failed to send OTP:", error);
+    return {
+      success: false,
+      message: "Failed to send OTP. Please try again.",
+    };
+  }
 
-    } catch (err) {
-        console.log(err);
+  return { success: true };
+};
 
-    }
-
-}
-
-exports.resetPassword = async (password, _id) => {
-    try {
-
-        const hasedPassword = await passwordHasher(password)
-        await userCollection.updateOne({ _id }, { password: hasedPassword })
-    } catch (err) {
-        console.log(err);
-    }
-}
+// Service function to update password
+export const resetPassword = async (password, _id) => {
+  const hashedPassword = await passwordHasher(password);
+  await userCollection.updateOne({ _id }, { password: hashedPassword });
+};

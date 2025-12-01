@@ -14,7 +14,7 @@
                             <!-- Search Form -->
                             <form action="/admin/categories" method="GET" class="search-input-group">
                                 <input type="text" id="search-input" name="search" class="form-control search-input"
-                                placeholder="search" value="<%= searchFilter ? searchFilter:null %>">
+                                    placeholder="search" value="<%= searchFilter ? searchFilter:null %>">
                                 <a href="/admin/categories?search=">
                                     <button type="button" class="btn-clear" id="clear-btn">
                                         <i class="fas fa-times"></i>
@@ -49,7 +49,7 @@
                             </thead>
                             <tbody>
                                 <% categoryList.forEach(category=> { %>
-                                    <tr>
+                                    <tr id="category-row-<%= category._id %>">
                                         <td>
                                             <%= category.categoryName %>
                                         </td>
@@ -63,16 +63,22 @@
                                                 <i class="fas fa-pencil-alt"></i></button>
                                         </td>
                                         <td>
-                                            <button class="btn btn-sm fs-15" onclick="listUnlistCategory('<%=category._id%>','<%= !category.isListed %>')">
-                                                <% if(category.isListed){ %>
-                                                    <i class="fas fa-times-circle"></i> Unlist          
-                                                <% }else{ %>
-                                                    <i class="fas fa-list"></i> List
-                                                <% } %>
+                                            <button class="btn btn-sm fs-15"
+                                                onclick="listUnlistCategory(this, '<%=category._id%>', '<%= !category.isListed %>')">
+                                                <p>
+                                                    <% if(category.isListed){ %>
+                                                        <i class="fas fa-times-circle"></i>
+                                                        Unlist
+                                                        <% }else{ %>
+                                                            <i class="fas fa-list"></i>
+                                                            List
+                                                            <% } %>
+                                                </p>
+
                                             </button>
                                         </td>
                                     </tr>
-                                <% }) %>
+                                    <% }) %>
                             </tbody>
                         </table>
                     </div>
@@ -82,7 +88,8 @@
                             class="m-r-20 text-dark">
                             <i class="fas fa-chevron-left"></i> Previous
                         </a>
-                        <P class="m-r-20 text-dark">page : <%= currentPage %> of <%= Math.ceil(totalNoOfPages) %>
+                        <P class="m-r-20 text-dark">page : <%= currentPage %> of
+                                <%= Math.ceil(totalNoOfPages) %>
                         </P>
                         <!-- Next Button -->
                         <a href="/admin/categories?search=<%= searchFilter %>&&page=<%= (currentPage<totalNoOfPages)? Number(currentPage)+1:currentPage %>"
@@ -101,7 +108,8 @@
                     <div class="modal-dialog modal-dialog-centered" role="document">
                         <div class="modal-content">
                             <div class="modal-header">
-                                <h5 class="modal-title" id="exampleModalLabel">New category</h5>
+                                <h5 class="modal-title" id="exampleModalLabel">
+                                    New category</h5>
                                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                     <span aria-hidden="true">&times;</span>
                                 </button>
@@ -109,7 +117,8 @@
                             <div class="modal-body">
                                 <form>
                                     <div class="form-group">
-                                        <label for="categoryName" class="col-form-label">Category Name</label>
+                                        <label for="categoryName" class="col-form-label">Category
+                                            Name</label>
                                         <input type="text" class="form-control" id="categoryName">
                                     </div>
                                     <div class="form-group">
@@ -134,7 +143,8 @@
                     <div class="modal-dialog modal-dialog-centered" role="document">
                         <div class="modal-content">
                             <div class="modal-header">
-                                <h5 class="modal-title" id="exampleModalLabel">Edit Category</h5>
+                                <h5 class="modal-title" id="exampleModalLabel">
+                                    Edit Category</h5>
                                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                     <span aria-hidden="true">&times;</span>
                                 </button>
@@ -142,7 +152,8 @@
                             <div class="modal-body">
                                 <form>
                                     <div class="form-group">
-                                        <label for="categoryNameEdit" class="col-form-label">Category Name</label>
+                                        <label for="categoryNameEdit" class="col-form-label">Category
+                                            Name</label>
                                         <input type="text" class="form-control" id="categoryNameEdit">
                                     </div>
                                     <div class="form-group">
@@ -164,12 +175,7 @@
                 <%- include('./partials/footer') %>
                     <script src="/public/JS/checkCategorySubcategoryValid.js"></script>
                     <script>
-                        function editcategory(ID) {
-
-                        }
-                    </script>
-                    <script>
-                        function addCategory(event) {
+                        async function addCategory(event) {
                             event.preventDefault()
                             const categoryName = document.getElementById('categoryName').value;
                             const categoryDescription = document.getElementById('categoryDescription').value;
@@ -182,250 +188,158 @@
                                 });
                                 return
                             }
-                            fetch('/admin/categories', {
-                                method: "POST",
-                                headers: {
-                                    'Content-Type': 'application/json'
-                                },
-                                body: JSON.stringify({ categoryName, categoryDescription })
-                            })
-                                .then(res => res.json())
-                                .then((data) => {
-                                    if (data.validationError) {
-                                        let timerInterval;
-                                        Swal.fire({
-                                            title: "Validation Error",
-                                            html: "You will be redirected to login in <b></b> milliseconds.",
-                                            timer: 2000,
-                                            timerProgressBar: true,
-                                            didOpen: () => {
-                                                Swal.showLoading();
-                                                const timer = Swal.getPopup().querySelector("b");
-                                                timerInterval = setInterval(() => {
-                                                    timer.textContent = `${Swal.getTimerLeft()}`;
-                                                }, 100);
-                                            },
-                                            willClose: () => {
-                                                clearInterval(timerInterval);
-                                            }
-                                        }).then((result) => {
-                                            /* Read more about handling dismissals below */
-                                            if (result.dismiss === Swal.DismissReason.timer) {
-                                                window.location.href = data.redirectUrl;
-                                            }
-                                        });
-                                    }
 
-                                    if (data.success) {
-                                        const Toast = Swal.mixin({
-                                            toast: true,
-                                            position: "top-end",
-                                            showConfirmButton: false,
-                                            timer: 2000,
-                                            timerProgressBar: true,
-                                            didOpen: (toast) => {
-                                                toast.onmouseenter = Swal.stopTimer;
-                                                toast.onmouseleave = Swal.resumeTimer;
-                                            }
-                                        });
-                                        Toast.fire({
-                                            icon: "success",
-                                            title: `new category ${categoryName} added`
-                                        });
-                                        setTimeout(() => {
-                                            window.location.reload()
-                                        }, 2000)
-
-                                    }
-
-                                    if (data.error) {
-                                        Swal.fire({
-                                            icon: "error",
-                                            title: "Validation Error",
-                                            text: data.error,
-                                        });
-                                    }
+                            try {
+                                const res = await axios.post('/admin/categories', {
+                                    categoryName,
+                                    categoryDescription
                                 })
+
+                                if (res.status === 200) {
+                                    await Swal.fire({
+                                        text: `Category has been added`,
+                                        icon: "success",
+                                        timer: 2000,
+                                        showConfirmButton: false
+                                    });
+
+                                    setTimeout(() => {
+                                        window.location.reload()
+                                    }, 2000)
+                                }
+                            } catch (err) {
+                                console.error(err);
+                                Swal.fire({
+                                    icon: "error",
+                                    title: "Error",
+                                    text: err.response?.data?.error || "An error occurred"
+                                });
+                            }
                         }
 
                         function editCategoryModel(e, _id) {
-
                             const categorydata = e.target.closest('button');
-
                             const { categoryName, categoryDescription } = JSON.parse(categorydata.getAttribute('data-category-item'));
-
 
                             document.getElementById('categoryNameEdit').value = categoryName;
                             document.getElementById('categoryDescriptionEdit').value = categoryDescription;
 
-                            // Get the parent div where the button should be appended
                             const editcategoryDiv = document.getElementById('editcategoryDiv');
+                            let editButton = document.getElementById('editcategoryButton');
 
-                            // Check if the edit button already exists
-                            if (!document.getElementById('editcategoryButton')) {
-                                var editButton = document.createElement('button');
+                            if (!editButton) {
+                                editButton = document.createElement('button');
                                 editButton.textContent = "Edit";
                                 editButton.id = 'editcategoryButton';
-                                editButton.onclick = () => editCategory(event, _id);
                                 editButton.classList.add('btn', 'btn-primary');
-
                                 editcategoryDiv.appendChild(editButton);
                             }
+
+                            editButton.onclick = (event) => editCategory(event, _id);
                         }
 
-
-                        function editCategory(event, ID) {
-
+                        async function editCategory(event, ID) {
                             event.preventDefault();
                             const categoryName = document.getElementById('categoryNameEdit').value;
                             const categoryDescription = document.getElementById('categoryDescriptionEdit').value;
-                            let error = checkCategorySubCategoryValid(categoryName, categoryDescription)
+
+                            let error = checkCategorySubCategoryValid(categoryName, categoryDescription);
                             if (error) {
                                 Swal.fire({
                                     icon: "error",
                                     title: "Validation Error",
                                     text: error,
                                 });
-                                return
+                                return;
                             }
-                            fetch(`/admin/categories/${ID}`, {
-                                method: "PUT",
-                                headers: {
-                                    'Content-Type': 'application/json'
-                                },
-                                body: JSON.stringify({ categoryName, categoryDescription })
-                            })
-                                .then(res => res.json())
-                                .then((data) => {
-                                    if (data.validationError) {
-                                        let timerInterval;
-                                        Swal.fire({
-                                            title: "Validation Error",
-                                            html: "You will be redirected to login in <b></b> milliseconds.",
-                                            timer: 2000,
-                                            timerProgressBar: true,
-                                            didOpen: () => {
-                                                Swal.showLoading();
-                                                const timer = Swal.getPopup().querySelector("b");
-                                                timerInterval = setInterval(() => {
-                                                    timer.textContent = `${Swal.getTimerLeft()}`;
-                                                }, 100);
-                                            },
-                                            willClose: () => {
-                                                clearInterval(timerInterval);
-                                            }
-                                        }).then((result) => {
-                                            /* Read more about handling dismissals below */
-                                            if (result.dismiss === Swal.DismissReason.timer) {
-                                                
-                                                window.location.href = data.redirectUrl;
-                                            }
-                                        });
-                                    }
 
-                                    if (data.success) {
-                                        const Toast = Swal.mixin({
-                                            toast: true,
-                                            position: "top-end",
-                                            showConfirmButton: false,
-                                            timer: 2000,
-                                            timerProgressBar: true,
-                                            didOpen: (toast) => {
-                                                toast.onmouseenter = Swal.stopTimer;
-                                                toast.onmouseleave = Swal.resumeTimer;
-                                            }
-                                        });
-                                        Toast.fire({
-                                            icon: "success",
-                                            title: `Category has been edited`
-                                        });
-                                        setTimeout(() => {
-                                            window.location.reload()
-                                        }, 2000)
+                            try {
+                                const response = await axios.put(`/admin/categories/${ID}`, {
+                                    categoryName,
+                                    categoryDescription
+                                });
 
-                                    }
+                                $('#editCategoryModel').modal('hide');
 
-                                    if (data.error) {
-                                        Swal.fire({
-                                            icon: "error",
-                                            title: "Validation Error",
-                                            text: data.error,
-                                        });
+                                if (response.status === 200) {
+                                    Swal.fire({
+                                        text: `Category has been edited`,
+                                        icon: "success",
+                                        timer: 2000,
+                                        showConfirmButton: false
+                                    });
+
+                                    const row = document.getElementById(`category-row-${ID}`);
+                                    if (row) {
+                                        row.cells[0].innerText = categoryName;
+                                        row.cells[1].innerText = categoryDescription;
+
+                                        const editBtn = row.querySelector('button[data-category-item]');
+                                        if (editBtn) {
+                                            const currentData = JSON.parse(editBtn.getAttribute('data-category-item'));
+                                            currentData.categoryName = categoryName;
+                                            currentData.categoryDescription = categoryDescription;
+                                            editBtn.setAttribute('data-category-item', JSON.stringify(currentData));
+                                        }
                                     }
-                                })
+                                }
+
+                            } catch (err) {
+                                console.error(err);
+                                Swal.fire({
+                                    icon: "error",
+                                    title: "Error",
+                                    text: err.response?.data?.error || "An error occurred"
+                                });
+                            }
                         }
 
+                        async function listUnlistCategory(btn, ID, list) {
+                            try {
+                                const isListing = list === 'true' || list === true;
+                                const action = isListing ? 'list' : 'unlist';
 
-                        function listUnlistCategory(ID,list) {
-                                                
-                            Swal.fire({
-                                title: "Are you sure?",
-                                text: `Do you want to ${(eval(list)? 'list':'unlist')} this category`,
-                                icon: "warning",
-                                showCancelButton: true,
-                                confirmButtonColor: "#3085d6",
-                                cancelButtonColor: "#d33",
-                                confirmButtonText: "Yes"
-                            }).then((result) => {
-                                if (result.isConfirmed) {
-                                    fetch(`/admin/categories/${ID}`, {
-                                        method: "PATCH",
-                                        headers: {
-                                            'Content-Type': 'application/json'
-                                        },
-                                        body:JSON.stringify({list})
-                                    }).then(res => res.json())
-                                        .then((data) => {
-                                            if (data.validationError) {
-                                                let timerInterval;
-                                                Swal.fire({
-                                                    title: "Validation Error",
-                                                    html: "You will be redirected to login in <b></b> milliseconds.",
-                                                    timer: 2000,
-                                                    timerProgressBar: true,
-                                                    didOpen: () => {
-                                                        Swal.showLoading();
-                                                        const timer = Swal.getPopup().querySelector("b");
-                                                        timerInterval = setInterval(() => {
-                                                            timer.textContent = `${Swal.getTimerLeft()}`;
-                                                        }, 100);
-                                                    },
-                                                    willClose: () => {
-                                                        clearInterval(timerInterval);
-                                                    }
-                                                }).then((result) => {
-                                                    /* Read more about handling dismissals below */
-                                                    if (result.dismiss === Swal.DismissReason.timer) {
-                                                        
-                                                        window.location.href = data.redirectUrl;
-                                                    }
-                                                });
-                                            }
+                                const result = await Swal.fire({
+                                    title: "Are you sure?",
+                                    text: `Do you want to ${action} this category?`,
+                                    icon: "warning",
+                                    showCancelButton: true,
+                                    confirmButtonColor: "#3085d6",
+                                    cancelButtonColor: "#d33",
+                                    confirmButtonText: "Yes"
+                                });
 
-                                            if (data.error) {
-                                                Swal.fire({
-                                                    icon: "error",
-                                                    title: "Validation Error",
-                                                    text: data.error,
-                                                });
-                                            }
+                                if (!result.isConfirmed) return;
 
-                                            if (data.success) {
-                                                Swal.fire({
-                                                    text: `You ${(eval(list)? 'listed':'unlisted')} the category`,
-                                                    icon: "success",
-                                                    timer: 2000
-                                                });
+                                const response = await axios.patch(`/admin/categories/${ID}`, {
+                                    list: isListing
+                                });
 
-                                                setTimeout(() => {
-                                                    window.location.reload()
-                                                }, 2000)
+                                if (response.status === 200) {
+                                    Swal.fire({
+                                        text: `You ${isListing ? 'listed' : 'unlisted'} the category`,
+                                        icon: "success",
+                                        timer: 2000,
+                                        showConfirmButton: false
+                                    });
 
-                                            }
-                                        })
+                                    const pTag = btn.querySelector('p');
+                                    if (isListing) {
+                                        pTag.innerHTML = '<i class="fas fa-times-circle"></i> Unlist';
+                                        btn.setAttribute('onclick', `listUnlistCategory(this, '${ID}', false)`);
+                                    } else {
+                                        pTag.innerHTML = '<i class="fas fa-list"></i> List';
+                                        btn.setAttribute('onclick', `listUnlistCategory(this, '${ID}', true)`);
+                                    }
                                 }
-                            });
-
+                            } catch (err) {
+                                console.error(err);
+                                Swal.fire({
+                                    icon: "error",
+                                    title: "Error",
+                                    text: err.response?.data?.error || "An error occurred"
+                                });
+                            }
                         }
                     </script>
 

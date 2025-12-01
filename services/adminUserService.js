@@ -1,10 +1,10 @@
 //collections
-const userCollection = require("../models/userModel");
+import userCollection from "../models/userModel.js";
 
-exports.userList = async (search, currentPage, noOfList, skipPages) => {
+// Service to get users list with pagination and search
+export const getUsers = async (search, currentPage, noOfList, skipPages) => {
   let findQuery = { isAdmin: false };
 
-  //for search user
   if (search) {
     findQuery["$or"] = [
       { username: { $regex: new RegExp(search, "i") } },
@@ -12,27 +12,16 @@ exports.userList = async (search, currentPage, noOfList, skipPages) => {
     ];
   }
 
-  try {
-    let totalNoOfList = await userCollection.countDocuments(findQuery);
-    let userList = await userCollection
-      .find(findQuery)
-      .skip(skipPages)
-      .limit(noOfList);
+  let totalNoOfList = await userCollection.countDocuments(findQuery);
+  let userList = await userCollection
+    .find(findQuery)
+    .skip(skipPages)
+    .limit(noOfList);
 
-    return { userList, currentPage, totalNoOfList };
-  } catch (err) {
-    console.log(err);
-  }
+  return { userList, currentPage, totalNoOfList };
 };
 
-exports.blockUnblockUser = async (userID) => {
-  try {
-    const user = await userCollection.findById(userID);
-    await userCollection.updateOne(
-      { _id: userID },
-      { isblocked: !user.isblocked }
-    );
-  } catch (err) {
-    console.log(err);
-  }
+// Service to block or unblock user
+export const blockUnblockUser = async (userID, isblocked) => {
+  await userCollection.updateOne({ _id: userID }, { isblocked: isblocked });
 };

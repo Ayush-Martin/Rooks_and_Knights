@@ -8,39 +8,40 @@
 <body>
 	<style>
 		.image-container {
-    position: relative;
-    width: 400px;
-    height: 400px;
-    overflow: hidden;
-    border: 1px solid #ddd;
-}
+			position: relative;
+			width: 400px;
+			height: 400px;
+			overflow: hidden;
+			border: 1px solid #ddd;
+		}
 
-.image-container img {
-    width: 100%;
-    height: 100%;
-}
+		.image-container img {
+			width: 100%;
+			height: 100%;
+		}
 
-.zoom-lens {
-    position: absolute;
-    border: 1px solid #000;
-    width: 100px;
-    height: 100px;
-    opacity: 0.4;
-    background-color: rgba(255,255,255,0.5);
-    display: none;
-}
+		.zoom-lens {
+			position: absolute;
+			border: 1px solid #000;
+			width: 100px;
+			height: 100px;
+			opacity: 0.4;
+			background-color: rgba(255, 255, 255, 0.5);
+			display: none;
+		}
 
-.zoomed-image {
-    position: absolute;
-    top: 0;
-    left: 420px; /* Adjust the distance based on your layout */
-    width: 800px; /* Zoomed-in size */
-    height: 800px;
-    background-size: 800px 800px;
-    display: none;
-    z-index: 10;
-}
-
+		.zoomed-image {
+			position: absolute;
+			top: 0;
+			left: 420px;
+			/* Adjust the distance based on your layout */
+			width: 800px;
+			/* Zoomed-in size */
+			height: 800px;
+			background-size: 800px 800px;
+			display: none;
+			z-index: 10;
+		}
 	</style>
 
 	<!-- Header -->
@@ -82,10 +83,11 @@
 								<div class="item-slick3" data-thumb="<%= product.productImage1 %>">
 									<div class="wrap-pic-w pos-relative">
 										<div class="image-container" style="object-fit: cover;">
-											<img src="<%= product.productImage1 %>" alt="Zoomable Image" id="main-image" >
+											<img src="<%= product.productImage1 %>" alt="Zoomable Image"
+												id="main-image">
 											<div class="zoom-lens" id="zoom-lens"></div>
 										</div>
-										
+
 
 										<a class="flex-c-m size-108 how-pos1 bor0 fs-16 cl10 bg0 hov-btn3 trans-04"
 											href="<%= product.productImage1 %>">
@@ -97,7 +99,8 @@
 								<div class="item-slick3" data-thumb="<%= product.productImage2 %>">
 									<div class="wrap-pic-w pos-relative">
 										<div class="image-container" style="object-fit: cover;">
-											<img src="<%= product.productImage2 %>" alt="Zoomable Image" id="main-image" >
+											<img src="<%= product.productImage2 %>" alt="Zoomable Image"
+												id="main-image">
 											<div class="zoom-lens" id="zoom-lens"></div>
 										</div>
 
@@ -111,7 +114,8 @@
 								<div class="item-slick3" data-thumb="<%= product.productImage3 %>">
 									<div class="wrap-pic-w pos-relative">
 										<div class="image-container" style="object-fit: cover;">
-											<img src="<%= product.productImage3 %>" alt="Zoomable Image" id="main-image" >
+											<img src="<%= product.productImage3 %>" alt="Zoomable Image"
+												id="main-image">
 											<div class="zoom-lens" id="zoom-lens"></div>
 										</div>
 
@@ -134,10 +138,12 @@
 
 						<p class="mtext-106 cl2">
 							<% if(product.offer || product.categoryID.offer || product.subCategoryID.offer) {%>
-								<span style="text-decoration: line-through">₹<%= product.price %></span> ₹<%=parseInt( product.price- product.price * Math.max(product.offer,product.categoryID.offer,product.subCategoryID.offer)/100 )%>
-							<% }else{ %>
-								₹<%= product.price %>
-							<% } %>
+								<span style="text-decoration: line-through">₹<%= product.price %></span> ₹<%=parseInt(
+									product.price- product.price *
+									Math.max(product.offer,product.categoryID.offer,product.subCategoryID.offer)/100 )%>
+									<% }else{ %>
+										₹<%= product.price %>
+											<% } %>
 						</p>
 
 						<p class="stext-102 cl3 p-t-23">
@@ -151,37 +157,39 @@
 						<div class="p-b-10">
 							<div class="size-204 respon6-next">
 
+								<% if(!product.isListed || !product.categoryID.isListed ||
+									!product.subCategoryID.isListed ){%>
+									<p class="fs-20">Product not available</p>
+									<% }else if(product.stock>0){%>
+										<form id="addToCartForm"
+											onsubmit="addToCart('<%= product._id %>','<%= product.categoryID._id%>','<%= product.subCategoryID._id%>' ,event )">
+											<p id="stock-Left"></p>
+											<div class="wrap-num-product flex-w  m-tb-10">
 
-								<% if(product.stock>0){%>
-									<form id="addToCartForm"
-										onsubmit="addToCart('<%= product._id %>','<%= product.categoryID._id%>','<%= product.subCategoryID._id%>' ,event )">
-										<p id="stock-Left"></p>
-										<div class="wrap-num-product flex-w  m-tb-10">
+												<div class="btn-num-product-down btn-num-product-down cl8 hov-btn3 trans-04 flex-c-m"
+													onclick="decreaseProduct(this)">
+													<i class="fs-16 zmdi zmdi-minus"></i>
+												</div>
 
-											<div class="btn-num-product-down btn-num-product-down cl8 hov-btn3 trans-04 flex-c-m"
-												onclick="decreaseProduct(this)">
-												<i class="fs-16 zmdi zmdi-minus"></i>
+												<input class="mtext-104 cl3 txt-center num-product" type="number"
+													name="quantity" value="1" id="productQuantity" readonly>
+
+												<div class="btn-num-product btn-num-product-up cl8 hov-btn3 trans-04 flex-c-m"
+													onclick="increaseProduct(this,'<%= product.stock %>')">
+													<i class="fs-16 zmdi zmdi-plus"></i>
+												</div>
 											</div>
 
-											<input class="mtext-104 cl3 txt-center num-product" type="number"
-												name="quantity" value="1" id="productQuantity" readonly>
+											<button
+												class="flex-c-m stext-101 cl0 size-101 bg1 bor1 hov-btn1 p-lr-15 trans-04 js-addcart-detail"
+												type="submit">
+												Add to cart
+											</button>
 
-											<div class="btn-num-product btn-num-product-up cl8 hov-btn3 trans-04 flex-c-m"
-												onclick="increaseProduct(this,'<%= product.stock %>')">
-												<i class="fs-16 zmdi zmdi-plus"></i>
-											</div>
-										</div>
-
-										<button
-											class="flex-c-m stext-101 cl0 size-101 bg1 bor1 hov-btn1 p-lr-15 trans-04 js-addcart-detail"
-											type="submit">
-											Add to cart
-										</button>
-
-									</form>
-									<% }else{ %>
-										<p class="fs-20">Out Of Stock</p>
-										<% } %>
+										</form>
+										<% }else{ %>
+											<p class="fs-20">Out Of Stock</p>
+											<% } %>
 
 							</div>
 						</div>
@@ -190,13 +198,15 @@
 					<!--  -->
 					<div class="flex-w flex-m  p-t-10 respon7">
 						<div class="flex-m bor9 p-r-10 m-r-11">
-							<button href="#" onclick="addRemoveWishlist(event,'<%= product._id %>','<%= productInWishlist %>','<%= product.categoryID._id %>','<%= product.subCategoryID._id %>')"
+							<button href="#"
+								onclick="addRemoveWishlist(event,'<%= product._id %>','<%= productInWishlist %>','<%= product.categoryID._id %>','<%= product.subCategoryID._id %>')"
 								class="fs-20 cl3 hov-cl1 trans-04 lh-10 p-lr-5 p-tb-2 js-addwish-detail tooltip100"
 								data-tooltip="<%= productInWishlist? 'Remove form wishlist':'Add to wishlist' %>">
-								<i id="wishlistIcon" class="<%= productInWishlist? 'zmdi zmdi-favorite':'zmdi zmdi-favorite-outline' %>"></i>
+								<i id="wishlistIcon"
+									class="<%= productInWishlist? 'zmdi zmdi-favorite':'zmdi zmdi-favorite-outline' %>"></i>
 							</button>
 
-							
+
 						</div>
 					</div>
 				</div>
@@ -236,8 +246,7 @@
 							<div class="col-sm-10 col-md-8 col-lg-6 m-lr-auto">
 								<div class="p-b-30 m-lr-15-sm">
 									<!-- Add review -->
-									<form class="w-full m-b-100" action="/shop/product/addReview/<%=product._id%>"
-										method="post" onsubmit="addReview(event)">
+									<form class="w-full m-b-100" id="addReviewForm" onsubmit="addReview(event)">
 										<h5 class="mtext-108 cl2 p-b-7">
 											Add a review
 										</h5>
@@ -281,7 +290,7 @@
 									<% product.reviews.forEach(review=> {%>
 										<div class="flex-w flex-t p-b-68">
 											<div class="wrap-pic-s size-200 bor0 of-hidden m-r-18 m-t-6">
-												
+
 												<i class="fas fa-user"></i>
 
 											</div>
@@ -289,7 +298,7 @@
 											<div class="size-207">
 												<div class="flex-w flex-sb-m p-b-17">
 													<span class="mtext-107 cl2 p-r-20">
-														<%= review.userID.username %>
+														<%= review.userID ? review.userID.username : 'Anonymous' %>
 													</span>
 
 													<span class="fs-18 cl11">
@@ -395,7 +404,7 @@
 
 		<%- include('./partials/scriptBody.ejs') %>
 
-			
+
 			<script>
 				//handle the quantity
 
@@ -426,33 +435,31 @@
 
 				}
 
-			</script>
-			<script>
 				//sending request to server
 
 				//function ot add prouduct to cart
-				function addToCart(productID,categoryID,subCategoryID , event ) {
+				function addToCart(productID, categoryID, subCategoryID, event) {
 					event.preventDefault();
-				
+
 					let quantity = document.getElementById('productQuantity').value;
-					
-					const error=checkValidNumber(quantity, "quantity", 1, 10)
-					
-					if(error){
+
+					const error = checkValidNumber(quantity, "quantity", 1, 10)
+
+					if (error) {
 						Swal.fire({
-									title: "Error",
-									text: error,
-									icon: "error",
-								})
+							title: "Error",
+							text: error,
+							icon: "error",
+						})
 						return
 					}
-					fetch(`/cart/addToCart/${productID}`, {
+					fetch(`/cart/${productID}`, {
 						method: 'POST',
 						headers: {
 							'Content-Type': 'application/json'
 						},
 						body: JSON.stringify({
-							quantity,categoryID,subCategoryID
+							quantity, categoryID, subCategoryID
 						})
 					}).then((res) => res.json())
 						.then((data) => {
@@ -486,52 +493,76 @@
 
 
 				//function to add review
-				function addReview(event) {
+				async function addReview(event) {
 					event.preventDefault();
-					Swal.fire({
-						title: "Good job!",
-						text: "Review added",
-						icon: "success",
-						showConfirmButton: true,
-					}).then((result) => {
-						if (result.isConfirmed) {
-							event.target.submit()
-						}
-					})
+					const form = event.target;
+					const formData = new FormData(form);
+					const ratingStar = formData.get('ratingStar');
+					const comments = formData.get('comments');
 
+					if (!ratingStar || !comments) {
+						Swal.fire({
+							icon: "error",
+							title: "Validation Error",
+							text: "Please provide both a rating and a comment."
+						});
+						return;
+					}
+
+					try {
+						const response = await axios.post(`/shop/product/<%=product._id%>`, {
+							ratingStar,
+							comments
+						});
+
+						if (response.status === 201) {
+							Swal.fire({
+								title: "Good job!",
+								text: "Review added successfully",
+								icon: "success",
+								showConfirmButton: false,
+								timer: 1500
+							}).then(() => {
+								window.location.reload();
+							});
+						}
+					} catch (err) {
+						console.error(err);
+						Swal.fire({
+							icon: "error",
+							title: "Error",
+							text: err.response?.data?.error || "An error occurred while adding the review."
+						});
+					}
 				}
 
-				function addRemoveWishlist(event, productID,productInWishlist,categoryID,subCategoryID) {
+				async function addRemoveWishlist(event, productID, productInWishlist, categoryID, subCategoryID) {
 					event.preventDefault()
 
-					const  method = (productInWishlist=='true') ? 'DELETE' : 'POST';
-					const  wishlistIcon=document.getElementById('wishlistIcon')
+					const method = (productInWishlist == 'true') ? 'delete' : 'post';
+					const wishlistIcon = document.getElementById('wishlistIcon')
 
-					
-					fetch(`/wishlist/${productID}`, {
-						method,
-						headers: {
-							'Content-Type': 'application/json'
-						},
-						body:JSON.stringify({categoryID,subCategoryID})
-					}).then((res) => res.json())
-						.then((data) => {
-							if (data.success) {
+					try {
+						const res = await axios({
+							method: method,
+							url: `/wishlist/${productID}`,
+							data: { categoryID, subCategoryID }
+						});
 
-								
-									window.location.reload()
-								
-							} else if (data.authError) {
-								Swal.fire({
-									icon: "error",
-									title: "Oops...",
-									text: data.authError,
-									footer: data.errorRedirect
-								});
-							}
-						}).catch((err) => {
-							console.log(err);
-						})
+						const data = res.data;
+
+						if (data.success) {
+							window.location.reload()
+						}
+					} catch (err) {
+						console.log(err);
+						Swal.fire({
+							icon: "error",
+							title: "Oops...",
+							text: err.response?.data?.error || "Something went wrong!",
+							footer: err.response?.data?.errorRedirect
+						});
+					}
 				}
 			</script>
 
@@ -543,43 +574,51 @@
 				}
 
 				const img = document.getElementById("main-image");
-const zoomLens = document.getElementById("zoom-lens");
+				const zoomLens = document.getElementById("zoom-lens");
 
-img.addEventListener("mousemove", function(e) {
-    zoomLens.style.display = "block";
-    
-    // Get the cursor position and set lens position
-    const pos = getCursorPosition(e, img);
-    let x = pos.x - (zoomLens.offsetWidth / 2);
-    let y = pos.y - (zoomLens.offsetHeight / 2);
-    
-    // Prevent the lens from going outside the image
-    if (x > img.width - zoomLens.offsetWidth) {x = img.width - zoomLens.offsetWidth;}
-    if (x < 0) {x = 0;}
-    if (y > img.height - zoomLens.offsetHeight) {y = img.height - zoomLens.offsetHeight;}
-    if (y < 0) {y = 0;}
-    
-    // Set the position of the zoom lens
-    zoomLens.style.left = x + "px";
-    zoomLens.style.top = y + "px";
-    
-    // Show the zoomed-in area
-    document.querySelector(".zoomed-image").style.display = "block";
-    document.querySelector(".zoomed-image").style.backgroundImage = "url('your-image.jpg')";
-    document.querySelector(".zoomed-image").style.backgroundPosition = `-${x * 2}px -${y * 2}px`;
-});
+				if (img && zoomLens) {
+					img.addEventListener("mousemove", function (e) {
+						zoomLens.style.display = "block";
 
-img.addEventListener("mouseleave", function() {
-    zoomLens.style.display = "none";
-    document.querySelector(".zoomed-image").style.display = "none";
-});
+						// Get the cursor position and set lens position
+						const pos = getCursorPosition(e, img);
+						let x = pos.x - (zoomLens.offsetWidth / 2);
+						let y = pos.y - (zoomLens.offsetHeight / 2);
 
-function getCursorPosition(e, img) {
-    const rect = img.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    return {x: x, y: y};
-}
+						// Prevent the lens from going outside the image
+						if (x > img.width - zoomLens.offsetWidth) { x = img.width - zoomLens.offsetWidth; }
+						if (x < 0) { x = 0; }
+						if (y > img.height - zoomLens.offsetHeight) { y = img.height - zoomLens.offsetHeight; }
+						if (y < 0) { y = 0; }
+
+						// Set the position of the zoom lens
+						zoomLens.style.left = x + "px";
+						zoomLens.style.top = y + "px";
+
+						// Show the zoomed-in area
+						const zoomedImage = document.querySelector(".zoomed-image");
+						if (zoomedImage) {
+							zoomedImage.style.display = "block";
+							zoomedImage.style.backgroundImage = `url('${img.src}')`;
+							zoomedImage.style.backgroundPosition = `-${x * 2}px -${y * 2}px`;
+						}
+					});
+
+					img.addEventListener("mouseleave", function () {
+						zoomLens.style.display = "none";
+						const zoomedImage = document.querySelector(".zoomed-image");
+						if (zoomedImage) {
+							zoomedImage.style.display = "none";
+						}
+					});
+				}
+
+				function getCursorPosition(e, img) {
+					const rect = img.getBoundingClientRect();
+					const x = e.clientX - rect.left;
+					const y = e.clientY - rect.top;
+					return { x: x, y: y };
+				}
 
 			</script>
 

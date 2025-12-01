@@ -1,95 +1,138 @@
-//requiring modules
-const express = require('express');
+//importing modules
+import express from "express";
 const router = express.Router();
 
 //controllers
-const adminController = require('../controllers/adminController');
+import * as adminController from "../controllers/admin/adminController.js";
+import * as adminCategoryController from "../controllers/admin/adminCategoryController.js";
+import * as adminSubCategoryController from "../controllers/admin/adminSubCategoryController.js";
+import * as adminUserController from "../controllers/admin/adminUserController.js";
+import * as adminProductController from "../controllers/admin/adminProductController.js";
+import * as adminOfferController from "../controllers/admin/adminOfferController.js";
+import * as adminCouponController from "../controllers/admin/adminCouponController.js";
+import * as adminOrderController from "../controllers/admin/adminOrderController.js";
+import * as adminReturnController from "../controllers/admin/adminReturnController.js";
+import * as adminTransactionController from "../controllers/admin/adminTransactionController.js";
+import * as adminSalesController from "../controllers/admin/adminSalesController.js";
 
 //multer upload middleware
-const upload = require('../utils/multerUtils');;
+import upload, { handleUpload } from "../utils/multerUtils.js";
 
 //middlewares
-const adminMiddleware = require('../middlewares/adminAuthMiddleware');;
+import * as adminMiddleware from "../middlewares/adminAuthMiddleware.js";
 
 //routers
-//Login 
-router.get('/login', adminMiddleware.checkAdminAldreadyAuthenticated, adminController.getLogin); //display login page
-router.post('/login', adminController.postLogin); //login 
-router.post('/logout', adminController.postLogout); //logout
+//Login
+router
+  .route("/login")
+  .get(
+    adminMiddleware.checkAdminAlreadyAuthenticated,
+    adminController.loginPage
+  )
+  .post(adminController.login);
+
+router.post("/logout", adminController.logout); //logout
 
 //set up middleware for get request
 router.use((req, res, next) => {
-    if (req.method == 'GET' && req.url != '/login') {
-        return adminMiddleware.checkAdminAuthenticated(req, res, next)
-    }
-    next()
-})
+  if (req.method == "GET" && req.url != "/login") {
+    return adminMiddleware.checkAdminAuthenticated(req, res, next);
+  }
+  next();
+});
 
 //set up middleware for routes other that get
 router.use((req, res, next) => {
-    if (req.method != 'GET') {
-        return adminMiddleware.validAdmin(req, res, next)
-    }
-    next()
-})
-
+  if (req.method != "GET") {
+    return adminMiddleware.validAdmin(req, res, next);
+  }
+  next();
+});
 
 //Dashboard
-router.get('/', adminController.getDashboard); //display dashboard
+router.get("/", adminController.dashboardPage);
 
 //Users
-router.get('/users', adminController.getUsers); //display user list
-router.patch('/users/:id', adminController.patchBlockUnblockUser); //block or unblock user
+router.get("/users", adminUserController.usersPage);
+router.patch("/users/:id", adminUserController.blockUnblockUser);
 
-//Products 
-router.get('/products', adminController.getProducts); //display products
-router.get('/products/addProduct', adminController.getAddProduct); //display page to add a new product
-router.post('/products/addProduct', upload, adminController.postAddProduct); //add a new product
-router.get('/products/viewEditProduct/:id', adminController.getViewEditProduct); //view specif product
-router.post('/products/viewEditProduct/:id', upload, adminController.putViewEditProduct);//edit a product
-router.patch('/products/:id', adminController.patchListUnlistProduct); //delete a product
+//Products
+router.get("/products", adminProductController.productsPage);
 
+router
+  .route("/products/add")
+  .get(adminProductController.addProductPage)
+  .post(handleUpload, adminProductController.addProduct);
+
+router
+  .route("/products/:id")
+  .get(adminProductController.productPage)
+  .put(handleUpload, adminProductController.editProduct)
+  .patch(adminProductController.listUnlistProduct);
 
 //Categories
-router.get('/categories', adminController.getCategories); //display categories
-router.post('/categories', adminController.addCategory); //add new category
-router.put('/categories/:id', adminController.putEditCategory) //edit a category
-router.patch('/categories/:id', adminController.patchListUnlistCategory); //delete a category
+router
+  .route("/categories")
+  .get(adminCategoryController.categoriesPage)
+  .post(adminCategoryController.addCategory);
 
+router
+  .route("/categories/:id")
+  .put(adminCategoryController.editCategory)
+  .patch(adminCategoryController.listUnlistCategory);
 
 //subCategories
-router.get('/subCategories', adminController.getSubCategory) //display sub categories
-router.post('/subCategories', adminController.addSubCategory); //add new sub category
-router.put('/subCategories/:id', adminController.putEditSubCategory) //edit a sub category
-router.patch('/subCategories/:id', adminController.patchListUnlistSubCategory); //delet a sub category
+router
+  .route("/subCategories")
+  .get(adminSubCategoryController.subCategoriesPage)
+  .post(adminSubCategoryController.addSubCategory);
 
+router
+  .route("/subCategories/:id")
+  .put(adminSubCategoryController.editSubCategory)
+  .patch(adminSubCategoryController.listUnlistSubCategory);
 
 //orders
-router.get('/orders', adminController.getOrders); //display orders
-router.get('/orders/viewEditOrder/:id', adminController.getViewEditOrder);  //display specific order
-router.patch('/orders/viewEditOrder/:id', adminController.patchChageProductStatus) //update product status
+router.get("/orders", adminOrderController.ordersPage);
+router
+  .route("/orders/:id")
+  .get(adminOrderController.orderPage)
+  .patch(adminOrderController.updateOrderProductStatus);
 
 //returns
-router.get('/returns', adminController.getReturns) //display returns
-router.patch('/returns', adminController.patchAproveRejectReturn); //approve or reject returns
+router
+  .route("/returns")
+  .get(adminReturnController.returnsPage)
+  .patch(adminReturnController.approveRejectReturn);
 
-//transations
-router.get('/transations', adminController.getTransations) //display transations 
+//transactions
+router.get("/transactions", adminTransactionController.transactionsPage);
 
-//offers
-router.get('/offers', adminController.getOffers) //display offers
-router.post('/offers', adminController.postAddOffer); //add new offer
-router.delete('/offers/:id', adminController.deleteOffer) //delete offer
+// Offers
+router
+  .route("/offers")
+  .get(adminOfferController.offersPage)
+  .post(adminOfferController.addOffer);
+
+router
+  .route("/offers/:id")
+  .put(adminOfferController.editOffer)
+  .delete(adminOfferController.deleteOffer);
 
 //coupons
-router.get('/coupons', adminController.getCoupons); //display coupons
-router.post('/coupons', adminController.postAddCoupon) //add coupon
-router.delete('/coupons/:id', adminController.deleteCoupon); //delete coupon
-router.put('/coupons/:id', adminController.putEditCoupon); //edit coupon
+router
+  .route("/coupons")
+  .get(adminCouponController.couponsPage)
+  .post(adminCouponController.addCoupon);
+
+router
+  .route("/coupons/:id")
+  .put(adminCouponController.editCoupon)
+  .delete(adminCouponController.deleteCoupon);
 
 //sales
-router.get('/sales', adminController.getSales) //dispaly sales
-router.get('/sales/downloadExcel', adminController.getDownloadSalesExcel) //download sales excel
-router.get('/sales/downloadPdf', adminController.getDownloadSalesPdf) //download sales pdf
+router.get("/sales", adminSalesController.salesPage);
+router.get("/sales/downloadExcel", adminSalesController.getDownloadSalesExcel);
+router.get("/sales/downloadPdf", adminSalesController.getDownloadSalesPdf);
 
-module.exports = router;
+export default router;
