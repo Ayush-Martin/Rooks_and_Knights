@@ -661,34 +661,49 @@
 
         async function proceedToPayment(event) {
           event.preventDefault();
+
           const selectedAddress = document.querySelector(
             'input[name="shippingAddress"]:checked'
           );
 
           if (!selectedAddress) {
-            Swal.fire({
-              title: "Address not selected ",
-              icon: "error",
-            });
+            Swal.fire({ title: "Address not selected", icon: "error" });
             return;
           }
 
           const addressId = selectedAddress.value;
-
           const rows = document.querySelectorAll(".cart-product-row");
-          const products = [];
-          const cartItemIds = [];
-          let outOfStock = false;
-          let unavailableProduct = false;
 
           if (!rows.length) {
-            Swal.fire({
-              title: "No product to checkout ",
-              icon: "error",
-            });
+            Swal.fire({ title: "No product to checkout", icon: "error" });
             return;
           }
 
+          let outOfStock = false;
+          let unavailableProduct = false;
+
+          const products = [];
+          const cartItemIds = [];
+
+          /* -------------------------------------------
+             STEP 1: CALCULATE CART TOTAL (NO COUPON)
+          --------------------------------------------*/
+          let cartTotal = 0;
+
+          rows.forEach((row) => {
+            const cartItem = JSON.parse(row.getAttribute("data-products"));
+            cartTotal += cartItem.productID.price * cartItem.quantity;
+          });
+
+          /* -------------------------------------------
+             STEP 2: GET COUPON DISCOUNT (ONCE)
+          --------------------------------------------*/
+          const couponDiscount =
+            parseInt(document.getElementById("couponDiscountAmount")?.innerText) || 0;
+
+          /* -------------------------------------------
+             STEP 3: BUILD PRODUCTS WITH PROPORTIONAL DISCOUNT
+          --------------------------------------------*/
           rows.forEach((row) => {
             const cartItem = JSON.parse(row.getAttribute("data-products"));
 
@@ -699,17 +714,26 @@
                 text: "Contains out of stock",
                 icon: "error",
               });
+              return;
             }
 
-            if (!cartItem.productID.isListed || !cartItem.subCategoryID.isListed || !cartItem.categoryID.isListed) {
+            if (
+              !cartItem.productID.isListed ||
+              !cartItem.categoryID.isListed ||
+              !cartItem.subCategoryID.isListed
+            ) {
               unavailableProduct = true;
               Swal.fire({
                 title: "Cannot Proceed to payment",
                 text: "Contains unavailable products",
                 icon: "error",
               });
+              return;
             }
+
             const price = cartItem.productID.price * cartItem.quantity;
+
+            /* ---------- PRODUCT / CATEGORY OFFER ---------- */
             let discount = 0;
 
             if (
@@ -717,23 +741,23 @@
               cartItem.categoryID.offer ||
               cartItem.subCategoryID.offer
             ) {
-              discount = parseInt(
-                ((cartItem.productID.price *
+              discount += Math.floor(
+                (cartItem.productID.price *
                   Math.max(
-                    cartItem.productID.offer,
-                    cartItem.categoryID.offer,
-                    cartItem.subCategoryID.offer
+                    cartItem.productID.offer || 0,
+                    cartItem.categoryID.offer || 0,
+                    cartItem.subCategoryID.offer || 0
                   )) /
-                  100) *
+                100 *
                 cartItem.quantity
               );
             }
 
-            const couponDiscount = parseInt(
-              document.getElementById("couponDiscountAmount").innerText
-            );
+            /* ---------- COUPON PROPORTIONAL SHARE ---------- */
+            const couponShare =
+              cartTotal > 0 ? Math.round((price / cartTotal) * couponDiscount) : 0;
 
-            discount += couponDiscount;
+            discount += couponShare;
 
             products.push({
               productID: cartItem.productID,
@@ -746,24 +770,29 @@
             cartItemIds.push(cartItem._id);
           });
 
-          if (outOfStock || unavailableProduct) {
-            return;
-          }
+          if (outOfStock || unavailableProduct) return;
+
+          /* -------------------------------------------
+             STEP 4: PAYMENT DETAILS
+          --------------------------------------------*/
           const paymentMethod = document.getElementById("paymentMethod").value;
           const basePrice = document.getElementById("basePrice").textContent;
           const totalAmount = document.getElementById("totalAmount").textContent;
-          const discount = document.getElementById("discountAmount").textContent;
+          const discountAmount = document.getElementById("discountAmount").textContent;
           const taxAmount = document.getElementById("taxAmount").textContent;
 
-          if (totalAmount > 1000 && paymentMethod == "COD") {
+          if (totalAmount > 1000 && paymentMethod === "COD") {
             Swal.fire({
-              title: "Cannot Proceed to using Cash on delivery",
-              text: "For cash on delivery the amount should be less than 1000",
+              title: "Cannot Proceed using Cash on Delivery",
+              text: "COD allowed only for amount below 1000",
               icon: "error",
             });
             return;
           }
 
+          /* -------------------------------------------
+             STEP 5: PROCEED TO PAYMENT
+          --------------------------------------------*/
           try {
             const res = await axios.post("/order/proceedToPayment", {
               products,
@@ -772,72 +801,73 @@
               basePrice,
               cartItemIds,
               totalAmount,
-              discount,
+              discount: discountAmount,
               taxAmount,
               couponCodeIds,
             });
+
             const data = res.data;
 
             if (data.success) {
               Swal.fire({
                 title: "Ordered",
-                text: "Order Placed successfully",
+                text: "Order placed successfully",
                 icon: "success",
                 timer: 2000,
               });
+
               setTimeout(() => {
                 window.location.href = data.successRedirect;
               }, 2000);
+              return;
             }
 
             if (data.error) {
-              Swal.fire({
-                title: "Error",
-                text: data.error,
-                icon: "error",
-              });
-            } else if (data.authError) {
+              Swal.fire({ title: "Error", text: data.error, icon: "error" });
+              return;
+            }
+
+            if (data.authError) {
               Swal.fire({
                 icon: "error",
                 title: "Oops...",
                 text: data.authError,
-                footer: "/",
               });
-
               return;
             }
 
+            /* -------------------------------------------
+               RAZORPAY
+            --------------------------------------------*/
             if (data.razorpayOrder) {
-              var options = {
-                key: "rzp_test_RSspzzgBAA2ViI", // Enter the Key ID generated from the Dashboard
+              const options = {
+                key: "rzp_test_RSspzzgBAA2ViI",
                 name: "Rook & Knights",
                 description: "Test Transaction",
                 image:
                   "https://imgs.search.brave.com/jsPXFiH4YxTvzVbUvQMILb4V32Y6I0DxlC2p3CaqAfA/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9ibG9n/LnBob3RvYWRraW5n/LmNvbS93cC1jb250/ZW50L3VwbG9hZHMv/MjAyMy8wNS8xNjgy/OTQ2NDIzMzgxLTEu/anBn",
-                order_id: data.razorpayOrder.id, //This is a sample Order ID. Pass the `id` obtained in the response of Step 1
+                order_id: data.razorpayOrder.id,
                 callback_url: "/order/completePayment",
-                theme: {
-                  color: "#454545",
-                },
+                theme: { color: "#454545" },
                 modal: {
-                  ondismiss: function () {
-                    alert("payment Failed");
+                  ondismiss() {
+                    alert("Payment Failed");
                     window.location.href = "/";
                   },
                 },
               };
-              var rzp1 = new Razorpay(options);
 
-              rzp1.on("payment.failed", function (response) {
-                // Handle payment failure and redirect
-                console.error("Payment failed:", response.error);
-                alert("payment Failed");
+              const rzp1 = new Razorpay(options);
+
+              rzp1.on("payment.failed", function () {
+                alert("Payment Failed");
                 window.location.href = "/";
               });
+
               rzp1.open();
             }
           } catch (err) {
-            console.log(err);
+            console.error(err);
             Swal.fire({
               icon: "error",
               title: "Error",
