@@ -84,6 +84,9 @@ export const getCart = async (userID) => {
     })
     .populate({
       path: "cartItems.subCategoryID",
+    })
+    .populate({
+      path: "coupons.couponID",
     });
 
   if (!cart) {
@@ -132,6 +135,10 @@ export const deleteManyCartItem = async (cartItemIDs, price, userID) => {
       $inc: { totalPrice: -price },
     }
   );
+};
+
+export const removeCartCoupons = async (userID) => {
+  await cartCollection.updateOne({ userID }, { $set: { coupons: [] } });
 };
 
 // Helper to calculate offer price

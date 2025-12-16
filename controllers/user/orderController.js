@@ -63,6 +63,7 @@ export const createCheckoutOrder = async (req, res) => {
       }
 
       await cartService.deleteManyCartItem(cartItemIds, basePrice, req.userID);
+      await cartService.removeCartCoupons(req.userID);
       return res
         .status(StatusCode.OK)
         .json({ success: true, successRedirect: "/" });
@@ -99,6 +100,7 @@ export const createCheckoutOrder = async (req, res) => {
       }
 
       await cartService.deleteManyCartItem(cartItemIds, basePrice, req.userID);
+      await cartService.removeCartCoupons(req.userID);
       await orderService.completePayment(orderResult.order._id);
       await transactionService.completeTransaction(
         req.userID,
@@ -131,6 +133,7 @@ export const createCheckoutOrder = async (req, res) => {
     }
 
     await cartService.deleteManyCartItem(cartItemIds, basePrice, req.userID);
+    await cartService.removeCartCoupons(req.userID);
 
     const options = {
       amount: orderResult.order.totalAmmount * 100,
@@ -248,7 +251,8 @@ export const addCouponDiscount = async (req, res) => {
 
     const result = await couponService.applyCouponDiscount(
       totalAmount,
-      couponCode
+      couponCode,
+      req.userID
     );
 
     if (!result.success) {
@@ -349,6 +353,94 @@ export const invoiceDownload = async (req, res) => {
     const orderID = req.params.id;
     const { order } = await orderService.getOrder(orderID);
     generateInvoice(req, res, order);
+  } catch (err) {
+    console.log(err);
+    res
+      .status(StatusCode.INTERNAL_SERVER_ERROR)
+      .json({ error: "Server Error" });
+  }
+};
+
+// Controller to get applied coupons and validate them
+export const getAppliedCoupons = async (req, res) => {
+  try {
+    const cart = await cartService.getCart(req.userID);
+    if (!cart) {
+      return res
+        .status(StatusCode.OK)
+        .json({ success: true, appliedCoupons: [], totalCouponDiscount: 0 });
+    }
+
+    // Calculate total amount (gross) and offer total
+    let grossTotal = 0;
+    let offerTotal = 0;
+
+    cart.cartItems.forEach((item) => {
+      grossTotal += item.productID.price * item.quantity;
+
+      // Calculate offer
+      const offer = Math.max(
+        item.productID.offer || 0,
+        item.categoryID.offer || 0,
+        item.subCategoryID.offer || 0
+      );
+
+      const discountAmount = Math.floor(
+        ((item.productID.price * offer) / 100) * item.quantity
+      );
+      offerTotal += discountAmount;
+    });
+
+    const netTotal = grossTotal - offerTotal;
+
+    const validCoupons = [];
+    let totalCouponDiscount = 0;
+    const couponsToRemove = [];
+
+    if (cart.coupons && cart.coupons.length > 0) {
+      for (const couponEntry of cart.coupons) {
+        const coupon = couponEntry.couponID;
+        // Validate
+        const validation = couponService.validateCoupon(coupon, netTotal);
+
+        if (validation.isValid) {
+          validCoupons.push(coupon);
+          totalCouponDiscount += coupon.discountAmount;
+        } else {
+          if (coupon) {
+            couponsToRemove.push(coupon._id);
+          }
+        }
+      }
+    }
+
+    // Remove invalid coupons
+    if (couponsToRemove.length > 0) {
+      for (const couponId of couponsToRemove) {
+        await couponService.removeCoupon(req.userID, couponId);
+      }
+    }
+
+    return res.status(StatusCode.OK).json({
+      success: true,
+      appliedCoupons: validCoupons,
+      totalCouponDiscount,
+      removedCoupons: couponsToRemove.length > 0,
+    });
+  } catch (err) {
+    console.log(err);
+    res
+      .status(StatusCode.INTERNAL_SERVER_ERROR)
+      .json({ error: "Server Error" });
+  }
+};
+
+// Controller to remove coupon
+export const removeCoupon = async (req, res) => {
+  try {
+    const couponID = req.params.id;
+    await couponService.removeCoupon(req.userID, couponID);
+    res.status(StatusCode.OK).json({ success: true });
   } catch (err) {
     console.log(err);
     res
