@@ -5,6 +5,212 @@
   <%- include('./partials/head.ejs') %>
     <style>
       /* Custom Checkout UI Styles */
+      /* Product & Address Card Styles */
+      .checkout-card {
+        background: #fff;
+        border-radius: 16px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+        padding: 25px;
+        margin-bottom: 30px;
+        border: 1px solid #f0f0f0;
+      }
+
+      .checkout-card-header {
+        font-size: 20px;
+        font-weight: 700;
+        color: #333;
+        margin-bottom: 20px;
+        padding-bottom: 15px;
+        border-bottom: 2px solid #f5f5f5;
+      }
+
+      .product-list-item {
+        display: flex;
+        align-items: center;
+        padding: 15px 0;
+        border-bottom: 1px solid #eee;
+      }
+
+      .product-list-item:last-child {
+        border-bottom: none;
+      }
+
+      .product-img-wrapper {
+        width: 80px;
+        height: 80px;
+        border-radius: 10px;
+        overflow: hidden;
+        margin-right: 20px;
+        border: 1px solid #eee;
+      }
+
+      .product-img-wrapper img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .product-details {
+        flex: 1;
+      }
+
+      .product-name {
+        font-size: 16px;
+        font-weight: 600;
+        color: #333;
+        text-decoration: none;
+        display: block;
+        margin-bottom: 5px;
+      }
+
+      .product-meta {
+        font-size: 14px;
+        color: #888;
+        margin-bottom: 5px;
+      }
+
+      .product-price {
+        font-size: 16px;
+        font-weight: 700;
+        color: #333;
+      }
+
+      .address-card-item {
+        border: 2px solid #e0e0e0;
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 15px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        position: relative;
+      }
+
+      .address-card-item.selected {
+        border-color: #333;
+        background-color: #fafafa;
+      }
+
+      .address-radio {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        accent-color: #333;
+      }
+
+      .address-title {
+        font-weight: 700;
+        font-size: 16px;
+        color: #333;
+        margin-bottom: 5px;
+      }
+
+      .address-text {
+        font-size: 14px;
+        color: #666;
+        margin-bottom: 15px;
+        padding-right: 30px;
+      }
+
+      .address-actions {
+        display: flex;
+        gap: 10px;
+      }
+
+      .btn-address-action {
+        border: none;
+        background: none;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        padding: 5px 10px;
+        border-radius: 6px;
+        transition: all 0.2s;
+      }
+
+      .btn-edit {
+        color: #333;
+        background: #f0f0f0;
+      }
+
+      .btn-edit:hover {
+        background: #e0e0e0;
+      }
+
+      .btn-delete {
+        color: #dc3545;
+        background: #fff5f5;
+      }
+
+      .btn-delete:hover {
+        background: #ffe0e0;
+      }
+
+      .btn-add-new {
+        width: 100%;
+        padding: 15px;
+        border: 2px dashed #e0e0e0;
+        border-radius: 12px;
+        background: none;
+        color: #666;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+        margin-top: 10px;
+      }
+
+      .btn-add-new:hover {
+        border-color: #333;
+        color: #333;
+        background: #fafafa;
+      }
+
+      /* Modal Custom Styles */
+      .modal-content-custom {
+        border-radius: 16px;
+        border: none;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+      }
+
+      .modal-header-custom {
+        border-bottom: 1px solid #f0f0f0;
+        padding: 20px 25px;
+      }
+
+      .modal-title-custom {
+        font-weight: 700;
+        color: #333;
+      }
+
+      .modal-body-custom {
+        padding: 25px;
+      }
+
+      .form-label-custom {
+        font-weight: 600;
+        font-size: 13px;
+        color: #666;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .form-control-custom {
+        border-radius: 8px;
+        border: 1px solid #e0e0e0;
+        padding: 12px 15px;
+        font-size: 15px;
+        color: #333;
+      }
+
+      .form-control-custom:focus {
+        border-color: #333;
+        box-shadow: 0 0 0 3px rgba(51, 51, 51, 0.1);
+      }
+
+      .modal-footer-custom {
+        border-top: 1px solid #f0f0f0;
+        padding: 20px 25px;
+      }
+
       .order-summary-card {
         background: #fff;
         border-radius: 16px;
@@ -207,99 +413,79 @@
     <div class="container">
       <div class="row">
         <div class="col-lg-10 col-xl-7 m-lr-auto m-b-50">
-          <div class="m-l-15 m-r--30 m-lr-0-xl">
-            <div class="wrap-table-shopping-cart">
-              <table class="table-shopping-cart">
-                <tr class="table_head">
-                  <th class="column-1">Product</th>
-                  <th class="column-2"></th>
-                  <th class="column-3">Price</th>
-                  <th class="column-4">Quantity</th>
-                  <th class="column-5">Total</th>
-                  <th></th>
-                </tr>
-
-                <% cart.cartItems.forEach((cartItem)=>{%>
-
-                  <tr class="table_row cart-product-row" id="cartItemRow_<%= cartItem._id %>"
-                    data-products="<%=JSON.stringify(cartItem)  %>">
-                    <td class="column-1">
-                      <a class="how-itemcart1 d-block" href="/shop/product/<%= cartItem.productID._id %>">
-                        <img src="<%= cartItem.productID.productImage1 %>" alt="IMG" />
-                      </a>
-                    </td>
-                    <td class="column-2">
+          <!-- Product List Card -->
+          <div class="checkout-card">
+            <div class="checkout-card-header">
+              Order Items (<%= cart.cartItems.length %>)
+            </div>
+            <div class="product-list">
+              <% cart.cartItems.forEach((cartItem)=>{%>
+                <div class="product-list-item">
+                  <div class="product-img-wrapper">
+                    <a href="/shop/product/<%= cartItem.productID._id %>">
+                      <img src="<%= cartItem.productID.productImage1 %>" alt="<%= cartItem.productID.productName %>" />
+                    </a>
+                  </div>
+                  <div class="product-details">
+                    <a href="/shop/product/<%= cartItem.productID._id %>" class="product-name">
                       <%= cartItem.productID.productName %>
-                    </td>
-                    <td class="column-3">
-                      <%= cartItem.productID.price %>
-                    </td>
-
-                    <td class="column-4 text-center">
-                      <% if(!cartItem.productID.isListed || !cartItem.categoryID.isListed ||
-                        !cartItem.subCategoryID.isListed){%>
-                        <p>Product unavailable</p>
-                        <% } else if(cartItem.quantity<=cartItem.productID.stock) {%>
-
-                          <p class="p-l-40">
-                            <%= cartItem.quantity %>
-                          </p>
-                          <% }else{%>
-                            <p>Out of stock</p>
-                            <% } %>
-                    </td>
-                    <td class="column-5 cart-product-total" id="cartProductTotal_<%=cartItem._id%>">
-                      <%=cartItem.productID.price * cartItem.quantity%>
-                    </td>
-                    <!-- <td class="column-2">
-                      <button type="button" data-cartItem="<%= JSON.stringify(cartItem) %>"
-                        onclick="deleteProduct(this)">
-                        <i class="fa-solid fa-trash"></i>
-                      </button>
-                    </td> -->
-                  </tr>
-                  <% }); %>
-              </table>
-            </div>
-            <div class="card shadow-sm p-3 mb-5 bg-white rounded bor2">
-              <div class="text-dark cl0 bor2 f-w-700 m-l-15">
-                Shipping Address
-              </div>
-              <div class="card-body">
-                <div id="address-list">
-                  <% address.address.forEach((addressItem)=>{ %>
-                    <div class="address-item m-b-15 d-flex justify-content-between"
-                      id="address-item-<%= addressItem._id %>">
-                      <div class="form-check">
-                        <input class="form-check-input" type="radio" name="shippingAddress"
-                          id="address_<%= addressItem._id %>" value="<%= addressItem._id %>"
-                          <%=addressItem._id===address.address[0]._id ? 'checked' : '' %>>
-                        <label for="address_<%= addressItem._id %>" class="form-check-label cl8">
-                          <%= addressItem.addressTitle %> : <%= addressItem.state %>,<%= addressItem.city %>,<%=
-                                  addressItem.pinCode %>,<%= addressItem.streetAddress %>
-                        </label>
-                      </div>
-                      <div>
-                        <button class="btn btn-dark btn-sm m-b-3" data-address-item="<%= JSON.stringify(addressItem)%>"
-                          onclick="editAddressModel(event,'<%=addressItem._id%>')" data-toggle="modal"
-                          data-target="#editAddressModel">
-                          <i class="fa fa-edit"></i>
-                        </button>
-
-                        <button class="btn btn-danger btn-sm m-b-3"
-                          onclick="removeAddress(event,'<%=addressItem._id%>')">
-                          <i class="fa fa-trash"></i>
-                        </button>
-                      </div>
+                    </a>
+                    <div class="product-meta">
+                      Price: ₹<%= cartItem.productID.price %> | Qty: <%= cartItem.quantity %>
                     </div>
-                    <% }) %>
+                    <div class="product-price">
+                      Total: ₹<%= cartItem.productID.price * cartItem.quantity %>
+                    </div>
+                    <% if(!cartItem.productID.isListed || !cartItem.categoryID.isListed ||
+                      !cartItem.subCategoryID.isListed){%>
+                      <div class="text-danger small mt-1">Product unavailable</div>
+                      <% } else if(cartItem.quantity> cartItem.productID.stock) {%>
+                        <div class="text-danger small mt-1">Out of stock</div>
+                        <% } %>
+                  </div>
                 </div>
-
-                <button class="btn btn-primary" data-toggle="modal" data-target="#addAddressModel">
-                  <i class="fa fa-plus"></i> Add New Address
-                </button>
-              </div>
+                <% }); %>
             </div>
+          </div>
+
+          <!-- Shipping Address Card -->
+          <div class="checkout-card">
+            <div class="checkout-card-header">
+              Shipping Address
+            </div>
+            <div id="address-list">
+              <% address.address.forEach((addressItem)=>{ %>
+                <div
+                  class="address-card-item <%= addressItem._id.toString() === address.address[0]._id.toString() ? 'selected' : '' %>"
+                  onclick="selectAddress(this, '<%= addressItem._id %>')">
+                  <input type="radio" name="shippingAddress" id="address_<%= addressItem._id %>"
+                    value="<%= addressItem._id %>" class="address-radio"
+                    <%=addressItem._id.toString()===address.address[0]._id.toString() ? 'checked' : '' %>>
+
+                  <div class="address-title">
+                    <%= addressItem.addressTitle %>
+                  </div>
+                  <div class="address-text">
+                    <%= addressItem.state %>, <%= addressItem.city %>, <%= addressItem.streetAddress %> - <%=
+                            addressItem.pinCode %>
+                  </div>
+
+                  <div class="address-actions">
+                    <button class="btn-address-action btn-edit" onclick="editAddressModel(event,'<%=addressItem._id%>')"
+                      data-toggle="modal" data-target="#editAddressModel">
+                      <i class="fa fa-edit"></i> Edit
+                    </button>
+                    <button class="btn-address-action btn-delete" onclick="removeAddress(event,'<%=addressItem._id%>')">
+                      <i class="fa fa-trash"></i> Delete
+                    </button>
+                  </div>
+                </div>
+                <% }) %>
+            </div>
+
+            <button class="btn-add-new" data-toggle="modal" data-target="#addAddressModel">
+              <i class="fa fa-plus"></i> Add New Address
+            </button>
           </div>
         </div>
 
@@ -400,43 +586,46 @@
   <!-- modal to add new address -->
   <div class="modal fade m-t-50" id="addAddressModel" tabindex="-2" role="dialog">
     <div class="modal-dialog modal-dialog-centered" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="exampleModalLabel">New Address</h5>
+      <div class="modal-content modal-content-custom">
+        <div class="modal-header modal-header-custom">
+          <h5 class="modal-title modal-title-custom" id="exampleModalLabel">New Address</h5>
           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
-        <div class="modal-body">
+        <div class="modal-body modal-body-custom">
           <form>
             <div class="form-group">
-              <label for="addressTitle" class="col-form-label">Address Title</label>
-              <input type="text" class="form-control" id="addressTitle" />
+              <label for="addressTitle" class="col-form-label form-label-custom">Address Title</label>
+              <input type="text" class="form-control form-control-custom" id="addressTitle"
+                placeholder="e.g. Home, Office" />
+            </div>
+            <div class="form-row">
+              <div class="form-group col-md-6">
+                <label for="state" class="col-form-label form-label-custom">State</label>
+                <input type="text" class="form-control form-control-custom" id="state" />
+              </div>
+              <div class="form-group col-md-6">
+                <label for="city" class="col-form-label form-label-custom">City</label>
+                <input type="text" class="form-control form-control-custom" id="city" />
+              </div>
             </div>
             <div class="form-group">
-              <label for="state" class="col-form-label">State</label>
-              <input type="text" class="form-control" id="state" />
+              <label for="pinCode" class="col-form-label form-label-custom">Pin Code</label>
+              <input type="text" class="form-control form-control-custom" id="pinCode" />
             </div>
             <div class="form-group">
-              <label for="city" class="col-form-label">City</label>
-              <input type="text" class="form-control" id="city" />
-            </div>
-            <div class="form-group">
-              <label for="pinCode" class="col-form-label">Pin Code</label>
-              <input type="text" class="form-control" id="pinCode" />
-            </div>
-            <div class="form-group">
-              <label for="streetAddress" class="col-form-label">Street Address</label>
-              <textarea class="form-control" id="streetAddress"></textarea>
+              <label for="streetAddress" class="col-form-label form-label-custom">Street Address</label>
+              <textarea class="form-control form-control-custom" id="streetAddress" rows="3"></textarea>
             </div>
           </form>
         </div>
-        <div class="modal-footer">
+        <div class="modal-footer modal-footer-custom">
           <button type="button" class="btn btn-secondary" data-dismiss="modal">
             Close
           </button>
           <button type="button" class="btn btn-primary" onclick="addNewAddress(event)">
-            Add
+            Add Address
           </button>
         </div>
       </div>
@@ -446,893 +635,920 @@
   <!-- modal to edit address -->
   <div class="modal fade m-t-50" id="editAddressModel" tabindex="-2" role="dialog">
     <div class="modal-dialog modal-dialog-centered" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="exampleModalLabel">Edit Address</h5>
+      <div class="modal-content modal-content-custom">
+        <div class="modal-header modal-header-custom">
+          <h5 class="modal-title modal-title-custom" id="exampleModalLabel">Edit Address</h5>
           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
-        <div class="modal-body">
+        <div class="modal-body modal-body-custom">
           <form>
             <div class="form-group">
-              <label for="addressTitle" class="col-form-label">Address Title</label>
-              <input type="text" class="form-control" id="addressTitleEdit" />
+              <label for="addressTitle" class="col-form-label form-label-custom">Address Title</label>
+              <input type="text" class="form-control form-control-custom" id="addressTitleEdit" />
+            </div>
+            <div class="form-row">
+              <div class="form-group col-md-6">
+                <label for="state" class="col-form-label form-label-custom">State</label>
+                <input type="text" class="form-control form-control-custom" id="stateEdit" />
+              </div>
+              <div class="form-group col-md-6">
+                <label for="city" class="col-form-label form-label-custom">City</label>
+                <input type="text" class="form-control form-control-custom" id="cityEdit" />
+              </div>
             </div>
             <div class="form-group">
-              <label for="state" class="col-form-label">State</label>
-              <input type="text" class="form-control" id="stateEdit" />
+              <label for="pinCode" class="col-form-label form-label-custom">Pin Code</label>
+              <input type="text" class="form-control form-control-custom" id="pinCodeEdit" />
             </div>
             <div class="form-group">
-              <label for="city" class="col-form-label">City</label>
-              <input type="text" class="form-control" id="cityEdit" />
-            </div>
-            <div class="form-group">
-              <label for="pinCode" class="col-form-label">Pin Code</label>
-              <input type="text" class="form-control" id="pinCodeEdit" />
-            </div>
-            <div class="form-group">
-              <label for="streetAddress" class="col-form-label">Street Address</label>
-              <textarea class="form-control" id="streetAddressEdit"></textarea>
+              <label for="streetAddress" class="col-form-label form-label-custom">Street Address</label>
+              <textarea class="form-control form-control-custom" id="streetAddressEdit" rows="3"></textarea>
             </div>
           </form>
         </div>
-        <div class="modal-footer" id="editAddressDiv">
+        <div class="modal-footer modal-footer-custom" id="editAddressDiv">
           <button type="button" class="btn btn-secondary" data-dismiss="modal">
             Close
           </button>
-
-          <%- include('./partials/backToTop.ejs') %> <%- include('./partials/scriptBody.ejs') %>
-              <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-              <script>
-                availableCoupon();
-                getAppliedCoupons();
-                let couponCodeIds = [];
-
-                async function getAppliedCoupons() {
-                  try {
-                    const res = await axios.get("/order/applied-coupons");
-                    const data = res.data;
-
-                    if (data.success) {
-                      const couponList = document.getElementById("couponList");
-                      // Clear existing list and IDs
-                      couponList.innerHTML = "";
-                      couponCodeIds = [];
-                      const couponDiscountAmount = document.getElementById("couponDiscountAmount");
-                      const discountAmount = document.getElementById("discountAmount");
-                      const totalAmount = document.getElementById("totalAmount");
-
-                      // Update coupon list
-                      if (data.appliedCoupons && data.appliedCoupons.length > 0) {
-                        data.appliedCoupons.forEach(coupon => {
-                          if (!couponCodeIds.includes(coupon._id)) {
-                            couponCodeIds.push(coupon._id);
-                          }
-
-                          const newCouponListItem = `
-                      <li class="coupon-tag" id="coupon_${coupon.couponCode}">
-                        <span class="coupon-code-text">${coupon.couponCode}</span>
-                        <span class="coupon-discount-text">-₹${coupon.discountAmount}</span>
-                        <button type="button" style="background:none;border:none;color:#dc3545;" onclick="removeCoupon('${coupon._id}',${coupon.discountAmount})">
-                          <i class="fa-solid fa-trash"></i>
-                        </button>
-                      </li>
-                    `;
-                          if (!document.getElementById(`coupon_${coupon.couponCode}`)) {
-                            couponList.insertAdjacentHTML("beforeend", newCouponListItem);
-                          }
-                        });
-                      }
-
-                      // Update totals if there are coupons
-                      if (data.totalCouponDiscount > 0) {
-                        // Correctly update totals
-                        const previousCouponDiscount = Number(couponDiscountAmount.innerText) || 0;
-                        const currentTotal = Number(totalAmount.innerText);
-                        const newTotal = currentTotal + previousCouponDiscount - data.totalCouponDiscount;
-
-                        totalAmount.innerText = newTotal;
-                        couponDiscountAmount.innerText = data.totalCouponDiscount;
-
-                        const currentTotalSavings = Number(discountAmount.innerText);
-                        discountAmount.innerText = currentTotalSavings - previousCouponDiscount + data.totalCouponDiscount;
-
-
-                      }
-
-                      // Notify if coupons were removed
-                      if (data.removedCoupons) {
-                        Swal.fire({
-                          title: "Coupons Removed",
-                          text: "Some coupons were removed because they are no longer valid.",
-                          icon: "warning"
-                        });
-                      }
-                    }
-                  } catch (err) {
-                    console.log(err);
-                  }
-                }
-
-                async function addNewAddress(event) {
-                  event.preventDefault();
-
-                  let addressTitle = document.getElementById("addressTitle").value;
-                  let state = document.getElementById("state").value;
-                  let city = document.getElementById("city").value;
-                  let pinCode = document.getElementById("pinCode").value;
-                  let streetAddress = document.getElementById("streetAddress").value;
-
-                  const error = ValidateAddress(
-                    addressTitle,
-                    state,
-                    city,
-                    pinCode,
-                    streetAddress
-                  );
-
-                  if (error) {
-                    Swal.fire({
-                      icon: "error",
-                      title: "Validation Error",
-                      text: error,
-                    });
-                    return;
-                  }
-
-                  try {
-                    const res = await axios.post("/address", {
-                      addressTitle,
-                      state,
-                      city,
-                      pinCode,
-                      streetAddress,
-                    });
-                    const data = res.data;
-
-                    if (data.success) {
-                      Swal.fire({
-                        title: "Added",
-                        text: "New address has been added",
-                        icon: "success",
-                        timer: 2000,
-                      });
-
-                      // Close modal
-                      $('#addAddressModel').modal('hide');
-
-                      // Reset form
-                      document.querySelector('#addAddressModel form').reset();
-
-                      // Dynamic UI Update
-                      const newAddress = data.newAddress; // Ensure backend returns newAddress
-                      if (newAddress) {
-                        const addressList = document.getElementById('address-list');
-                        const newAddressHtml = `
-      <div class="address-item m-b-15 d-flex justify-content-between" id="address-item-${newAddress._id}">
-        <div class="form-check">
-          <input class="form-check-input" type="radio" name="shippingAddress" id="address_${newAddress._id}" value="${newAddress._id}" checked>
-            <label for="address_${newAddress._id}" class="form-check-label cl8">
-              ${newAddress.addressTitle} : ${newAddress.state},${newAddress.city},${newAddress.pinCode},${newAddress.streetAddress}
-            </label>
-        </div>
-        <div>
-          <button class="btn btn-dark btn-sm m-b-3" data-address-item='${JSON.stringify(newAddress)}'
-            onclick="editAddressModel(event,'${newAddress._id}')" data-toggle="modal"
-            data-target="#editAddressModel">
-            <i class="fa fa-edit"></i>
-          </button>
-
-          <button class="btn btn-danger btn-sm m-b-3" onclick="removeAddress(event,'${newAddress._id}')">
-            <i class="fa fa-trash"></i>
-          </button>
+          <!-- Update button will be injected here -->
         </div>
       </div>
-      `;
-                        addressList.insertAdjacentHTML('beforeend', newAddressHtml);
-                      } else {
-                        // Fallback if no address object returned
-                        setTimeout(() => {
-                          window.location.reload();
-                        }, 2000);
-                      }
+    </div>
+  </div>
 
-                    } else if (data.error) {
-                      Swal.fire({
-                        title: "Not added",
-                        text: data.error,
-                        icon: "error",
-                        timer: 2000,
-                      });
-                    } else if (data.authError) {
-                      Swal.fire({
-                        icon: "error",
-                        title: "Oops...",
-                        text: data.authError,
-                        footer: data.errorRedirect,
-                      });
-                    }
-                  } catch (err) {
-                    console.log(err);
-                    Swal.fire({
-                      icon: "error",
-                      title: "Error",
-                      text: err.response?.data?.error || "Something went wrong!",
-                    });
+  <%- include('./partials/backToTop.ejs') %> <%- include('./partials/scriptBody.ejs') %>
+      <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+      <script>
+        availableCoupon();
+        getAppliedCoupons();
+        let couponCodeIds = [];
+
+        async function getAppliedCoupons() {
+          try {
+            const res = await axios.get("/order/applied-coupons");
+            const data = res.data;
+
+            if (data.success) {
+              const couponList = document.getElementById("couponList");
+              // Clear existing list and IDs
+              couponList.innerHTML = "";
+              couponCodeIds = [];
+              const couponDiscountAmount = document.getElementById("couponDiscountAmount");
+              const discountAmount = document.getElementById("discountAmount");
+              const totalAmount = document.getElementById("totalAmount");
+
+              // Update coupon list
+              if (data.appliedCoupons && data.appliedCoupons.length > 0) {
+                data.appliedCoupons.forEach(coupon => {
+                  if (!couponCodeIds.includes(coupon._id)) {
+                    couponCodeIds.push(coupon._id);
+                  }
+
+                  const newCouponListItem = `
+<li class="coupon-tag" id="coupon_${coupon.couponCode}">
+  <span class="coupon-code-text">${coupon.couponCode}</span>
+  <span class="coupon-discount-text">-₹${coupon.discountAmount}</span>
+  <button type="button" style="background:none;border:none;color:#dc3545;"
+    onclick="removeCoupon('${coupon._id}',${coupon.discountAmount})">
+    <i class="fa-solid fa-trash"></i>
+  </button>
+</li>
+`;
+                  if (!document.getElementById(`coupon_${coupon.couponCode}`)) {
+                    couponList.insertAdjacentHTML("beforeend", newCouponListItem);
+                  }
+                });
+              }
+
+              // Update totals if there are coupons
+              if (data.totalCouponDiscount > 0) {
+                // Correctly update totals
+                const previousCouponDiscount = Number(couponDiscountAmount.innerText) || 0;
+                const currentTotal = Number(totalAmount.innerText);
+                const newTotal = currentTotal + previousCouponDiscount - data.totalCouponDiscount;
+
+                totalAmount.innerText = newTotal;
+                couponDiscountAmount.innerText = data.totalCouponDiscount;
+
+                const currentTotalSavings = Number(discountAmount.innerText);
+                discountAmount.innerText = currentTotalSavings - previousCouponDiscount + data.totalCouponDiscount;
+
+
+              }
+
+              // Notify if coupons were removed
+              if (data.removedCoupons) {
+                Swal.fire({
+                  title: "Coupons Removed",
+                  text: "Some coupons were removed because they are no longer valid.",
+                  icon: "warning"
+                });
+              }
+            }
+          } catch (err) {
+            console.log(err);
+          }
+        }
+
+        async function addNewAddress(event) {
+          event.preventDefault();
+
+          let addressTitle = document.getElementById("addressTitle").value;
+          let state = document.getElementById("state").value;
+          let city = document.getElementById("city").value;
+          let pinCode = document.getElementById("pinCode").value;
+          let streetAddress = document.getElementById("streetAddress").value;
+
+          const error = ValidateAddress(
+            addressTitle,
+            state,
+            city,
+            pinCode,
+            streetAddress
+          );
+
+          if (error) {
+            Swal.fire({
+              icon: "error",
+              title: "Validation Error",
+              text: error,
+            });
+            return;
+          }
+
+          try {
+            const res = await axios.post("/address", {
+              addressTitle,
+              state,
+              city,
+              pinCode,
+              streetAddress,
+            });
+            const data = res.data;
+
+            if (data.success) {
+              Swal.fire({
+                title: "Added",
+                text: "New address has been added",
+                icon: "success",
+                timer: 2000,
+              });
+
+              // Close modal
+              $('#addAddressModel').modal('hide');
+
+              // Reset form
+              document.querySelector('#addAddressModel form').reset();
+
+              // Dynamic UI Update
+              const newAddress = data.newAddress; // Ensure backend returns newAddress
+              if (newAddress) {
+                const addressList = document.getElementById('address-list');
+                const newAddressHtml = `
+<div class="address-item m-b-15 d-flex justify-content-between" id="address-item-${newAddress._id}">
+  <div class="form-check">
+    <input class="form-check-input" type="radio" name="shippingAddress" id="address_${newAddress._id}"
+      value="${newAddress._id}" checked>
+    <label for="address_${newAddress._id}" class="form-check-label cl8">
+      ${newAddress.addressTitle} :
+      ${newAddress.state},${newAddress.city},${newAddress.pinCode},${newAddress.streetAddress}
+    </label>
+  </div>
+  <div>
+    <button class="btn btn-dark btn-sm m-b-3" data-address-item='${JSON.stringify(newAddress)}'
+      onclick="editAddressModel(event,'${newAddress._id}')" data-toggle="modal" data-target="#editAddressModel">
+      <i class="fa fa-edit"></i>
+    </button>
+
+    <button class="btn btn-danger btn-sm m-b-3" onclick="removeAddress(event,'${newAddress._id}')">
+      <i class="fa fa-trash"></i>
+    </button>
+  </div>
+</div>
+`;
+                addressList.insertAdjacentHTML('beforeend', newAddressHtml);
+              } else {
+                // Fallback if no address object returned
+                setTimeout(() => {
+                  window.location.reload();
+                }, 2000);
+              }
+
+            } else if (data.error) {
+              Swal.fire({
+                title: "Not added",
+                text: data.error,
+                icon: "error",
+                timer: 2000,
+              });
+            } else if (data.authError) {
+              Swal.fire({
+                icon: "error",
+                title: "Oops...",
+                text: data.authError,
+                footer: data.errorRedirect,
+              });
+            }
+          } catch (err) {
+            console.log(err);
+            Swal.fire({
+              icon: "error",
+              title: "Error",
+              text: err.response?.data?.error || "Something went wrong!",
+            });
+          }
+        }
+
+        async function editAddress(event, _id) {
+          event.preventDefault();
+
+          let addressTitle = document.getElementById("addressTitleEdit").value;
+          let state = document.getElementById("stateEdit").value;
+          let city = document.getElementById("cityEdit").value;
+          let pinCode = document.getElementById("pinCodeEdit").value;
+          let streetAddress = document.getElementById("streetAddressEdit").value;
+
+          const error = ValidateAddress(
+            addressTitle,
+            state,
+            city,
+            pinCode,
+            streetAddress
+          );
+
+          if (error) {
+            Swal.fire({
+              icon: "error",
+              title: "Validation Error",
+              text: error,
+            });
+            return;
+          }
+
+          try {
+            const res = await axios.put(`/address/${_id}`, {
+              addressTitle,
+              state,
+              city,
+              pinCode,
+              streetAddress,
+            });
+            const data = res.data;
+
+            if (data.success) {
+              Swal.fire({
+                title: "Edited",
+                text: "Address has been edited",
+                icon: "success",
+                timer: 2000,
+              });
+
+              // Close modal
+              $('#editAddressModel').modal('hide');
+
+              // Dynamic UI Update
+              const updatedAddress = data.updatedAddress; // Ensure backend returns updatedAddress
+              if (updatedAddress) {
+                const addressItemDiv = document.getElementById(`address-item-${_id}`);
+                if (addressItemDiv) {
+                  // Update label text
+                  const label = addressItemDiv.querySelector('label');
+                  if (label) {
+                    label.textContent = `${updatedAddress.addressTitle} :
+${updatedAddress.state},${updatedAddress.city},${updatedAddress.pinCode},${updatedAddress.streetAddress}`;
+                  }
+                  // Update data attribute on edit button
+                  const editBtn = addressItemDiv.querySelector('button[data-address-item]');
+                  if (editBtn) {
+                    editBtn.setAttribute('data-address-item', JSON.stringify(updatedAddress));
                   }
                 }
+              } else {
+                setTimeout(() => {
+                  window.location.reload();
+                }, 2000);
+              }
 
-                async function editAddress(event, _id) {
-                  event.preventDefault();
+            } else if (data.error) {
+              Swal.fire({
+                title: "Not Edited",
+                text: data.error,
+                icon: "error",
+                timer: 2000,
+              });
+            } else if (data.authError) {
+              Swal.fire({
+                icon: "error",
+                title: "Oops...",
+                text: data.authError,
+                footer: data.errorRedirect,
+              });
+            }
+          } catch (err) {
+            console.log(err);
+            Swal.fire({
+              icon: "error",
+              title: "Error",
+              text: err.response?.data?.error || "Something went wrong!",
+            });
+          }
+        }
 
-                  let addressTitle = document.getElementById("addressTitleEdit").value;
-                  let state = document.getElementById("stateEdit").value;
-                  let city = document.getElementById("cityEdit").value;
-                  let pinCode = document.getElementById("pinCodeEdit").value;
-                  let streetAddress = document.getElementById("streetAddressEdit").value;
+        async function removeAddress(event, ID) {
+          event.preventDefault();
 
-                  const error = ValidateAddress(
-                    addressTitle,
-                    state,
-                    city,
-                    pinCode,
-                    streetAddress
-                  );
+          const result = await Swal.fire({
+            title: "Are you sure?",
+            text: "You want to remove this address",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Yes",
+          });
 
-                  if (error) {
-                    Swal.fire({
-                      icon: "error",
-                      title: "Validation Error",
-                      text: error,
-                    });
-                    return;
-                  }
+          if (result.isConfirmed) {
+            try {
+              const res = await axios.delete(`/address/${ID}`);
+              const data = res.data;
 
-                  try {
-                    const res = await axios.put(`/address/${_id}`, {
-                      addressTitle,
-                      state,
-                      city,
-                      pinCode,
-                      streetAddress,
-                    });
-                    const data = res.data;
+              if (data.success) {
+                Swal.fire({
+                  title: "Deleted",
+                  text: "Address has been removed",
+                  icon: "success",
+                  timer: 2000,
+                });
 
-                    if (data.success) {
-                      Swal.fire({
-                        title: "Edited",
-                        text: "Address has been edited",
-                        icon: "success",
-                        timer: 2000,
-                      });
-
-                      // Close modal
-                      $('#editAddressModel').modal('hide');
-
-                      // Dynamic UI Update
-                      const updatedAddress = data.updatedAddress; // Ensure backend returns updatedAddress
-                      if (updatedAddress) {
-                        const addressItemDiv = document.getElementById(`address-item-${_id}`);
-                        if (addressItemDiv) {
-                          // Update label text
-                          const label = addressItemDiv.querySelector('label');
-                          if (label) {
-                            label.textContent = `${updatedAddress.addressTitle} : ${updatedAddress.state},${updatedAddress.city},${updatedAddress.pinCode},${updatedAddress.streetAddress}`;
-                          }
-                          // Update data attribute on edit button
-                          const editBtn = addressItemDiv.querySelector('button[data-address-item]');
-                          if (editBtn) {
-                            editBtn.setAttribute('data-address-item', JSON.stringify(updatedAddress));
-                          }
-                        }
-                      } else {
-                        setTimeout(() => {
-                          window.location.reload();
-                        }, 2000);
-                      }
-
-                    } else if (data.error) {
-                      Swal.fire({
-                        title: "Not Edited",
-                        text: data.error,
-                        icon: "error",
-                        timer: 2000,
-                      });
-                    } else if (data.authError) {
-                      Swal.fire({
-                        icon: "error",
-                        title: "Oops...",
-                        text: data.authError,
-                        footer: data.errorRedirect,
-                      });
-                    }
-                  } catch (err) {
-                    console.log(err);
-                    Swal.fire({
-                      icon: "error",
-                      title: "Error",
-                      text: err.response?.data?.error || "Something went wrong!",
-                    });
-                  }
+                // Dynamic UI Update
+                const addressItemDiv = document.getElementById(`address-item-${ID}`);
+                if (addressItemDiv) {
+                  addressItemDiv.remove();
                 }
 
-                async function removeAddress(event, ID) {
-                  event.preventDefault();
-
-                  const result = await Swal.fire({
-                    title: "Are you sure?",
-                    text: "You want to remove this address",
-                    icon: "warning",
-                    showCancelButton: true,
-                    confirmButtonColor: "#3085d6",
-                    cancelButtonColor: "#d33",
-                    confirmButtonText: "Yes",
-                  });
-
-                  if (result.isConfirmed) {
-                    try {
-                      const res = await axios.delete(`/address/${ID}`);
-                      const data = res.data;
-
-                      if (data.success) {
-                        Swal.fire({
-                          title: "Deleted",
-                          text: "Address has been removed",
-                          icon: "success",
-                          timer: 2000,
-                        });
-
-                        // Dynamic UI Update
-                        const addressItemDiv = document.getElementById(`address-item-${ID}`);
-                        if (addressItemDiv) {
-                          addressItemDiv.remove();
-                        }
-
-                      } else if (data.authError) {
-                        Swal.fire({
-                          icon: "error",
-                          title: "Oops...",
-                          text: data.authError,
-                          footer: data.errorRedirect,
-                        });
-                      }
-                    } catch (err) {
-                      console.log(err);
-                      Swal.fire({
-                        icon: "error",
-                        title: "Error",
-                        text: err.response?.data?.error || "Something went wrong!",
-                      });
-                    }
-                  }
-                }
-
-                function editAddressModel(e, _id) {
-                  const addressData = e.target.closest("button");
-
-                  const {
-                    addressTitle,
-                    state,
-                    city,
-                    pinCode,
-                    streetAddress
-                  } =
-                    JSON.parse(addressData.getAttribute("data-address-item"));
-                  document.getElementById("addressTitleEdit").value = addressTitle;
-                  document.getElementById("stateEdit").value = state;
-                  document.getElementById("cityEdit").value = city;
-                  document.getElementById("pinCodeEdit").value = pinCode;
-                  document.getElementById("streetAddressEdit").value = streetAddress;
-
-                  // Get the parent div where the button should be appended
-                  const editAddressDiv = document.getElementById("editAddressDiv");
-
-                  // Remove existing button if any to avoid duplicates
-                  const existingButton = document.getElementById("editAddressButton");
-                  if (existingButton) {
-                    existingButton.remove();
-                  }
-
-                  var editButton = document.createElement("button");
-                  editButton.textContent = "Update Address";
-                  editButton.id = "editAddressButton";
-                  editButton.onclick = (event) => editAddress(event, _id);
-                  editButton.classList.add("btn", "btn-primary");
-
-                  editAddressDiv.appendChild(editButton);
-                }
-
-                async function deleteProduct(button) {
-                  const cartItem = JSON.parse(button.getAttribute("data-cartItem"));
-
-                  const row = document.getElementById(`cartItemRow_${cartItem._id}`);
-                  const basePrice = document.getElementById("basePrice");
-                  const OfferAmount = document.getElementById("OfferAmount");
-                  const totalAmount = document.getElementById("totalAmount");
-                  const couponDiscountAmount = document.getElementById(
-                    "couponDiscountAmount"
-                  );
-                  const discountAmount = document.getElementById("discountAmount");
-
-                  try {
-                    const res = await axios.delete(`/cart/${cartItem._id}`);
-                    if (!res.data.success) {
-                      Swal.fire({
-                        icon: "error",
-                        title: "Error",
-                        text: "Failed to remove product",
-                      });
-                      return;
-                    }
-                  } catch (err) {
-                    console.log(err);
-                    Swal.fire({
-                      icon: "error",
-                      title: "Error",
-                      text: "Failed to remove product",
-                    });
-                    return;
-                  }
-
-                  let offer = 0;
-
-                  if (cartItem.productID.offer) {
-                    offer = parseInt(
-                      (cartItem.productID.offer *
-                        cartItem.productID.price *
-                        cartItem.quantity) /
-                      100
-                    );
-                  } else if (cartItem.categoryID.offer) {
-                    offer = parseInt(
-                      (cartItem.categoryID.offer *
-                        cartItem.productID.price *
-                        cartItem.quantity) /
-                      100
-                    );
-                  } else if (cartItem.subCategoryID.offer) {
-                    offer = parseInt(
-                      (cartItem.subcategoryID.offer *
-                        cartItem.productID.price *
-                        cartItem.quantity) /
-                      100
-                    );
-                  }
-
-                  basePrice.innerHTML =
-                    Number(basePrice.textContent) -
-                    Number(cartItem.productID.price * cartItem.quantity);
-                  OfferAmount.innerText = Number(OfferAmount.textContent) - offer;
-                  totalAmount.innerText =
-                    Number(totalAmount.textContent) -
-                    (cartItem.productID.price * cartItem.quantity - offer);
-                  discountAmount.innerText =
-                    Number(discountAmount.textContent) -
-                    offer -
-                    Number(couponDiscountAmount.textContent);
-
-                  await getAppliedCoupons();
-                  availableCoupon();
-                  row.parentNode.removeChild(row);
-                }
-
-                async function proceedToPayment(event) {
-                  event.preventDefault();
-
-                  const selectedAddress = document.querySelector(
-                    'input[name="shippingAddress"]:checked'
-                  );
-
-                  if (!selectedAddress) {
-                    Swal.fire({
-                      title: "Address not selected",
-                      icon: "error"
-                    });
-                    return;
-                  }
-
-                  const addressId = selectedAddress.value;
-                  const rows = document.querySelectorAll(".cart-product-row");
-
-                  if (!rows.length) {
-                    Swal.fire({
-                      title: "No product to checkout",
-                      icon: "error"
-                    });
-                    return;
-                  }
-
-                  let outOfStock = false;
-                  let unavailableProduct = false;
-
-                  const products = [];
-                  const cartItemIds = [];
-
-                  /* -------------------------------------------
-                     STEP 1: CALCULATE CART TOTAL (NO COUPON)
-                  --------------------------------------------*/
-                  let cartTotal = 0;
-
-                  rows.forEach((row) => {
-                    const cartItem = JSON.parse(row.getAttribute("data-products"));
-                    cartTotal += cartItem.productID.price * cartItem.quantity;
-                  });
-
-                  /* -------------------------------------------
-                     STEP 2: GET COUPON DISCOUNT (ONCE)
-                  --------------------------------------------*/
-                  const couponDiscount =
-                    parseInt(document.getElementById("couponDiscountAmount")?.innerText) || 0;
-
-                  /* -------------------------------------------
-                     STEP 3: BUILD PRODUCTS WITH PROPORTIONAL DISCOUNT
-                  --------------------------------------------*/
-                  rows.forEach((row) => {
-                    const cartItem = JSON.parse(row.getAttribute("data-products"));
-
-                    if (cartItem.quantity > cartItem.productID.stock) {
-                      outOfStock = true;
-                      Swal.fire({
-                        title: "Cannot Proceed to payment",
-                        text: "Contains out of stock",
-                        icon: "error",
-                      });
-                      return;
-                    }
-
-                    if (
-                      !cartItem.productID.isListed ||
-                      !cartItem.categoryID.isListed ||
-                      !cartItem.subCategoryID.isListed
-                    ) {
-                      unavailableProduct = true;
-                      Swal.fire({
-                        title: "Cannot Proceed to payment",
-                        text: "Contains unavailable products",
-                        icon: "error",
-                      });
-                      return;
-                    }
-
-                    const price = cartItem.productID.price * cartItem.quantity;
-
-                    /* ---------- PRODUCT / CATEGORY OFFER ---------- */
-                    let discount = 0;
-
-                    if (
-                      cartItem.productID.offer ||
-                      cartItem.categoryID.offer ||
-                      cartItem.subCategoryID.offer
-                    ) {
-                      discount += Math.floor(
-                        (cartItem.productID.price *
-                          Math.max(
-                            cartItem.productID.offer || 0,
-                            cartItem.categoryID.offer || 0,
-                            cartItem.subCategoryID.offer || 0
-                          )) /
-                        100 *
-                        cartItem.quantity
-                      );
-                    }
-
-                    /* ---------- COUPON PROPORTIONAL SHARE ---------- */
-                    const couponShare =
-                      cartTotal > 0 ? Math.round((price / cartTotal) * couponDiscount) : 0;
-
-                    discount += couponShare;
-
-                    products.push({
-                      productID: cartItem.productID,
-                      quantity: cartItem.quantity,
-                      price,
-                      discount,
-                      amountPaid: price - discount,
-                    });
-
-                    cartItemIds.push(cartItem._id);
-                  });
-
-                  if (outOfStock || unavailableProduct) return;
-
-                  /* -------------------------------------------
-                     STEP 4: PAYMENT DETAILS
-                  --------------------------------------------*/
-                  const paymentMethod = document.getElementById("paymentMethod").value;
-                  const basePrice = document.getElementById("basePrice").textContent;
-                  const totalAmount = document.getElementById("totalAmount").textContent;
-                  const discountAmount = document.getElementById("discountAmount").textContent;
-                  const taxAmount = document.getElementById("taxAmount").textContent;
-
-                  if (totalAmount > 1000 && paymentMethod === "COD") {
-                    Swal.fire({
-                      title: "Cannot Proceed using Cash on Delivery",
-                      text: "COD allowed only for amount below 1000",
-                      icon: "error",
-                    });
-                    return;
-                  }
-
-                  /* -------------------------------------------
-                     STEP 5: PROCEED TO PAYMENT
-                  --------------------------------------------*/
-                  try {
-                    const res = await axios.post("/order/proceedToPayment", {
-                      products,
-                      addressId,
-                      paymentMethod,
-                      basePrice,
-                      cartItemIds,
-                      totalAmount,
-                      discount: discountAmount,
-                      taxAmount,
-                      couponCodeIds,
-                    });
-
-                    const data = res.data;
-
-                    if (data.success) {
-                      Swal.fire({
-                        title: "Ordered",
-                        text: "Order placed successfully",
-                        icon: "success",
-                        timer: 2000,
-                      });
-
-                      setTimeout(() => {
-                        window.location.href = data.successRedirect;
-                      }, 2000);
-                      return;
-                    }
-
-                    if (data.error) {
-                      Swal.fire({
-                        title: "Error",
-                        text: data.error,
-                        icon: "error"
-                      });
-                      return;
-                    }
-
-                    if (data.authError) {
-                      Swal.fire({
-                        icon: "error",
-                        title: "Oops...",
-                        text: data.authError,
-                      });
-                      return;
-                    }
-
-                    /* -------------------------------------------
-                       RAZORPAY
-                    --------------------------------------------*/
-                    if (data.razorpayOrder) {
-                      const options = {
-                        key: "rzp_test_RSspzzgBAA2ViI",
-                        name: "Rook & Knights",
-                        description: "Test Transaction",
-                        image: "https://imgs.search.brave.com/jsPXFiH4YxTvzVbUvQMILb4V32Y6I0DxlC2p3CaqAfA/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9ibG9n/LnBob3RvYWRraW5n/LmNvbS93cC1jb250/ZW50L3VwbG9hZHMv/MjAyMy8wNS8xNjgy/OTQ2NDIzMzgxLTEu/anBn",
-                        order_id: data.razorpayOrder.id,
-                        callback_url: "/order/completePayment",
-                        theme: {
-                          color: "#454545"
-                        },
-                        modal: {
-                          ondismiss() {
-                            alert("Payment Failed");
-                            window.location.href = "/";
-                          },
-                        },
-                      };
-
-                      const rzp1 = new Razorpay(options);
-
-                      rzp1.on("payment.failed", function () {
-                        alert("Payment Failed");
-                        window.location.href = "/";
-                      });
-
-                      rzp1.open();
-                    }
-                  } catch (err) {
-                    console.error(err);
-                    Swal.fire({
-                      icon: "error",
-                      title: "Error",
-                      text: err.response?.data?.error || "Something went wrong!",
-                    });
-                  }
-                }
-
-                async function addCouponDiscount() {
-                  const basePrice = document.getElementById("basePrice").textContent;
-                  const couponCode = document.getElementById("couponCodeInput").value;
-                  const totalAmount = document.getElementById("totalAmount");
-                  const couponDiscountAmount = document.getElementById(
-                    "couponDiscountAmount"
-                  );
-                  const discountAmount = document.getElementById("discountAmount");
-                  const couponList = document.getElementById("couponList");
-
-                  if (document.getElementById(`coupon_${couponCode}`)) {
-                    Swal.fire({
-                      icon: "error",
-                      title: "Oops...",
-                      text: "Coupon already applied",
-                    });
-
-                    return;
-                  };
-
-                  try {
-                    const res = await axios.post(`/order/coupon`, {
-                      totalAmount: totalAmount.textContent,
-                      couponCode,
-                    });
-                    const data = res.data;
-
-
-                    if (data.success) {
-                      couponCodeIds.push(data.couponID);
-
-
-                      if (couponDiscountAmount.textContent > 0) {
-                        discountAmount.innerText =
-                          Number(discountAmount.textContent) -
-                          Number(couponDiscountAmount.textContent);
-                        totalAmount.innerText =
-                          Number(totalAmount.textContent) +
-                          Number(couponDiscountAmount.textContent);
-                      }
-                      couponDiscountAmount.innerText =
-                        Number(couponDiscountAmount.textContent) + data.couponDiscount;
-                      discountAmount.innerText =
-                        Number(discountAmount.textContent) + data.couponDiscount;
-                      totalAmount.innerText =
-                        Number(totalAmount.textContent) - data.couponDiscount;
-
-                      const newCouponListItem = `
-      <li class="coupon-tag" id="coupon_${data.couponCode}">
-        <span class="coupon-code-text">${couponCode}</span>
-        <span class="coupon-discount-text">-₹${data.couponDiscount}</span>
-        <button type="button" style="background:none;border:none;color:#dc3545;" onclick="removeCoupon('${data.couponID}',${data.couponDiscount})">
-          <i class="fa-solid fa-trash"></i>
-        </button>
-      </li>
-      `;
-
-                      availableCoupon();
-
-                      if (!document.getElementById(`coupon_${data.couponID}`))
-                        couponList.insertAdjacentHTML("beforeend", newCouponListItem);
-                    } else if (data.error) {
-                      Swal.fire({
-                        title: "Error",
-                        text: data.error,
-                        icon: "error",
-                      });
-                    } else if (data.authError) {
-                      Swal.fire({
-                        icon: "error",
-                        title: "Oops...",
-                        text: data.authError,
-                        footer: data.errorRedirect,
-                      });
-                    }
-                  } catch (err) {
-                    console.log(err);
-                    Swal.fire({
-                      icon: "error",
-                      title: "Error",
-                      text: err.response?.data?.error || "Something went wrong!",
-                    });
-                  }
-                }
-
-                async function removeCoupon(couponID, couponDiscount) {
-                  try {
-                    const res = await axios.delete(`/order/coupon/${couponID}`);
-                    if (res.data.success) {
-                      // Remove from UI
-                      const couponElement = document.querySelector(`[onclick*="${couponID}"]`).closest('li');
-                      if (couponElement) couponElement.remove();
-
-                      const totalAmount = document.getElementById("totalAmount");
-                      const couponDiscountAmount = document.getElementById(
-                        "couponDiscountAmount"
-                      );
-                      const discountAmount = document.getElementById("discountAmount");
-
-                      totalAmount.innerText =
-                        parseInt(totalAmount.textContent) + parseInt(couponDiscount);
-                      couponDiscountAmount.innerText =
-                        Number(couponDiscountAmount.textContent) - couponDiscount;
-                      discountAmount.innerText = Number(discountAmount.textContent) - couponDiscount;
-                      availableCoupon();
-
-                      // Remove from couponCodeIds
-                      const index = couponCodeIds.indexOf(couponID);
-                      if (index > -1) {
-                        couponCodeIds.splice(index, 1);
-                      }
-                    }
-                  } catch (err) {
-                    console.log(err);
-                    Swal.fire({
-                      icon: "error",
-                      title: "Error",
-                      text: "Failed to remove coupon",
-                    });
-                  }
-                }
-
-                async function availableCoupon() {
-                  const totalAmount = document
-                    .getElementById("totalAmount")
-                    .textContent.trim();
-                  const availableCouponList = document.getElementById(
-                    "availableCouponList"
-                  );
-
-                  // Clear list first to avoid duplicates
-                  availableCouponList.innerHTML = '';
-
-                  try {
-                    const res = await axios.get(`/order/coupon/${totalAmount}`);
-                    const data = res.data;
-
-                    data.availableCouponList.forEach((coupon) => {
-                      const newCouponListItem = `
-      <li class="coupon-tag" id="coupon_view_${coupon._id}">
-        <span class="coupon-code-text">${coupon.couponCode}</span>
-        <button class="btn btn-sm btn-dark" onclick="navigator.clipboard.writeText('${coupon.couponCode}'); Swal.fire({toast: true, position: 'top-end', icon: 'success', title: 'Copied!', showConfirmButton: false, timer: 1500});">Copy</button>
-      </li>
-      `;
-
-                      if (!document.getElementById(`coupon_view_${coupon._id}`))
-                        availableCouponList.insertAdjacentHTML(
-                          "beforeend",
-                          newCouponListItem
-                        );
-                    });
-                  } catch (err) {
-                    console.log(err);
-                  }
-                }
-
-                function ValidateAddress(
-                  addressTitle,
-                  state,
-                  city,
-                  pinCode,
-                  streetAddress
-                ) {
-                  return (
-                    checkValidText(
-                      addressTitle,
-                      "Address Title",
-                      3,
-                      20,
-                      true,
-                      true,
-                      false
-                    ) ||
-                    checkValidText(state, "State", 3, 25, true, false, false) ||
-                    checkValidText(city, "City", 3, 25, true, false, false) ||
-                    checkPincode(pinCode) ||
-                    checkValidText(
-                      streetAddress,
-                      "Street Address",
-                      10,
-                      100,
-                      true,
-                      true,
-                      true
-                    )
-                  );
-                }
-              </script>
+              } else if (data.authError) {
+                Swal.fire({
+                  icon: "error",
+                  title: "Oops...",
+                  text: data.authError,
+                  footer: data.errorRedirect,
+                });
+              }
+            } catch (err) {
+              console.log(err);
+              Swal.fire({
+                icon: "error",
+                title: "Error",
+                text: err.response?.data?.error || "Something went wrong!",
+              });
+            }
+          }
+        }
+
+        function editAddressModel(e, _id) {
+          const addressData = e.target.closest("button");
+
+          const {
+            addressTitle,
+            state,
+            city,
+            pinCode,
+            streetAddress
+          } =
+            JSON.parse(addressData.getAttribute("data-address-item"));
+          document.getElementById("addressTitleEdit").value = addressTitle;
+          document.getElementById("stateEdit").value = state;
+          document.getElementById("cityEdit").value = city;
+          document.getElementById("pinCodeEdit").value = pinCode;
+          document.getElementById("streetAddressEdit").value = streetAddress;
+
+          // Get the parent div where the button should be appended
+          const editAddressDiv = document.getElementById("editAddressDiv");
+
+          // Remove existing button if any to avoid duplicates
+          const existingButton = document.getElementById("editAddressButton");
+          if (existingButton) {
+            existingButton.remove();
+          }
+
+          var editButton = document.createElement("button");
+          editButton.textContent = "Update Address";
+          editButton.id = "editAddressButton";
+          editButton.onclick = (event) => editAddress(event, _id);
+          editButton.classList.add("btn", "btn-primary");
+
+          editAddressDiv.appendChild(editButton);
+        }
+
+        async function deleteProduct(button) {
+          const cartItem = JSON.parse(button.getAttribute("data-cartItem"));
+
+          const row = document.getElementById(`cartItemRow_${cartItem._id}`);
+          const basePrice = document.getElementById("basePrice");
+          const OfferAmount = document.getElementById("OfferAmount");
+          const totalAmount = document.getElementById("totalAmount");
+          const couponDiscountAmount = document.getElementById(
+            "couponDiscountAmount"
+          );
+          const discountAmount = document.getElementById("discountAmount");
+
+          try {
+            const res = await axios.delete(`/cart/${cartItem._id}`);
+            if (!res.data.success) {
+              Swal.fire({
+                icon: "error",
+                title: "Error",
+                text: "Failed to remove product",
+              });
+              return;
+            }
+          } catch (err) {
+            console.log(err);
+            Swal.fire({
+              icon: "error",
+              title: "Error",
+              text: "Failed to remove product",
+            });
+            return;
+          }
+
+          let offer = 0;
+
+          if (cartItem.productID.offer) {
+            offer = parseInt(
+              (cartItem.productID.offer *
+                cartItem.productID.price *
+                cartItem.quantity) /
+              100
+            );
+          } else if (cartItem.categoryID.offer) {
+            offer = parseInt(
+              (cartItem.categoryID.offer *
+                cartItem.productID.price *
+                cartItem.quantity) /
+              100
+            );
+          } else if (cartItem.subCategoryID.offer) {
+            offer = parseInt(
+              (cartItem.subcategoryID.offer *
+                cartItem.productID.price *
+                cartItem.quantity) /
+              100
+            );
+          }
+
+          basePrice.innerHTML =
+            Number(basePrice.textContent) -
+            Number(cartItem.productID.price * cartItem.quantity);
+          OfferAmount.innerText = Number(OfferAmount.textContent) - offer;
+          totalAmount.innerText =
+            Number(totalAmount.textContent) -
+            (cartItem.productID.price * cartItem.quantity - offer);
+          discountAmount.innerText =
+            Number(discountAmount.textContent) -
+            offer -
+            Number(couponDiscountAmount.textContent);
+
+          await getAppliedCoupons();
+          availableCoupon();
+          row.parentNode.removeChild(row);
+        }
+
+        async function proceedToPayment(event) {
+          event.preventDefault();
+
+          const selectedAddress = document.querySelector(
+            'input[name="shippingAddress"]:checked'
+          );
+
+          if (!selectedAddress) {
+            Swal.fire({
+              title: "Address not selected",
+              icon: "error"
+            });
+            return;
+          }
+
+          const addressId = selectedAddress.value;
+          const rows = document.querySelectorAll(".cart-product-row");
+
+          if (!rows.length) {
+            Swal.fire({
+              title: "No product to checkout",
+              icon: "error"
+            });
+            return;
+          }
+
+          let outOfStock = false;
+          let unavailableProduct = false;
+
+          const products = [];
+          const cartItemIds = [];
+
+          /* -------------------------------------------
+          STEP 1: CALCULATE CART TOTAL (NO COUPON)
+          --------------------------------------------*/
+          let cartTotal = 0;
+
+          rows.forEach((row) => {
+            const cartItem = JSON.parse(row.getAttribute("data-products"));
+            cartTotal += cartItem.productID.price * cartItem.quantity;
+          });
+
+          /* -------------------------------------------
+          STEP 2: GET COUPON DISCOUNT (ONCE)
+          --------------------------------------------*/
+          const couponDiscount =
+            parseInt(document.getElementById("couponDiscountAmount")?.innerText) || 0;
+
+          /* -------------------------------------------
+          STEP 3: BUILD PRODUCTS WITH PROPORTIONAL DISCOUNT
+          --------------------------------------------*/
+          rows.forEach((row) => {
+            const cartItem = JSON.parse(row.getAttribute("data-products"));
+
+            if (cartItem.quantity > cartItem.productID.stock) {
+              outOfStock = true;
+              Swal.fire({
+                title: "Cannot Proceed to payment",
+                text: "Contains out of stock",
+                icon: "error",
+              });
+              return;
+            }
+
+            if (
+              !cartItem.productID.isListed ||
+              !cartItem.categoryID.isListed ||
+              !cartItem.subCategoryID.isListed
+            ) {
+              unavailableProduct = true;
+              Swal.fire({
+                title: "Cannot Proceed to payment",
+                text: "Contains unavailable products",
+                icon: "error",
+              });
+              return;
+            }
+
+            const price = cartItem.productID.price * cartItem.quantity;
+
+            /* ---------- PRODUCT / CATEGORY OFFER ---------- */
+            let discount = 0;
+
+            if (
+              cartItem.productID.offer ||
+              cartItem.categoryID.offer ||
+              cartItem.subCategoryID.offer
+            ) {
+              discount += Math.floor(
+                (cartItem.productID.price *
+                  Math.max(
+                    cartItem.productID.offer || 0,
+                    cartItem.categoryID.offer || 0,
+                    cartItem.subCategoryID.offer || 0
+                  )) /
+                100 *
+                cartItem.quantity
+              );
+            }
+
+            /* ---------- COUPON PROPORTIONAL SHARE ---------- */
+            const couponShare =
+              cartTotal > 0 ? Math.round((price / cartTotal) * couponDiscount) : 0;
+
+            discount += couponShare;
+
+            products.push({
+              productID: cartItem.productID,
+              quantity: cartItem.quantity,
+              price,
+              discount,
+              amountPaid: price - discount,
+            });
+
+            cartItemIds.push(cartItem._id);
+          });
+
+          if (outOfStock || unavailableProduct) return;
+
+          /* -------------------------------------------
+          STEP 4: PAYMENT DETAILS
+          --------------------------------------------*/
+          const paymentMethod = document.getElementById("paymentMethod").value;
+          const basePrice = document.getElementById("basePrice").textContent;
+          const totalAmount = document.getElementById("totalAmount").textContent;
+          const discountAmount = document.getElementById("discountAmount").textContent;
+          const taxAmount = document.getElementById("taxAmount").textContent;
+
+          if (totalAmount > 1000 && paymentMethod === "COD") {
+            Swal.fire({
+              title: "Cannot Proceed using Cash on Delivery",
+              text: "COD allowed only for amount below 1000",
+              icon: "error",
+            });
+            return;
+          }
+
+          /* -------------------------------------------
+          STEP 5: PROCEED TO PAYMENT
+          --------------------------------------------*/
+          try {
+            const res = await axios.post("/order/proceedToPayment", {
+              products,
+              addressId,
+              paymentMethod,
+              basePrice,
+              cartItemIds,
+              totalAmount,
+              discount: discountAmount,
+              taxAmount,
+              couponCodeIds,
+            });
+
+            const data = res.data;
+
+            if (data.success) {
+              Swal.fire({
+                title: "Ordered",
+                text: "Order placed successfully",
+                icon: "success",
+                timer: 2000,
+              });
+
+              setTimeout(() => {
+                window.location.href = data.successRedirect;
+              }, 2000);
+              return;
+            }
+
+            if (data.error) {
+              Swal.fire({
+                title: "Error",
+                text: data.error,
+                icon: "error"
+              });
+              return;
+            }
+
+            if (data.authError) {
+              Swal.fire({
+                icon: "error",
+                title: "Oops...",
+                text: data.authError,
+              });
+              return;
+            }
+
+            /* -------------------------------------------
+            RAZORPAY
+            --------------------------------------------*/
+            if (data.razorpayOrder) {
+              const options = {
+                key: "rzp_test_RSspzzgBAA2ViI",
+                name: "Rook & Knights",
+                description: "Test Transaction",
+                image:
+                  "https://imgs.search.brave.com/jsPXFiH4YxTvzVbUvQMILb4V32Y6I0DxlC2p3CaqAfA/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9ibG9n/LnBob3RvYWRraW5n/LmNvbS93cC1jb250/ZW50L3VwbG9hZHMv/MjAyMy8wNS8xNjgy/OTQ2NDIzMzgxLTEu/anBn",
+                order_id: data.razorpayOrder.id,
+                callback_url: "/order/completePayment",
+                theme: {
+                  color: "#454545"
+                },
+                modal: {
+                  ondismiss() {
+                    alert("Payment Failed");
+                    window.location.href = "/";
+                  },
+                },
+              };
+
+              const rzp1 = new Razorpay(options);
+
+              rzp1.on("payment.failed", function () {
+                alert("Payment Failed");
+                window.location.href = "/";
+              });
+
+              rzp1.open();
+            }
+          } catch (err) {
+            console.error(err);
+            Swal.fire({
+              icon: "error",
+              title: "Error",
+              text: err.response?.data?.error || "Something went wrong!",
+            });
+          }
+        }
+
+        async function addCouponDiscount() {
+          const basePrice = document.getElementById("basePrice").textContent;
+          const couponCode = document.getElementById("couponCodeInput").value;
+          const totalAmount = document.getElementById("totalAmount");
+          const couponDiscountAmount = document.getElementById(
+            "couponDiscountAmount"
+          );
+          const discountAmount = document.getElementById("discountAmount");
+          const couponList = document.getElementById("couponList");
+
+          if (document.getElementById(`coupon_${couponCode}`)) {
+            Swal.fire({
+              icon: "error",
+              title: "Oops...",
+              text: "Coupon already applied",
+            });
+
+            return;
+          };
+
+          try {
+            const res = await axios.post(`/order/coupon`, {
+              totalAmount: totalAmount.textContent,
+              couponCode,
+            });
+            const data = res.data;
+
+
+            if (data.success) {
+              couponCodeIds.push(data.couponID);
+
+
+              if (couponDiscountAmount.textContent > 0) {
+                discountAmount.innerText =
+                  Number(discountAmount.textContent) -
+                  Number(couponDiscountAmount.textContent);
+                totalAmount.innerText =
+                  Number(totalAmount.textContent) +
+                  Number(couponDiscountAmount.textContent);
+              }
+              couponDiscountAmount.innerText =
+                Number(couponDiscountAmount.textContent) + data.couponDiscount;
+              discountAmount.innerText =
+                Number(discountAmount.textContent) + data.couponDiscount;
+              totalAmount.innerText =
+                Number(totalAmount.textContent) - data.couponDiscount;
+
+              const newCouponListItem = `
+<li class="coupon-tag" id="coupon_${data.couponCode}">
+  <span class="coupon-code-text">${couponCode}</span>
+  <span class="coupon-discount-text">-₹${data.couponDiscount}</span>
+  <button type="button" style="background:none;border:none;color:#dc3545;"
+    onclick="removeCoupon('${data.couponID}',${data.couponDiscount})">
+    <i class="fa-solid fa-trash"></i>
+  </button>
+</li>
+`;
+
+              availableCoupon();
+
+              if (!document.getElementById(`coupon_${data.couponID}`))
+                couponList.insertAdjacentHTML("beforeend", newCouponListItem);
+            } else if (data.error) {
+              Swal.fire({
+                title: "Error",
+                text: data.error,
+                icon: "error",
+              });
+            } else if (data.authError) {
+              Swal.fire({
+                icon: "error",
+                title: "Oops...",
+                text: data.authError,
+                footer: data.errorRedirect,
+              });
+            }
+          } catch (err) {
+            console.log(err);
+            Swal.fire({
+              icon: "error",
+              title: "Error",
+              text: err.response?.data?.error || "Something went wrong!",
+            });
+          }
+        }
+
+        async function removeCoupon(couponID, couponDiscount) {
+          try {
+            const res = await axios.delete(`/order/coupon/${couponID}`);
+            if (res.data.success) {
+              // Remove from UI
+              const couponElement = document.querySelector(`[onclick*="${couponID}"]`).closest('li');
+              if (couponElement) couponElement.remove();
+
+              const totalAmount = document.getElementById("totalAmount");
+              const couponDiscountAmount = document.getElementById(
+                "couponDiscountAmount"
+              );
+              const discountAmount = document.getElementById("discountAmount");
+
+              totalAmount.innerText =
+                parseInt(totalAmount.textContent) + parseInt(couponDiscount);
+              couponDiscountAmount.innerText =
+                Number(couponDiscountAmount.textContent) - couponDiscount;
+              discountAmount.innerText = Number(discountAmount.textContent) - couponDiscount;
+              availableCoupon();
+
+              // Remove from couponCodeIds
+              const index = couponCodeIds.indexOf(couponID);
+              if (index > -1) {
+                couponCodeIds.splice(index, 1);
+              }
+            }
+          } catch (err) {
+            console.log(err);
+            Swal.fire({
+              icon: "error",
+              title: "Error",
+              text: "Failed to remove coupon",
+            });
+          }
+        }
+
+        function selectAddress(element, addressId) {
+          // Update visual selection
+          document.querySelectorAll('.address-card-item').forEach(item => {
+            item.classList.remove('selected');
+          });
+          element.classList.add('selected');
+
+          // Check the radio button
+          const radio = document.getElementById('address_' + addressId);
+          if (radio) {
+            radio.checked = true;
+          }
+        }
+
+        async function availableCoupon() {
+          const totalAmount = document
+            .getElementById("totalAmount")
+            .textContent.trim();
+          const availableCouponList = document.getElementById(
+            "availableCouponList"
+          );
+
+          // Clear list first to avoid duplicates
+          availableCouponList.innerHTML = '';
+
+          try {
+            const res = await axios.get(`/order/coupon/${totalAmount}`);
+            const data = res.data;
+
+            data.availableCouponList.forEach((coupon) => {
+              const newCouponListItem = `
+<li class="coupon-tag" id="coupon_view_${coupon._id}">
+  <span class="coupon-code-text">${coupon.couponCode}</span>
+  <button class="btn btn-sm btn-dark"
+    onclick="navigator.clipboard.writeText('${coupon.couponCode}'); Swal.fire({toast: true, position: 'top-end', icon: 'success', title: 'Copied!', showConfirmButton: false, timer: 1500});">Copy</button>
+</li>
+`;
+
+              if (!document.getElementById(`coupon_view_${coupon._id}`))
+                availableCouponList.insertAdjacentHTML(
+                  "beforeend",
+                  newCouponListItem
+                );
+            });
+          } catch (err) {
+            console.log(err);
+          }
+        }
+
+        function ValidateAddress(
+          addressTitle,
+          state,
+          city,
+          pinCode,
+          streetAddress
+        ) {
+          return (
+            checkValidText(
+              addressTitle,
+              "Address Title",
+              3,
+              20,
+              true,
+              true,
+              false
+            ) ||
+            checkValidText(state, "State", 3, 25, true, false, false) ||
+            checkValidText(city, "City", 3, 25, true, false, false) ||
+            checkPincode(pinCode) ||
+            checkValidText(
+              streetAddress,
+              "Street Address",
+              10,
+              100,
+              true,
+              true,
+              true
+            )
+          );
+        }
+      </script>
 </body>
 
 </html>
