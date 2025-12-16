@@ -57,12 +57,12 @@
                     <td class="column-5 cart-product-total" id="cartProductTotal_<%=cartItem._id%>">
                       <%=cartItem.productID.price * cartItem.quantity%>
                     </td>
-                    <td class="column-2">
+                    <!-- <td class="column-2">
                       <button type="button" data-cartItem="<%= JSON.stringify(cartItem) %>"
                         onclick="deleteProduct(this)">
                         <i class="fa-solid fa-trash"></i>
                       </button>
-                    </td>
+                    </td> -->
                   </tr>
                   <% }); %>
               </table>
@@ -322,6 +322,9 @@
 
                     if (data.success) {
                       const couponList = document.getElementById("couponList");
+                      // Clear existing list and IDs
+                      couponList.innerHTML = "";
+                      couponCodeIds = [];
                       const couponDiscountAmount = document.getElementById("couponDiscountAmount");
                       const discountAmount = document.getElementById("discountAmount");
                       const totalAmount = document.getElementById("totalAmount");
@@ -348,9 +351,18 @@
 
                       // Update totals if there are coupons
                       if (data.totalCouponDiscount > 0) {
+                        // Correctly update totals
+                        const previousCouponDiscount = Number(couponDiscountAmount.innerText) || 0;
+                        const currentTotal = Number(totalAmount.innerText);
+                        const newTotal = currentTotal + previousCouponDiscount - data.totalCouponDiscount;
+
+                        totalAmount.innerText = newTotal;
                         couponDiscountAmount.innerText = data.totalCouponDiscount;
-                        discountAmount.innerText = Number(discountAmount.innerText) + data.totalCouponDiscount;
-                        totalAmount.innerText = Number(totalAmount.innerText) - data.totalCouponDiscount;
+
+                        const currentTotalSavings = Number(discountAmount.innerText);
+                        discountAmount.innerText = currentTotalSavings - previousCouponDiscount + data.totalCouponDiscount;
+
+
                       }
 
                       // Notify if coupons were removed
@@ -655,7 +667,7 @@
                   editAddressDiv.appendChild(editButton);
                 }
 
-                function deleteProduct(button) {
+                async function deleteProduct(button) {
                   const cartItem = JSON.parse(button.getAttribute("data-cartItem"));
 
                   const row = document.getElementById(`cartItemRow_${cartItem._id}`);
@@ -666,6 +678,26 @@
                     "couponDiscountAmount"
                   );
                   const discountAmount = document.getElementById("discountAmount");
+
+                  try {
+                    const res = await axios.delete(`/cart/${cartItem._id}`);
+                    if (!res.data.success) {
+                      Swal.fire({
+                        icon: "error",
+                        title: "Error",
+                        text: "Failed to remove product",
+                      });
+                      return;
+                    }
+                  } catch (err) {
+                    console.log(err);
+                    Swal.fire({
+                      icon: "error",
+                      title: "Error",
+                      text: "Failed to remove product",
+                    });
+                    return;
+                  }
 
                   let offer = 0;
 
@@ -704,6 +736,7 @@
                     offer -
                     Number(couponDiscountAmount.textContent);
 
+                  await getAppliedCoupons();
                   availableCoupon();
                   row.parentNode.removeChild(row);
                 }

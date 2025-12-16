@@ -26,8 +26,10 @@ export const checkoutPage = async (req, res) => {
     let cart = await cartService.getCart(req.userID);
     res.render("checkout", { address, cart });
   } catch (err) {
-    console.log(err);
-    res.redirect("/error");
+    console.error(err);
+    return res
+      .status(StatusCode.INTERNAL_SERVER_ERROR)
+      .json({ error: "Something went wrong! Please try again." });
   }
 };
 
@@ -43,7 +45,65 @@ export const createCheckoutOrder = async (req, res) => {
       cartItemIds,
       discount,
       taxAmount,
+      couponCodeIds, // Get coupon IDs from request
     } = req.body;
+
+    // Validate Coupons
+    if (couponCodeIds && couponCodeIds.length > 0) {
+      // Calculate net total (basePrice - offer) to validate against
+      // Note: We are trusting the frontend totalAmount here, but ideally we should recalculate it.
+      // For now, we validate the coupon against the passed totalAmount (which includes tax/delivery/discount?).
+      // Actually, validateCoupon expects the subtotal (before coupon discount).
+      // Let's assume totalAmount passed is the final amount.
+      // We need the amount BEFORE coupon discount to validate.
+      // totalAmount = basePrice - offer - couponDiscount + tax + delivery
+      // netTotal = basePrice - offer
+
+      // Let's use the logic from getAppliedCoupons to be consistent, but we don't have the cart items here easily without fetching.
+      // So let's fetch the cart to be safe and correct.
+      const cart = await cartService.getCart(req.userID);
+      if (cart) {
+        let grossTotal = 0;
+        let offerTotal = 0;
+        cart.cartItems.forEach((item) => {
+          grossTotal += item.productID.price * item.quantity;
+          const offer = Math.max(
+            item.productID.offer || 0,
+            item.categoryID.offer || 0,
+            item.subCategoryID.offer || 0
+          );
+          const discountAmount = Math.floor(
+            ((item.productID.price * offer) / 100) * item.quantity
+          );
+          offerTotal += discountAmount;
+        });
+        const netTotal = grossTotal - offerTotal;
+
+        for (const couponId of couponCodeIds) {
+          // We need to find the coupon object.
+          // Since we have IDs, we can find in cart or fetch from DB.
+          // Let's fetch from DB to be sure.
+          // Actually couponService.validateCoupon expects a coupon object.
+          // We can iterate cart.coupons if they match.
+          const couponEntry = cart.coupons.find(
+            (c) => c.couponID._id.toString() === couponId
+          );
+          if (couponEntry) {
+            const validation = couponService.validateCoupon(
+              couponEntry.couponID,
+              netTotal
+            );
+            if (!validation.isValid) {
+              return res
+                .status(StatusCode.BAD_REQUEST)
+                .json({
+                  error: `Coupon ${couponEntry.couponID.couponCode} is no longer valid: ${validation.error}`,
+                });
+            }
+          }
+        }
+      }
+    }
 
     // Payment method is cash on delivery
     if (paymentMethod == "COD") {
@@ -282,8 +342,14 @@ export const getAvailableCoupon = async (req, res) => {
   try {
     const totalAmount = req.params.id;
 
+    // Fetch user's cart to get applied coupons
+    const cart = await cartService.getCart(req.userID);
+    const appliedCouponIds =
+      cart && cart.coupons ? cart.coupons.map((c) => c.couponID._id) : [];
+
     const availableCouponList = await couponService.getAvailableCouponList(
-      totalAmount
+      totalAmount,
+      appliedCouponIds
     );
     return res
       .status(StatusCode.OK)

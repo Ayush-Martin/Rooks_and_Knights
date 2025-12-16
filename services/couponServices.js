@@ -33,13 +33,17 @@ export const applyCouponDiscount = async (totalAmount, couponCode, userID) => {
 };
 
 // Service to get available coupon list
-export const getAvailableCouponList = async (totalAmount) => {
+export const getAvailableCouponList = async (
+  totalAmount,
+  appliedCouponIds = []
+) => {
   const now = new Date();
   now.setHours(0, 0, 0, 0);
 
   const availableCouponList = await couponCollection.find({
     minimumOrderAmount: { $lte: totalAmount },
     expiryDate: { $gte: now },
+    _id: { $nin: appliedCouponIds },
   });
   return availableCouponList;
 };
