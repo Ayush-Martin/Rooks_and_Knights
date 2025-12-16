@@ -61,4 +61,18 @@ router.get(
   orderController.invoiceDownload
 );
 
+//get applied coupons
+router.get(
+  "/applied-coupons",
+  userAuthMiddleware.validUser,
+  orderController.getAppliedCoupons
+);
+
+//remove coupon
+router.delete(
+  "/coupon/:id",
+  userAuthMiddleware.validUser,
+  orderController.removeCoupon
+);
+
 export default router;

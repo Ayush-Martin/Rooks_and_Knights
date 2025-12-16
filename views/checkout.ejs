@@ -3,6 +3,406 @@
 
 <head>
   <%- include('./partials/head.ejs') %>
+    <style>
+      /* Custom Checkout UI Styles */
+      /* Product & Address Card Styles */
+      .checkout-card {
+        background: #fff;
+        border-radius: 16px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+        padding: 25px;
+        margin-bottom: 30px;
+        border: 1px solid #f0f0f0;
+      }
+
+      .checkout-card-header {
+        font-size: 20px;
+        font-weight: 700;
+        color: #333;
+        margin-bottom: 20px;
+        padding-bottom: 15px;
+        border-bottom: 2px solid #f5f5f5;
+      }
+
+      .product-list-item {
+        display: flex;
+        align-items: center;
+        padding: 15px 0;
+        border-bottom: 1px solid #eee;
+      }
+
+      .product-list-item:last-child {
+        border-bottom: none;
+      }
+
+      .product-img-wrapper {
+        width: 80px;
+        height: 80px;
+        border-radius: 10px;
+        overflow: hidden;
+        margin-right: 20px;
+        border: 1px solid #eee;
+      }
+
+      .product-img-wrapper img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .product-details {
+        flex: 1;
+      }
+
+      .product-name {
+        font-size: 16px;
+        font-weight: 600;
+        color: #333;
+        text-decoration: none;
+        display: block;
+        margin-bottom: 5px;
+      }
+
+      .product-meta {
+        font-size: 14px;
+        color: #888;
+        margin-bottom: 5px;
+      }
+
+      .product-price {
+        font-size: 16px;
+        font-weight: 700;
+        color: #333;
+      }
+
+      .address-card-item {
+        border: 2px solid #e0e0e0;
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 15px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        position: relative;
+      }
+
+      .address-card-item.selected {
+        border-color: #333;
+        background-color: #fafafa;
+      }
+
+      .address-radio {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        accent-color: #333;
+      }
+
+      .address-title {
+        font-weight: 700;
+        font-size: 16px;
+        color: #333;
+        margin-bottom: 5px;
+      }
+
+      .address-text {
+        font-size: 14px;
+        color: #666;
+        margin-bottom: 15px;
+        padding-right: 30px;
+      }
+
+      .address-actions {
+        display: flex;
+        gap: 10px;
+      }
+
+      .btn-address-action {
+        border: none;
+        background: none;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        padding: 5px 10px;
+        border-radius: 6px;
+        transition: all 0.2s;
+      }
+
+      .btn-edit {
+        color: #333;
+        background: #f0f0f0;
+      }
+
+      .btn-edit:hover {
+        background: #e0e0e0;
+      }
+
+      .btn-delete {
+        color: #dc3545;
+        background: #fff5f5;
+      }
+
+      .btn-delete:hover {
+        background: #ffe0e0;
+      }
+
+      .btn-add-new {
+        width: 100%;
+        padding: 15px;
+        border: 2px dashed #e0e0e0;
+        border-radius: 12px;
+        background: none;
+        color: #666;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+        margin-top: 10px;
+      }
+
+      .btn-add-new:hover {
+        border-color: #333;
+        color: #333;
+        background: #fafafa;
+      }
+
+      /* Modal Custom Styles */
+      .modal-content-custom {
+        border-radius: 16px;
+        border: none;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+      }
+
+      .modal-header-custom {
+        border-bottom: 1px solid #f0f0f0;
+        padding: 20px 25px;
+      }
+
+      .modal-title-custom {
+        font-weight: 700;
+        color: #333;
+      }
+
+      .modal-body-custom {
+        padding: 25px;
+      }
+
+      .form-label-custom {
+        font-weight: 600;
+        font-size: 13px;
+        color: #666;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .form-control-custom {
+        border-radius: 8px;
+        border: 1px solid #e0e0e0;
+        padding: 12px 15px;
+        font-size: 15px;
+        color: #333;
+      }
+
+      .form-control-custom:focus {
+        border-color: #333;
+        box-shadow: 0 0 0 3px rgba(51, 51, 51, 0.1);
+      }
+
+      .modal-footer-custom {
+        border-top: 1px solid #f0f0f0;
+        padding: 20px 25px;
+      }
+
+      .order-summary-card {
+        background: #fff;
+        border-radius: 16px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+        padding: 30px;
+        border: 1px solid #f0f0f0;
+      }
+
+      .summary-title {
+        font-family: 'Poppins', sans-serif;
+        font-size: 24px;
+        font-weight: 700;
+        color: #333;
+        margin-bottom: 25px;
+        padding-bottom: 15px;
+        border-bottom: 2px solid #f5f5f5;
+      }
+
+      .summary-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+        color: #666;
+        font-size: 15px;
+      }
+
+      .summary-item.total-row {
+        margin-top: 20px;
+        padding-top: 20px;
+        border-top: 2px dashed #eee;
+        color: #333;
+        font-weight: 700;
+        font-size: 18px;
+      }
+
+      .summary-value {
+        font-weight: 600;
+        color: #333;
+      }
+
+      .coupon-section {
+        background: #f8f9fa;
+        border-radius: 12px;
+        padding: 20px;
+        margin: 25px 0;
+      }
+
+      .coupon-input-group {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 15px;
+      }
+
+      .coupon-input {
+        flex: 1;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        padding: 10px 15px;
+        font-size: 14px;
+        transition: all 0.3s ease;
+      }
+
+      .coupon-input:focus {
+        border-color: #333;
+        outline: none;
+        box-shadow: 0 0 0 2px rgba(51, 51, 51, 0.1);
+      }
+
+      .btn-apply {
+        background: #333;
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        padding: 0 20px;
+        font-weight: 600;
+        font-size: 14px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+
+      .btn-apply:hover {
+        background: #000;
+        transform: translateY(-1px);
+      }
+
+      .coupon-list-container {
+        margin-top: 15px;
+      }
+
+      .coupon-list-title {
+        font-size: 13px;
+        font-weight: 600;
+        color: #888;
+        margin-bottom: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .coupon-tag {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: #fff;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        padding: 10px 15px;
+        margin-bottom: 8px;
+        font-size: 13px;
+        transition: all 0.2s ease;
+      }
+
+      .coupon-tag:hover {
+        border-color: #333;
+      }
+
+      .coupon-code-text {
+        font-family: 'Courier New', monospace;
+        font-weight: 700;
+        color: #333;
+      }
+
+      .coupon-discount-text {
+        color: #28a745;
+        font-weight: 600;
+      }
+
+      .payment-method-section {
+        margin-top: 25px;
+      }
+
+      .payment-select {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        background-color: #fff;
+        font-size: 15px;
+        color: #333;
+        cursor: pointer;
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23333' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 15px center;
+      }
+
+      .btn-checkout {
+        width: 100%;
+        background: #333;
+        color: #fff;
+        border: none;
+        border-radius: 10px;
+        padding: 16px;
+        font-size: 16px;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        margin-top: 30px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      }
+
+      .btn-checkout:hover {
+        background: #000;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+      }
+
+      /* Scrollbar for coupon lists */
+      #availableCouponList,
+      #couponList {
+        max-height: 200px;
+        overflow-y: auto;
+        padding-right: 5px;
+      }
+
+      #availableCouponList::-webkit-scrollbar,
+      #couponList::-webkit-scrollbar {
+        width: 4px;
+      }
+
+      #availableCouponList::-webkit-scrollbar-track,
+      #couponList::-webkit-scrollbar-track {
+        background: #f1f1f1;
+      }
+
+      #availableCouponList::-webkit-scrollbar-thumb,
+      #couponList::-webkit-scrollbar-thumb {
+        background: #ccc;
+        border-radius: 4px;
+      }
+    </style>
 </head>
 
 <body class="">
@@ -13,208 +413,169 @@
     <div class="container">
       <div class="row">
         <div class="col-lg-10 col-xl-7 m-lr-auto m-b-50">
-          <div class="m-l-15 m-r--30 m-lr-0-xl">
-            <div class="wrap-table-shopping-cart">
-              <table class="table-shopping-cart">
-                <tr class="table_head">
-                  <th class="column-1">Product</th>
-                  <th class="column-2"></th>
-                  <th class="column-3">Price</th>
-                  <th class="column-4">Quantity</th>
-                  <th class="column-5">Total</th>
-                  <th></th>
-                </tr>
-
-                <% cart.cartItems.forEach((cartItem)=>{%>
-
-                  <tr class="table_row cart-product-row" id="cartItemRow_<%= cartItem._id %>"
-                    data-products="<%=JSON.stringify(cartItem)  %>">
-                    <td class="column-1">
-                      <a class="how-itemcart1 d-block" href="/shop/product/<%= cartItem.productID._id %>">
-                        <img src="<%= cartItem.productID.productImage1 %>" alt="IMG" />
-                      </a>
-                    </td>
-                    <td class="column-2">
+          <!-- Product List Card -->
+          <div class="checkout-card">
+            <div class="checkout-card-header">
+              Order Items (<%= cart.cartItems.length %>)
+            </div>
+            <div class="product-list">
+              <% cart.cartItems.forEach((cartItem)=>{%>
+                <div class="product-list-item cart-product-row" id="cartItemRow_<%= cartItem._id %>"
+                  data-products="<%=JSON.stringify(cartItem)  %>">
+                  <div class="product-img-wrapper">
+                    <a href="/shop/product/<%= cartItem.productID._id %>">
+                      <img src="<%= cartItem.productID.productImage1 %>" alt="<%= cartItem.productID.productName %>" />
+                    </a>
+                  </div>
+                  <div class="product-details">
+                    <a href="/shop/product/<%= cartItem.productID._id %>" class="product-name">
                       <%= cartItem.productID.productName %>
-                    </td>
-                    <td class="column-3">
-                      <%= cartItem.productID.price %>
-                    </td>
-
-                    <td class="column-4 text-center">
-                      <% if(!cartItem.productID.isListed || !cartItem.categoryID.isListed ||
-                        !cartItem.subCategoryID.isListed){%>
-                        <p>Product unavailable</p>
-                        <% } else if(cartItem.quantity<=cartItem.productID.stock) {%>
-
-                          <p class="p-l-40">
-                            <%= cartItem.quantity %>
-                          </p>
-                          <% }else{%>
-                            <p>Out of stock</p>
-                            <% } %>
-                    </td>
-                    <td class="column-5 cart-product-total" id="cartProductTotal_<%=cartItem._id%>">
-                      <%=cartItem.productID.price * cartItem.quantity%>
-                    </td>
-                    <td class="column-2">
-                      <button type="button" data-cartItem="<%= JSON.stringify(cartItem) %>"
-                        onclick="deleteProduct(this)">
-                        <i class="fa-solid fa-trash"></i>
-                      </button>
-                    </td>
-                  </tr>
-                  <% }); %>
-              </table>
-            </div>
-            <div class="card shadow-sm p-3 mb-5 bg-white rounded bor2">
-              <div class="text-dark cl0 bor2 f-w-700 m-l-15">
-                Shipping Address
-              </div>
-              <div class="card-body">
-                <div id="address-list">
-                  <% address.address.forEach((addressItem)=>{ %>
-                    <div class="address-item m-b-15 d-flex justify-content-between"
-                      id="address-item-<%= addressItem._id %>">
-                      <div class="form-check">
-                        <input class="form-check-input" type="radio" name="shippingAddress"
-                          id="address_<%= addressItem._id %>" value="<%= addressItem._id %>"
-                          <%=addressItem._id===address.address[0]._id ? 'checked' : '' %>>
-                        <label for="address_<%= addressItem._id %>" class="form-check-label cl8">
-                          <%= addressItem.addressTitle %> : <%= addressItem.state %>,<%= addressItem.city %>,<%=
-                                  addressItem.pinCode %>,<%= addressItem.streetAddress %>
-                        </label>
-                      </div>
-                      <div>
-                        <button class="btn btn-dark btn-sm m-b-3" data-address-item="<%= JSON.stringify(addressItem)%>"
-                          onclick="editAddressModel(event,'<%=addressItem._id%>')" data-toggle="modal"
-                          data-target="#editAddressModel">
-                          <i class="fa fa-edit"></i>
-                        </button>
-
-                        <button class="btn btn-danger btn-sm m-b-3"
-                          onclick="removeAddress(event,'<%=addressItem._id%>')">
-                          <i class="fa fa-trash"></i>
-                        </button>
-                      </div>
+                    </a>
+                    <div class="product-meta">
+                      Price: ₹<%= cartItem.productID.price %> | Qty: <%= cartItem.quantity %>
                     </div>
-                    <% }) %>
+                    <div class="product-price">
+                      Total: ₹<%= cartItem.productID.price * cartItem.quantity %>
+                    </div>
+                    <% if(!cartItem.productID.isListed || !cartItem.categoryID.isListed ||
+                      !cartItem.subCategoryID.isListed){%>
+                      <div class="text-danger small mt-1">Product unavailable</div>
+                      <% } else if(cartItem.quantity> cartItem.productID.stock) {%>
+                        <div class="text-danger small mt-1">Out of stock</div>
+                        <% } %>
+                  </div>
                 </div>
-
-                <button class="btn btn-primary" data-toggle="modal" data-target="#addAddressModel">
-                  <i class="fa fa-plus"></i> Add New Address
-                </button>
-              </div>
+                <% }); %>
             </div>
+          </div>
+
+          <!-- Shipping Address Card -->
+          <div class="checkout-card">
+            <div class="checkout-card-header">
+              Shipping Address
+            </div>
+            <div id="address-list">
+              <% address.address.forEach((addressItem)=>{ %>
+                <div
+                  class="address-card-item <%= addressItem._id.toString() === address.address[0]._id.toString() ? 'selected' : '' %>"
+                  onclick="selectAddress(this, '<%= addressItem._id %>')">
+                  <input type="radio" name="shippingAddress" id="address_<%= addressItem._id %>"
+                    value="<%= addressItem._id %>" class="address-radio"
+                    <%=addressItem._id.toString()===address.address[0]._id.toString() ? 'checked' : '' %>>
+
+                  <div class="address-title">
+                    <%= addressItem.addressTitle %>
+                  </div>
+                  <div class="address-text">
+                    <%= addressItem.state %>, <%= addressItem.city %>, <%= addressItem.streetAddress %> - <%=
+                            addressItem.pinCode %>
+                  </div>
+
+                  <div class="address-actions">
+                    <button class="btn-address-action btn-edit" onclick="editAddressModel(event,'<%=addressItem._id%>')"
+                      data-toggle="modal" data-target="#editAddressModel">
+                      <i class="fa fa-edit"></i> Edit
+                    </button>
+                    <button class="btn-address-action btn-delete" onclick="removeAddress(event,'<%=addressItem._id%>')">
+                      <i class="fa fa-trash"></i> Delete
+                    </button>
+                  </div>
+                </div>
+                <% }) %>
+            </div>
+
+            <button class="btn-add-new" data-toggle="modal" data-target="#addAddressModel">
+              <i class="fa fa-plus"></i> Add New Address
+            </button>
           </div>
         </div>
 
         <div class="col-sm-9 col-lg-7 col-xl-5 m-lr-auto m-b-50">
-          <div class="bor10 p-lr-10 p-t-30 p-b-30 m-l-40 m-r-30 m-lr-0-xl p-lr-10-sm">
-            <h4 class="mtext-109 cl2 p-b-10">
-              Payment
-              <hr />
+          <div class="order-summary-card m-l-40 m-r-30 m-lr-0-xl">
+            <h4 class="summary-title">
+              Order Summary
             </h4>
 
-            <!-- Sub Total -->
-            <div class="m-t-10">
-              <p class="cl2 mtext-101">
-                Base Price:
-                <span id="basePrice">
-                  <%= cart.totalPrice %>
-                </span>
-              </p>
-            </div>
-            <div class="m-t-10">
-              <p class="cl2 mtext-101">
-                Offer:
-                <span id="OfferAmount">
-                  <% let offer=cart.cartItems.reduce((acc,product)=>{ %> <% return acc+parseInt((product.productID.price
-                      *Math.max(product.productID.offer,product.categoryID.offer,product.subCategoryID.offer)/100)*product.quantity)
-                      %>
-                      <%},0) %>
-                        <%= offer %>
-                </span>
-              </p>
+            <div class="summary-item">
+              <span>Base Price</span>
+              <span class="summary-value" id="basePrice">
+                <%= cart.totalPrice %>
+              </span>
             </div>
 
-            <!-- Coupon Code -->
-            <div class="p-t-20 p-b-10">
-              <div class="size-208 w-full">
-                <span class="mtext-101"> Coupon Code: </span>
-              </div>
-              <div class="size-200 d-flex p-t-1">
-                <input type="text" id="couponCodeInput" class="form-control" placeholder="Enter your coupon code"
-                  style="float: left" />
-                <button class="btn btn-primary" id="applyCoupon" onclick="addCouponDiscount()">
-                  Apply
-                </button>
-              </div>
+            <div class="summary-item">
+              <span>Tax (2%)</span>
+              <span class="summary-value" id="taxAmount">
+                <%= cart.totalPrice * 2 / 100 %>
+              </span>
             </div>
 
-            <div class="p-t-20 p-b-10">
-              <div class="size-208 w-full">
-                <span class="mtext-101"> Applied Coupons </span>
-              </div>
-              <div class="size-200 p-t-1 p-r-100">
-                <ul id="couponList"></ul>
-              </div>
+            <div class="summary-item">
+              <span>Delivery Charge</span>
+              <span class="summary-value" id="deliveryCharge"> 100 </span>
             </div>
 
-            <div class="p-t-20 p-b-10">
-              <div class="size-208 w-full">
-                <span class="mtext-101"> Available Coupons </span>
-              </div>
-              <div class="size-200 p-t-1 p-r-100">
-                <ul id="availableCouponList"></ul>
-              </div>
+            <hr style="border-top: 1px dashed #eee; margin: 15px 0;">
+
+            <div class="summary-item" style="color: #28a745;">
+              <span>Product Offer</span>
+              <span class="summary-value" id="OfferAmount" style="color: #28a745;">
+                <% let offer=cart.cartItems.reduce((acc,product)=>{ %> <% return acc+parseInt((product.productID.price
+                    *Math.max(product.productID.offer,product.categoryID.offer,product.subCategoryID.offer)/100)*product.quantity)
+                    %>
+                    <%},0) %>
+                      <%= offer %>
+              </span>
             </div>
 
-            <div class="m-t-10">
-              <p class="cl2 mtext-101">
-                Coupon Discount: <span id="couponDiscountAmount"> 0 </span>
-              </p>
-              <p class="cl2 mtext-101 m-t-5">
-                Total Discount Amount:
-                <span id="discountAmount">
-                  <%= offer %>
-                </span>
-              </p>
-              <p class="cl2 mtext-101 m-t-5">
-                Tax Amount:
-                <span id="taxAmount">
-                  <%= cart.totalPrice * 2 / 100 %>
-                </span>
-              </p>
-              <p class="cl2 mtext-101 m-t-5">
-                Delivery Charge:
-                <span id="deliveryCharge"> 100 </span>
-              </p>
+            <div class="summary-item" style="color: #28a745;">
+              <span>Coupon Discount</span>
+              <span class="summary-value" id="couponDiscountAmount" style="color: #28a745;"> 0 </span>
+            </div>
 
-              <p class="cl2 mtext-101 m-t-5">
-                Total Amount:
-                <span id="totalAmount">
-                  <%= cart.totalPrice-offer+100 %>
-                </span>
-              </p>
+            <div class="summary-item" style="color: #28a745; font-weight: 600;">
+              <span>Total Savings</span>
+              <span class="summary-value" id="discountAmount" style="color: #28a745;">
+                <%= offer %>
+              </span>
+            </div>
+
+            <div class="summary-item total-row">
+              <span>Total Amount</span>
+              <span class="summary-value" id="totalAmount">
+                <%= cart.totalPrice-offer+100 %>
+              </span>
+            </div>
+
+            <!-- Coupon Section -->
+            <div class="coupon-section">
+              <div class="coupon-input-group">
+                <input type="text" id="couponCodeInput" class="coupon-input" placeholder="Enter coupon code" />
+                <button class="btn-apply" id="applyCoupon" onclick="addCouponDiscount()">Apply</button>
+              </div>
+
+              <div class="coupon-list-container">
+                <div class="coupon-list-title">Applied Coupons</div>
+                <ul id="couponList" style="list-style: none; padding: 0;"></ul>
+              </div>
+
+              <div class="coupon-list-container">
+                <div class="coupon-list-title">Available Coupons</div>
+                <ul id="availableCouponList" style="list-style: none; padding: 0;"></ul>
+              </div>
             </div>
 
             <!-- Payment Method -->
-            <div class="p-t-20 p-b-33">
-              <div class="size-208 w-full">
-                <span class="mtext-101 cl2"> Payment Method: </span>
-              </div>
-              <div class="size-209 p-t-1">
-                <select id="paymentMethod" class="form-control">
-                  <option value="COD">Cash On Delivery</option>
-                  <option value="Razorpay">Online Payment</option>
-                  <option value="Wallet">Wallet</option>
-                </select>
-              </div>
+            <div class="payment-method-section">
+              <h5 class="mtext-101 cl2 p-b-10" style="font-size: 16px; font-weight: 600;">Payment Method</h5>
+              <select id="paymentMethod" class="payment-select">
+                <option value="COD">Cash On Delivery</option>
+                <option value="Razorpay">Online Payment</option>
+                <option value="Wallet">Wallet</option>
+              </select>
             </div>
 
-            <button class="flex-c-m stext-101 cl0 size-116 bg3 bor14 hov-btn3 p-lr-15 trans-04 pointer"
-              id="proceedCheckout" onclick="proceedToPayment(event)">
+            <button class="btn-checkout" id="proceedCheckout" onclick="proceedToPayment(event)">
               Proceed to Payment
             </button>
           </div>
@@ -226,43 +587,46 @@
   <!-- modal to add new address -->
   <div class="modal fade m-t-50" id="addAddressModel" tabindex="-2" role="dialog">
     <div class="modal-dialog modal-dialog-centered" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="exampleModalLabel">New Address</h5>
+      <div class="modal-content modal-content-custom">
+        <div class="modal-header modal-header-custom">
+          <h5 class="modal-title modal-title-custom" id="exampleModalLabel">New Address</h5>
           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
-        <div class="modal-body">
+        <div class="modal-body modal-body-custom">
           <form>
             <div class="form-group">
-              <label for="addressTitle" class="col-form-label">Address Title</label>
-              <input type="text" class="form-control" id="addressTitle" />
+              <label for="addressTitle" class="col-form-label form-label-custom">Address Title</label>
+              <input type="text" class="form-control form-control-custom" id="addressTitle"
+                placeholder="e.g. Home, Office" />
+            </div>
+            <div class="form-row">
+              <div class="form-group col-md-6">
+                <label for="state" class="col-form-label form-label-custom">State</label>
+                <input type="text" class="form-control form-control-custom" id="state" />
+              </div>
+              <div class="form-group col-md-6">
+                <label for="city" class="col-form-label form-label-custom">City</label>
+                <input type="text" class="form-control form-control-custom" id="city" />
+              </div>
             </div>
             <div class="form-group">
-              <label for="state" class="col-form-label">State</label>
-              <input type="text" class="form-control" id="state" />
+              <label for="pinCode" class="col-form-label form-label-custom">Pin Code</label>
+              <input type="text" class="form-control form-control-custom" id="pinCode" />
             </div>
             <div class="form-group">
-              <label for="city" class="col-form-label">City</label>
-              <input type="text" class="form-control" id="city" />
-            </div>
-            <div class="form-group">
-              <label for="pinCode" class="col-form-label">Pin Code</label>
-              <input type="text" class="form-control" id="pinCode" />
-            </div>
-            <div class="form-group">
-              <label for="streetAddress" class="col-form-label">Street Address</label>
-              <textarea class="form-control" id="streetAddress"></textarea>
+              <label for="streetAddress" class="col-form-label form-label-custom">Street Address</label>
+              <textarea class="form-control form-control-custom" id="streetAddress" rows="3"></textarea>
             </div>
           </form>
         </div>
-        <div class="modal-footer">
+        <div class="modal-footer modal-footer-custom">
           <button type="button" class="btn btn-secondary" data-dismiss="modal">
             Close
           </button>
           <button type="button" class="btn btn-primary" onclick="addNewAddress(event)">
-            Add
+            Add Address
           </button>
         </div>
       </div>
@@ -272,57 +636,122 @@
   <!-- modal to edit address -->
   <div class="modal fade m-t-50" id="editAddressModel" tabindex="-2" role="dialog">
     <div class="modal-dialog modal-dialog-centered" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="exampleModalLabel">Edit Address</h5>
+      <div class="modal-content modal-content-custom">
+        <div class="modal-header modal-header-custom">
+          <h5 class="modal-title modal-title-custom" id="exampleModalLabel">Edit Address</h5>
           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
-        <div class="modal-body">
+        <div class="modal-body modal-body-custom">
           <form>
             <div class="form-group">
-              <label for="addressTitle" class="col-form-label">Address Title</label>
-              <input type="text" class="form-control" id="addressTitleEdit" />
+              <label for="addressTitle" class="col-form-label form-label-custom">Address Title</label>
+              <input type="text" class="form-control form-control-custom" id="addressTitleEdit" />
+            </div>
+            <div class="form-row">
+              <div class="form-group col-md-6">
+                <label for="state" class="col-form-label form-label-custom">State</label>
+                <input type="text" class="form-control form-control-custom" id="stateEdit" />
+              </div>
+              <div class="form-group col-md-6">
+                <label for="city" class="col-form-label form-label-custom">City</label>
+                <input type="text" class="form-control form-control-custom" id="cityEdit" />
+              </div>
             </div>
             <div class="form-group">
-              <label for="state" class="col-form-label">State</label>
-              <input type="text" class="form-control" id="stateEdit" />
+              <label for="pinCode" class="col-form-label form-label-custom">Pin Code</label>
+              <input type="text" class="form-control form-control-custom" id="pinCodeEdit" />
             </div>
             <div class="form-group">
-              <label for="city" class="col-form-label">City</label>
-              <input type="text" class="form-control" id="cityEdit" />
-            </div>
-            <div class="form-group">
-              <label for="pinCode" class="col-form-label">Pin Code</label>
-              <input type="text" class="form-control" id="pinCodeEdit" />
-            </div>
-            <div class="form-group">
-              <label for="streetAddress" class="col-form-label">Street Address</label>
-              <textarea class="form-control" id="streetAddressEdit"></textarea>
+              <label for="streetAddress" class="col-form-label form-label-custom">Street Address</label>
+              <textarea class="form-control form-control-custom" id="streetAddressEdit" rows="3"></textarea>
             </div>
           </form>
         </div>
-        <div class="modal-footer" id="editAddressDiv">
+        <div class="modal-footer modal-footer-custom" id="editAddressDiv">
           <button type="button" class="btn btn-secondary" data-dismiss="modal">
             Close
           </button>
-          <!-- Button will be injected here by JS -->
+          <!-- Update button will be injected here -->
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Footer -->
-  <footer class="bg3 p-t-75 p-b-32">
-    <%- include('./partials/footer.ejs') %>
-  </footer>
-
   <%- include('./partials/backToTop.ejs') %> <%- include('./partials/scriptBody.ejs') %>
       <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
       <script>
         availableCoupon();
+        getAppliedCoupons();
         let couponCodeIds = [];
+
+        async function getAppliedCoupons() {
+          try {
+            const res = await axios.get("/order/applied-coupons");
+            const data = res.data;
+
+            if (data.success) {
+              const couponList = document.getElementById("couponList");
+              // Clear existing list and IDs
+              couponList.innerHTML = "";
+              couponCodeIds = [];
+              const couponDiscountAmount = document.getElementById("couponDiscountAmount");
+              const discountAmount = document.getElementById("discountAmount");
+              const totalAmount = document.getElementById("totalAmount");
+
+              // Update coupon list
+              if (data.appliedCoupons && data.appliedCoupons.length > 0) {
+                data.appliedCoupons.forEach(coupon => {
+                  if (!couponCodeIds.includes(coupon._id)) {
+                    couponCodeIds.push(coupon._id);
+                  }
+
+                  const newCouponListItem = `
+<li class="coupon-tag" id="coupon_${coupon.couponCode}">
+  <span class="coupon-code-text">${coupon.couponCode}</span>
+  <span class="coupon-discount-text">-₹${coupon.discountAmount}</span>
+  <button type="button" style="background:none;border:none;color:#dc3545;"
+    onclick="removeCoupon('${coupon._id}',${coupon.discountAmount})">
+    <i class="fa-solid fa-trash"></i>
+  </button>
+</li>
+`;
+                  if (!document.getElementById(`coupon_${coupon.couponCode}`)) {
+                    couponList.insertAdjacentHTML("beforeend", newCouponListItem);
+                  }
+                });
+              }
+
+              // Update totals if there are coupons
+              if (data.totalCouponDiscount > 0) {
+                // Correctly update totals
+                const previousCouponDiscount = Number(couponDiscountAmount.innerText) || 0;
+                const currentTotal = Number(totalAmount.innerText);
+                const newTotal = currentTotal + previousCouponDiscount - data.totalCouponDiscount;
+
+                totalAmount.innerText = newTotal;
+                couponDiscountAmount.innerText = data.totalCouponDiscount;
+
+                const currentTotalSavings = Number(discountAmount.innerText);
+                discountAmount.innerText = currentTotalSavings - previousCouponDiscount + data.totalCouponDiscount;
+
+
+              }
+
+              // Notify if coupons were removed
+              if (data.removedCoupons) {
+                Swal.fire({
+                  title: "Coupons Removed",
+                  text: "Some coupons were removed because they are no longer valid.",
+                  icon: "warning"
+                });
+              }
+            }
+          } catch (err) {
+            console.log(err);
+          }
+        }
 
         async function addNewAddress(event) {
           event.preventDefault();
@@ -379,26 +808,27 @@
               if (newAddress) {
                 const addressList = document.getElementById('address-list');
                 const newAddressHtml = `
-                    <div class="address-item m-b-15 d-flex justify-content-between" id="address-item-${newAddress._id}">
-                      <div class="form-check">
-                        <input class="form-check-input" type="radio" name="shippingAddress" id="address_${newAddress._id}" value="${newAddress._id}" checked>
-                        <label for="address_${newAddress._id}" class="form-check-label cl8">
-                          ${newAddress.addressTitle} : ${newAddress.state},${newAddress.city},${newAddress.pinCode},${newAddress.streetAddress}
-                        </label>
-                      </div>
-                      <div>
-                        <button class="btn btn-dark btn-sm m-b-3" data-address-item='${JSON.stringify(newAddress)}'
-                          onclick="editAddressModel(event,'${newAddress._id}')" data-toggle="modal"
-                          data-target="#editAddressModel">
-                          <i class="fa fa-edit"></i>
-                        </button>
+<div class="address-item m-b-15 d-flex justify-content-between" id="address-item-${newAddress._id}">
+  <div class="form-check">
+    <input class="form-check-input" type="radio" name="shippingAddress" id="address_${newAddress._id}"
+      value="${newAddress._id}" checked>
+    <label for="address_${newAddress._id}" class="form-check-label cl8">
+      ${newAddress.addressTitle} :
+      ${newAddress.state},${newAddress.city},${newAddress.pinCode},${newAddress.streetAddress}
+    </label>
+  </div>
+  <div>
+    <button class="btn btn-dark btn-sm m-b-3" data-address-item='${JSON.stringify(newAddress)}'
+      onclick="editAddressModel(event,'${newAddress._id}')" data-toggle="modal" data-target="#editAddressModel">
+      <i class="fa fa-edit"></i>
+    </button>
 
-                        <button class="btn btn-danger btn-sm m-b-3" onclick="removeAddress(event,'${newAddress._id}')">
-                          <i class="fa fa-trash"></i>
-                        </button>
-                      </div>
-                    </div>
-                 `;
+    <button class="btn btn-danger btn-sm m-b-3" onclick="removeAddress(event,'${newAddress._id}')">
+      <i class="fa fa-trash"></i>
+    </button>
+  </div>
+</div>
+`;
                 addressList.insertAdjacentHTML('beforeend', newAddressHtml);
               } else {
                 // Fallback if no address object returned
@@ -487,7 +917,8 @@
                   // Update label text
                   const label = addressItemDiv.querySelector('label');
                   if (label) {
-                    label.textContent = `${updatedAddress.addressTitle} : ${updatedAddress.state},${updatedAddress.city},${updatedAddress.pinCode},${updatedAddress.streetAddress}`;
+                    label.textContent = `${updatedAddress.addressTitle} :
+${updatedAddress.state},${updatedAddress.city},${updatedAddress.pinCode},${updatedAddress.streetAddress}`;
                   }
                   // Update data attribute on edit button
                   const editBtn = addressItemDiv.querySelector('button[data-address-item]');
@@ -580,7 +1011,13 @@
         function editAddressModel(e, _id) {
           const addressData = e.target.closest("button");
 
-          const { addressTitle, state, city, pinCode, streetAddress } =
+          const {
+            addressTitle,
+            state,
+            city,
+            pinCode,
+            streetAddress
+          } =
             JSON.parse(addressData.getAttribute("data-address-item"));
           document.getElementById("addressTitleEdit").value = addressTitle;
           document.getElementById("stateEdit").value = state;
@@ -606,7 +1043,7 @@
           editAddressDiv.appendChild(editButton);
         }
 
-        function deleteProduct(button) {
+        async function deleteProduct(button) {
           const cartItem = JSON.parse(button.getAttribute("data-cartItem"));
 
           const row = document.getElementById(`cartItemRow_${cartItem._id}`);
@@ -617,6 +1054,26 @@
             "couponDiscountAmount"
           );
           const discountAmount = document.getElementById("discountAmount");
+
+          try {
+            const res = await axios.delete(`/cart/${cartItem._id}`);
+            if (!res.data.success) {
+              Swal.fire({
+                icon: "error",
+                title: "Error",
+                text: "Failed to remove product",
+              });
+              return;
+            }
+          } catch (err) {
+            console.log(err);
+            Swal.fire({
+              icon: "error",
+              title: "Error",
+              text: "Failed to remove product",
+            });
+            return;
+          }
 
           let offer = 0;
 
@@ -655,40 +1112,62 @@
             offer -
             Number(couponDiscountAmount.textContent);
 
+          await getAppliedCoupons();
           availableCoupon();
           row.parentNode.removeChild(row);
         }
 
         async function proceedToPayment(event) {
           event.preventDefault();
+
           const selectedAddress = document.querySelector(
             'input[name="shippingAddress"]:checked'
           );
 
           if (!selectedAddress) {
             Swal.fire({
-              title: "Address not selected ",
-              icon: "error",
+              title: "Address not selected",
+              icon: "error"
             });
             return;
           }
 
           const addressId = selectedAddress.value;
-
           const rows = document.querySelectorAll(".cart-product-row");
-          const products = [];
-          const cartItemIds = [];
-          let outOfStock = false;
-          let unavailableProduct = false;
 
           if (!rows.length) {
             Swal.fire({
-              title: "No product to checkout ",
-              icon: "error",
+              title: "No product to checkout",
+              icon: "error"
             });
             return;
           }
 
+          let outOfStock = false;
+          let unavailableProduct = false;
+
+          const products = [];
+          const cartItemIds = [];
+
+          /* -------------------------------------------
+          STEP 1: CALCULATE CART TOTAL (NO COUPON)
+          --------------------------------------------*/
+          let cartTotal = 0;
+
+          rows.forEach((row) => {
+            const cartItem = JSON.parse(row.getAttribute("data-products"));
+            cartTotal += cartItem.productID.price * cartItem.quantity;
+          });
+
+          /* -------------------------------------------
+          STEP 2: GET COUPON DISCOUNT (ONCE)
+          --------------------------------------------*/
+          const couponDiscount =
+            parseInt(document.getElementById("couponDiscountAmount")?.innerText) || 0;
+
+          /* -------------------------------------------
+          STEP 3: BUILD PRODUCTS WITH PROPORTIONAL DISCOUNT
+          --------------------------------------------*/
           rows.forEach((row) => {
             const cartItem = JSON.parse(row.getAttribute("data-products"));
 
@@ -699,17 +1178,26 @@
                 text: "Contains out of stock",
                 icon: "error",
               });
+              return;
             }
 
-            if (!cartItem.productID.isListed || !cartItem.subCategoryID.isListed || !cartItem.categoryID.isListed) {
+            if (
+              !cartItem.productID.isListed ||
+              !cartItem.categoryID.isListed ||
+              !cartItem.subCategoryID.isListed
+            ) {
               unavailableProduct = true;
               Swal.fire({
                 title: "Cannot Proceed to payment",
                 text: "Contains unavailable products",
                 icon: "error",
               });
+              return;
             }
+
             const price = cartItem.productID.price * cartItem.quantity;
+
+            /* ---------- PRODUCT / CATEGORY OFFER ---------- */
             let discount = 0;
 
             if (
@@ -717,23 +1205,23 @@
               cartItem.categoryID.offer ||
               cartItem.subCategoryID.offer
             ) {
-              discount = parseInt(
-                ((cartItem.productID.price *
+              discount += Math.floor(
+                (cartItem.productID.price *
                   Math.max(
-                    cartItem.productID.offer,
-                    cartItem.categoryID.offer,
-                    cartItem.subCategoryID.offer
+                    cartItem.productID.offer || 0,
+                    cartItem.categoryID.offer || 0,
+                    cartItem.subCategoryID.offer || 0
                   )) /
-                  100) *
+                100 *
                 cartItem.quantity
               );
             }
 
-            const couponDiscount = parseInt(
-              document.getElementById("couponDiscountAmount").innerText
-            );
+            /* ---------- COUPON PROPORTIONAL SHARE ---------- */
+            const couponShare =
+              cartTotal > 0 ? Math.round((price / cartTotal) * couponDiscount) : 0;
 
-            discount += couponDiscount;
+            discount += couponShare;
 
             products.push({
               productID: cartItem.productID,
@@ -746,24 +1234,29 @@
             cartItemIds.push(cartItem._id);
           });
 
-          if (outOfStock || unavailableProduct) {
-            return;
-          }
+          if (outOfStock || unavailableProduct) return;
+
+          /* -------------------------------------------
+          STEP 4: PAYMENT DETAILS
+          --------------------------------------------*/
           const paymentMethod = document.getElementById("paymentMethod").value;
           const basePrice = document.getElementById("basePrice").textContent;
           const totalAmount = document.getElementById("totalAmount").textContent;
-          const discount = document.getElementById("discountAmount").textContent;
+          const discountAmount = document.getElementById("discountAmount").textContent;
           const taxAmount = document.getElementById("taxAmount").textContent;
 
-          if (totalAmount > 1000 && paymentMethod == "COD") {
+          if (totalAmount > 1000 && paymentMethod === "COD") {
             Swal.fire({
-              title: "Cannot Proceed to using Cash on delivery",
-              text: "For cash on delivery the amount should be less than 1000",
+              title: "Cannot Proceed using Cash on Delivery",
+              text: "COD allowed only for amount below 1000",
               icon: "error",
             });
             return;
           }
 
+          /* -------------------------------------------
+          STEP 5: PROCEED TO PAYMENT
+          --------------------------------------------*/
           try {
             const res = await axios.post("/order/proceedToPayment", {
               products,
@@ -772,72 +1265,79 @@
               basePrice,
               cartItemIds,
               totalAmount,
-              discount,
+              discount: discountAmount,
               taxAmount,
               couponCodeIds,
             });
+
             const data = res.data;
 
             if (data.success) {
               Swal.fire({
                 title: "Ordered",
-                text: "Order Placed successfully",
+                text: "Order placed successfully",
                 icon: "success",
                 timer: 2000,
               });
+
               setTimeout(() => {
                 window.location.href = data.successRedirect;
               }, 2000);
+              return;
             }
 
             if (data.error) {
               Swal.fire({
                 title: "Error",
                 text: data.error,
-                icon: "error",
+                icon: "error"
               });
-            } else if (data.authError) {
+              return;
+            }
+
+            if (data.authError) {
               Swal.fire({
                 icon: "error",
                 title: "Oops...",
                 text: data.authError,
-                footer: "/",
               });
-
               return;
             }
 
+            /* -------------------------------------------
+            RAZORPAY
+            --------------------------------------------*/
             if (data.razorpayOrder) {
-              var options = {
-                key: "rzp_test_RSspzzgBAA2ViI", // Enter the Key ID generated from the Dashboard
+              const options = {
+                key: "rzp_test_RSspzzgBAA2ViI",
                 name: "Rook & Knights",
                 description: "Test Transaction",
                 image:
                   "https://imgs.search.brave.com/jsPXFiH4YxTvzVbUvQMILb4V32Y6I0DxlC2p3CaqAfA/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9ibG9n/LnBob3RvYWRraW5n/LmNvbS93cC1jb250/ZW50L3VwbG9hZHMv/MjAyMy8wNS8xNjgy/OTQ2NDIzMzgxLTEu/anBn",
-                order_id: data.razorpayOrder.id, //This is a sample Order ID. Pass the `id` obtained in the response of Step 1
+                order_id: data.razorpayOrder.id,
                 callback_url: "/order/completePayment",
                 theme: {
-                  color: "#454545",
+                  color: "#454545"
                 },
                 modal: {
-                  ondismiss: function () {
-                    alert("payment Failed");
+                  ondismiss() {
+                    alert("Payment Failed");
                     window.location.href = "/";
                   },
                 },
               };
-              var rzp1 = new Razorpay(options);
 
-              rzp1.on("payment.failed", function (response) {
-                // Handle payment failure and redirect
-                console.error("Payment failed:", response.error);
-                alert("payment Failed");
+              const rzp1 = new Razorpay(options);
+
+              rzp1.on("payment.failed", function () {
+                alert("Payment Failed");
                 window.location.href = "/";
               });
+
               rzp1.open();
             }
           } catch (err) {
-            console.log(err);
+            console.error(err);
             Swal.fire({
               icon: "error",
               title: "Error",
@@ -894,12 +1394,15 @@
                 Number(totalAmount.textContent) - data.couponDiscount;
 
               const newCouponListItem = `
-                    <li class="flex-sb" id="coupon_${data.couponCode}">
-                      <p style="font-family: monospace;">${couponCode} : ₹${data.couponDiscount}</p>
-                      <button type="button" onclick="removeCoupon('${data.couponID}',${data.couponDiscount})"><i
-                          class="fa-solid fa-trash"></i></button>
-                    </li>
-                    `;
+<li class="coupon-tag" id="coupon_${data.couponCode}">
+  <span class="coupon-code-text">${couponCode}</span>
+  <span class="coupon-discount-text">-₹${data.couponDiscount}</span>
+  <button type="button" style="background:none;border:none;color:#dc3545;"
+    onclick="removeCoupon('${data.couponID}',${data.couponDiscount})">
+    <i class="fa-solid fa-trash"></i>
+  </button>
+</li>
+`;
 
               availableCoupon();
 
@@ -929,20 +1432,55 @@
           }
         }
 
-        function removeCoupon(couponID, couponDiscount) {
-          document.getElementById(`coupon_${couponID}`).remove();
-          const totalAmount = document.getElementById("totalAmount");
-          const couponDiscountAmount = document.getElementById(
-            "couponDiscountAmount"
-          );
-          const discountAmount = document.getElementById("discountAmount");
+        async function removeCoupon(couponID, couponDiscount) {
+          try {
+            const res = await axios.delete(`/order/coupon/${couponID}`);
+            if (res.data.success) {
+              // Remove from UI
+              const couponElement = document.querySelector(`[onclick*="${couponID}"]`).closest('li');
+              if (couponElement) couponElement.remove();
 
-          totalAmount.innerText =
-            parseInt(totalAmount.textContent) + parseInt(couponDiscount);
-          couponDiscountAmount.innerText =
-            couponDiscountAmount.textContent - couponDiscount;
-          discountAmount.innerText = discountAmount.textContent - couponDiscount;
-          availableCoupon();
+              const totalAmount = document.getElementById("totalAmount");
+              const couponDiscountAmount = document.getElementById(
+                "couponDiscountAmount"
+              );
+              const discountAmount = document.getElementById("discountAmount");
+
+              totalAmount.innerText =
+                parseInt(totalAmount.textContent) + parseInt(couponDiscount);
+              couponDiscountAmount.innerText =
+                Number(couponDiscountAmount.textContent) - couponDiscount;
+              discountAmount.innerText = Number(discountAmount.textContent) - couponDiscount;
+              availableCoupon();
+
+              // Remove from couponCodeIds
+              const index = couponCodeIds.indexOf(couponID);
+              if (index > -1) {
+                couponCodeIds.splice(index, 1);
+              }
+            }
+          } catch (err) {
+            console.log(err);
+            Swal.fire({
+              icon: "error",
+              title: "Error",
+              text: "Failed to remove coupon",
+            });
+          }
+        }
+
+        function selectAddress(element, addressId) {
+          // Update visual selection
+          document.querySelectorAll('.address-card-item').forEach(item => {
+            item.classList.remove('selected');
+          });
+          element.classList.add('selected');
+
+          // Check the radio button
+          const radio = document.getElementById('address_' + addressId);
+          if (radio) {
+            radio.checked = true;
+          }
         }
 
         async function availableCoupon() {
@@ -953,16 +1491,21 @@
             "availableCouponList"
           );
 
+          // Clear list first to avoid duplicates
+          availableCouponList.innerHTML = '';
+
           try {
             const res = await axios.get(`/order/coupon/${totalAmount}`);
             const data = res.data;
 
             data.availableCouponList.forEach((coupon) => {
               const newCouponListItem = `
-                    <li class="flex-sb" id="coupon_view_${coupon._id}">
-                      <p style="font-family: monospace;" class="fs-20">${coupon.couponCode}</p>
-                    </li>
-                    `;
+<li class="coupon-tag" id="coupon_view_${coupon._id}">
+  <span class="coupon-code-text">${coupon.couponCode}</span>
+  <button class="btn btn-sm btn-dark"
+    onclick="navigator.clipboard.writeText('${coupon.couponCode}'); Swal.fire({toast: true, position: 'top-end', icon: 'success', title: 'Copied!', showConfirmButton: false, timer: 1500});">Copy</button>
+</li>
+`;
 
               if (!document.getElementById(`coupon_view_${coupon._id}`))
                 availableCouponList.insertAdjacentHTML(

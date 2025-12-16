@@ -4,7 +4,6 @@ import jwt from "jsonwebtoken";
 // Middleware for routes where the user must be authenticated (GET requests)
 export const checkUserAuthenticated = async (req, res, next) => {
   try {
-    console.log("check middleware");
     const token = req.cookies.token;
 
     if (!token) {
@@ -14,7 +13,6 @@ export const checkUserAuthenticated = async (req, res, next) => {
     // Verify JWT token
     jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, async (err, user) => {
       if (err) {
-        console.log("check middleware: login err");
         return res.status(403).redirect("/user/login");
       }
 
@@ -41,7 +39,6 @@ export const checkUserAuthenticated = async (req, res, next) => {
 // Middleware for routes where the user must be authenticated (POST requests)
 export const validUser = async (req, res, next) => {
   try {
-    console.log("inside middleware");
     const token = req.cookies.token;
 
     if (!token) {

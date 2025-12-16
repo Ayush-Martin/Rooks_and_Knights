@@ -28,7 +28,6 @@ export const addToWishlist = async (
   categoryID,
   subCategoryID
 ) => {
-  console.log(userID);
   const wishlist = await wishlistCollection.findOne({ userID });
 
   if (!wishlist) {

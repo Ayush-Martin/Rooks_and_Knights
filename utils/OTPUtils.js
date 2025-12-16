@@ -9,7 +9,6 @@ export const generateOTP = () => {
 
 // Store OTP in DB
 export const storeOTP = async (email, OTP) => {
-  console.log(email, OTP);
 
   const expires = new Date(
     Date.now() + process.env.OTP_EXPIRY_MINUTES * 60 * 1000

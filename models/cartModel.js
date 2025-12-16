@@ -30,6 +30,14 @@ const cartSchema = Schema(
         },
       },
     ],
+    coupons: [
+      {
+        couponID: {
+          type: Schema.Types.ObjectId,
+          ref: "coupons",
+        },
+      },
+    ],
     totalPrice: {
       type: Number,
       default: 0,
