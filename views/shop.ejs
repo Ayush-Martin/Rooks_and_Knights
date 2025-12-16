@@ -3,6 +3,108 @@
 
 <head>
 	<%- include('./partials/head.ejs') %>
+		<style>
+			/* Custom Product Card UI */
+			.product-card-custom {
+				background: #fff;
+				border-radius: 16px;
+				overflow: hidden;
+				box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+				transition: all 0.3s ease;
+				height: 100%;
+				border: 1px solid #f0f0f0;
+				display: block;
+				text-decoration: none;
+				position: relative;
+			}
+
+			.product-card-custom:hover {
+				transform: translateY(-5px);
+				box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+				border-color: #333;
+			}
+
+			.product-img-wrapper {
+				position: relative;
+				padding-top: 100%;
+				/* 1:1 Aspect Ratio */
+				overflow: hidden;
+				background: #f9f9f9;
+			}
+
+			.product-img-wrapper img {
+				position: absolute;
+				top: 0;
+				left: 0;
+				width: 100%;
+				height: 100%;
+				object-fit: cover;
+				transition: transform 0.5s ease;
+			}
+
+			.product-card-custom:hover .product-img-wrapper img {
+				transform: scale(1.08);
+			}
+
+			.product-details {
+				padding: 20px;
+			}
+
+			.product-title {
+				font-family: 'Poppins', sans-serif;
+				font-size: 15px;
+				font-weight: 600;
+				color: #333;
+				margin-bottom: 8px;
+				white-space: nowrap;
+				overflow: hidden;
+				text-overflow: ellipsis;
+				display: block;
+				transition: color 0.3s;
+			}
+
+			.product-card-custom:hover .product-title {
+				color: #000;
+			}
+
+			.product-rating {
+				font-size: 13px;
+				color: #f1c40f;
+				margin-bottom: 10px;
+				display: flex;
+				align-items: center;
+			}
+
+			.product-rating i {
+				margin-right: 2px;
+			}
+
+			.product-price {
+				font-family: 'Poppins', sans-serif;
+				font-size: 17px;
+				font-weight: 700;
+				color: #333;
+				display: flex;
+				align-items: center;
+				gap: 8px;
+			}
+
+			.product-price .old-price {
+				font-size: 14px;
+				color: #999;
+				text-decoration: line-through;
+				font-weight: 400;
+			}
+
+			.product-price .discount-badge {
+				font-size: 11px;
+				background: #e74c3c;
+				color: #fff;
+				padding: 2px 6px;
+				border-radius: 4px;
+				font-weight: 600;
+			}
+		</style>
 </head>
 
 <body class="">
@@ -60,9 +162,9 @@
 							<i class="fas fa-times"></i>
 						</a>
 						<form id="searchForm" action="/shop" method="get" class="w-full">
-							<input class="mtext-107 cl2 size-114 plh2 p-r-15 w-full" type="text" id="searchInput" name="search"
-								placeholder="Search..." autofocus>
-								
+							<input class="mtext-107 cl2 size-114 plh2 p-r-15 w-full" type="text" id="searchInput"
+								name="search" placeholder="Search..." autofocus>
+
 						</form>
 					</div>
 				</div>
@@ -210,47 +312,47 @@
 
 			<div class="row isotope-grid">
 				<% productList.forEach((product)=> {%>
-					<a href="/shop/product/<%= product._id %>"
-						class="col-sm-6 col-md-4 col-lg-3 p-b-35 isotope-item women">
-
-						<div class="block2">
-							<div class="block2-pic hov-img0">
-								<img src="<%= product.productImage1 %>" alt="IMG-PRODUCT">
-
-
+					<div class="col-sm-6 col-md-4 col-lg-3 p-b-35 isotope-item women">
+						<a href="/shop/product/<%= product._id %>" class="product-card-custom">
+							<div class="product-img-wrapper">
+								<img src="<%= product.productImage1 %>" alt="<%= product.productName %>">
 							</div>
+							<div class="product-details">
+								<span class="product-title">
+									<%= product.productName %>
+								</span>
 
-							<div class="block2-txt flex-w flex-t p-t-14">
-								<div class="block2-txt-child1 flex-col-l ">
-									<p class="stext-104 cl4 hov-cl1 trans-04 js-name-b2 p-b-6">
-										<%= product.productName %>
-											</0>
-											<br>
-											<% let sum=0 %>
-												<% product.reviews.forEach(element=> { %>
-													<% sum+=element.ratingStar %>
-														<% }); %>
-															<% let average=sum/product.reviews.length %>
-																<span class="fs-18 cl11">
-																	<% for(let i=0;i<average;i++){ %>
-																		<i class="zmdi zmdi-star"></i>
-																		<% } %>
+								<div class="product-rating">
+									<% let sum=0 %>
+										<% product.reviews.forEach(element=> { sum+=element.ratingStar }); %>
+											<% let average=product.reviews.length> 0 ? sum/product.reviews.length : 0 %>
 
-																</span>
-																<br>
-																<span class="stext-105 cl3">
-																	<% if(product.offer || product.categoryID.offer || product.subCategoryID.offer) {%>
-																		<span style="text-decoration: line-through">₹<%= product.price %></span> ₹<%=parseInt( product.price- product.price * Math.max(product.offer,product.categoryID.offer,product.subCategoryID.offer)/100 )%>
-																	<% }else{ %>
-																		₹<%= product.price %>
-																	<% } %>
-																</span>
+												<% for(let i=0; i<5; i++){ %>
+													<% if(i < Math.round(average)) { %>
+														<i class="zmdi zmdi-star"></i>
+														<% } else { %>
+															<i class="zmdi zmdi-star-outline"
+																style="color: #e0e0e0;"></i>
+															<% } %>
+																<% } %>
+																	<span class="text-muted small ms-1"
+																		style="font-size: 11px;">(<%=
+																			product.reviews.length %>)</span>
+								</div>
 
+								<div class="product-price">
+									<% if(product.offer || product.categoryID.offer || product.subCategoryID.offer) {%>
+										<span class="old-price">₹<%= product.price %></span>
+										<span>₹<%=parseInt( product.price- product.price *
+												Math.max(product.offer,product.categoryID.offer,product.subCategoryID.offer)/100
+												)%></span>
+										<% }else{ %>
+											<span>₹<%= product.price %></span>
+											<% } %>
 								</div>
 							</div>
-						</div>
-
-					</a>
+						</a>
+					</div>
 					<% }) %>
 			</div>
 
@@ -260,7 +362,8 @@
 					class="m-r-20 text-dark">
 					<i class="fas fa-chevron-left"></i> Previous
 				</a>
-				<P class="m-r-20 text-dark">page : <%= currentPage %> of <%= totalNoOfPages %></P>
+				<P class="m-r-20 text-dark">page : <%= currentPage %> of <%= totalNoOfPages %>
+				</P>
 				<!-- Next Button -->
 				<a href="/shop?category=<%= categoryFilter %>&&sortby=<%= sortbyFilter %>&&price=<%= priceFilter %>&&subCategory=<%= subCategoryFilter %>&&search=<%= searchFilter %>&&page=<%= (currentPage<totalNoOfPages)? Number(currentPage)+1:currentPage %>"
 					class=" text-dark">
