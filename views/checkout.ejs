@@ -420,7 +420,8 @@
             </div>
             <div class="product-list">
               <% cart.cartItems.forEach((cartItem)=>{%>
-                <div class="product-list-item">
+                <div class="product-list-item cart-product-row" id="cartItemRow_<%= cartItem._id %>"
+                  data-products="<%=JSON.stringify(cartItem)  %>">
                   <div class="product-img-wrapper">
                     <a href="/shop/product/<%= cartItem.productID._id %>">
                       <img src="<%= cartItem.productID.productImage1 %>" alt="<%= cartItem.productID.productName %>" />

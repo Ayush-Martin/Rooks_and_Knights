@@ -50,17 +50,6 @@ export const createCheckoutOrder = async (req, res) => {
 
     // Validate Coupons
     if (couponCodeIds && couponCodeIds.length > 0) {
-      // Calculate net total (basePrice - offer) to validate against
-      // Note: We are trusting the frontend totalAmount here, but ideally we should recalculate it.
-      // For now, we validate the coupon against the passed totalAmount (which includes tax/delivery/discount?).
-      // Actually, validateCoupon expects the subtotal (before coupon discount).
-      // Let's assume totalAmount passed is the final amount.
-      // We need the amount BEFORE coupon discount to validate.
-      // totalAmount = basePrice - offer - couponDiscount + tax + delivery
-      // netTotal = basePrice - offer
-
-      // Let's use the logic from getAppliedCoupons to be consistent, but we don't have the cart items here easily without fetching.
-      // So let's fetch the cart to be safe and correct.
       const cart = await cartService.getCart(req.userID);
       if (cart) {
         let grossTotal = 0;
@@ -80,11 +69,6 @@ export const createCheckoutOrder = async (req, res) => {
         const netTotal = grossTotal - offerTotal;
 
         for (const couponId of couponCodeIds) {
-          // We need to find the coupon object.
-          // Since we have IDs, we can find in cart or fetch from DB.
-          // Let's fetch from DB to be sure.
-          // Actually couponService.validateCoupon expects a coupon object.
-          // We can iterate cart.coupons if they match.
           const couponEntry = cart.coupons.find(
             (c) => c.couponID._id.toString() === couponId
           );
@@ -94,11 +78,9 @@ export const createCheckoutOrder = async (req, res) => {
               netTotal
             );
             if (!validation.isValid) {
-              return res
-                .status(StatusCode.BAD_REQUEST)
-                .json({
-                  error: `Coupon ${couponEntry.couponID.couponCode} is no longer valid: ${validation.error}`,
-                });
+              return res.status(StatusCode.BAD_REQUEST).json({
+                error: `Coupon ${couponEntry.couponID.couponCode} is no longer valid: ${validation.error}`,
+              });
             }
           }
         }
@@ -222,8 +204,6 @@ export const createCheckoutOrder = async (req, res) => {
 export const createCheckoutOrderForPendingPayment = async (req, res) => {
   try {
     const { orderID, paymentMethod, totalAmount } = req.query;
-
-    console.log(orderID, paymentMethod, totalAmount);
 
     //Payment method is wallet
     if (paymentMethod == "Wallet") {
