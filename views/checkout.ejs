@@ -3,6 +3,200 @@
 
 <head>
   <%- include('./partials/head.ejs') %>
+    <style>
+      /* Custom Checkout UI Styles */
+      .order-summary-card {
+        background: #fff;
+        border-radius: 16px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+        padding: 30px;
+        border: 1px solid #f0f0f0;
+      }
+
+      .summary-title {
+        font-family: 'Poppins', sans-serif;
+        font-size: 24px;
+        font-weight: 700;
+        color: #333;
+        margin-bottom: 25px;
+        padding-bottom: 15px;
+        border-bottom: 2px solid #f5f5f5;
+      }
+
+      .summary-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+        color: #666;
+        font-size: 15px;
+      }
+
+      .summary-item.total-row {
+        margin-top: 20px;
+        padding-top: 20px;
+        border-top: 2px dashed #eee;
+        color: #333;
+        font-weight: 700;
+        font-size: 18px;
+      }
+
+      .summary-value {
+        font-weight: 600;
+        color: #333;
+      }
+
+      .coupon-section {
+        background: #f8f9fa;
+        border-radius: 12px;
+        padding: 20px;
+        margin: 25px 0;
+      }
+
+      .coupon-input-group {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 15px;
+      }
+
+      .coupon-input {
+        flex: 1;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        padding: 10px 15px;
+        font-size: 14px;
+        transition: all 0.3s ease;
+      }
+
+      .coupon-input:focus {
+        border-color: #333;
+        outline: none;
+        box-shadow: 0 0 0 2px rgba(51, 51, 51, 0.1);
+      }
+
+      .btn-apply {
+        background: #333;
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        padding: 0 20px;
+        font-weight: 600;
+        font-size: 14px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+
+      .btn-apply:hover {
+        background: #000;
+        transform: translateY(-1px);
+      }
+
+      .coupon-list-container {
+        margin-top: 15px;
+      }
+
+      .coupon-list-title {
+        font-size: 13px;
+        font-weight: 600;
+        color: #888;
+        margin-bottom: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .coupon-tag {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: #fff;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        padding: 10px 15px;
+        margin-bottom: 8px;
+        font-size: 13px;
+        transition: all 0.2s ease;
+      }
+
+      .coupon-tag:hover {
+        border-color: #333;
+      }
+
+      .coupon-code-text {
+        font-family: 'Courier New', monospace;
+        font-weight: 700;
+        color: #333;
+      }
+
+      .coupon-discount-text {
+        color: #28a745;
+        font-weight: 600;
+      }
+
+      .payment-method-section {
+        margin-top: 25px;
+      }
+
+      .payment-select {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        background-color: #fff;
+        font-size: 15px;
+        color: #333;
+        cursor: pointer;
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23333' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 15px center;
+      }
+
+      .btn-checkout {
+        width: 100%;
+        background: #333;
+        color: #fff;
+        border: none;
+        border-radius: 10px;
+        padding: 16px;
+        font-size: 16px;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        margin-top: 30px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      }
+
+      .btn-checkout:hover {
+        background: #000;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+      }
+
+      /* Scrollbar for coupon lists */
+      #availableCouponList,
+      #couponList {
+        max-height: 200px;
+        overflow-y: auto;
+        padding-right: 5px;
+      }
+
+      #availableCouponList::-webkit-scrollbar,
+      #couponList::-webkit-scrollbar {
+        width: 4px;
+      }
+
+      #availableCouponList::-webkit-scrollbar-track,
+      #couponList::-webkit-scrollbar-track {
+        background: #f1f1f1;
+      }
+
+      #availableCouponList::-webkit-scrollbar-thumb,
+      #couponList::-webkit-scrollbar-thumb {
+        background: #ccc;
+        border-radius: 4px;
+      }
+    </style>
 </head>
 
 <body class="">
@@ -110,111 +304,91 @@
         </div>
 
         <div class="col-sm-9 col-lg-7 col-xl-5 m-lr-auto m-b-50">
-          <div class="bor10 p-lr-10 p-t-30 p-b-30 m-l-40 m-r-30 m-lr-0-xl p-lr-10-sm">
-            <h4 class="mtext-109 cl2 p-b-10">
-              Payment
-              <hr />
+          <div class="order-summary-card m-l-40 m-r-30 m-lr-0-xl">
+            <h4 class="summary-title">
+              Order Summary
             </h4>
 
-            <!-- Sub Total -->
-            <div class="m-t-10">
-              <p class="cl2 mtext-101">
-                Base Price:
-                <span id="basePrice">
-                  <%= cart.totalPrice %>
-                </span>
-              </p>
-            </div>
-            <div class="m-t-10">
-              <p class="cl2 mtext-101">
-                Offer:
-                <span id="OfferAmount">
-                  <% let offer=cart.cartItems.reduce((acc,product)=>{ %> <% return acc+parseInt((product.productID.price
-                      *Math.max(product.productID.offer,product.categoryID.offer,product.subCategoryID.offer)/100)*product.quantity)
-                      %>
-                      <%},0) %>
-                        <%= offer %>
-                </span>
-              </p>
+            <div class="summary-item">
+              <span>Base Price</span>
+              <span class="summary-value" id="basePrice">
+                <%= cart.totalPrice %>
+              </span>
             </div>
 
-            <!-- Coupon Code -->
-            <div class="p-t-20 p-b-10">
-              <div class="size-208 w-full">
-                <span class="mtext-101"> Coupon Code: </span>
-              </div>
-              <div class="size-200 d-flex p-t-1">
-                <input type="text" id="couponCodeInput" class="form-control" placeholder="Enter your coupon code"
-                  style="float: left" />
-                <button class="btn btn-primary" id="applyCoupon" onclick="addCouponDiscount()">
-                  Apply
-                </button>
-              </div>
+            <div class="summary-item">
+              <span>Tax (2%)</span>
+              <span class="summary-value" id="taxAmount">
+                <%= cart.totalPrice * 2 / 100 %>
+              </span>
             </div>
 
-            <div class="p-t-20 p-b-10">
-              <div class="size-208 w-full">
-                <span class="mtext-101"> Applied Coupons </span>
-              </div>
-              <div class="size-200 p-t-1 p-r-100">
-                <ul id="couponList"></ul>
-              </div>
+            <div class="summary-item">
+              <span>Delivery Charge</span>
+              <span class="summary-value" id="deliveryCharge"> 100 </span>
             </div>
 
-            <div class="p-t-20 p-b-10">
-              <div class="size-208 w-full">
-                <span class="mtext-101"> Available Coupons </span>
-              </div>
-              <div class="size-200 p-t-1 p-r-100">
-                <ul id="availableCouponList"></ul>
-              </div>
+            <hr style="border-top: 1px dashed #eee; margin: 15px 0;">
+
+            <div class="summary-item" style="color: #28a745;">
+              <span>Product Offer</span>
+              <span class="summary-value" id="OfferAmount" style="color: #28a745;">
+                <% let offer=cart.cartItems.reduce((acc,product)=>{ %> <% return acc+parseInt((product.productID.price
+                    *Math.max(product.productID.offer,product.categoryID.offer,product.subCategoryID.offer)/100)*product.quantity)
+                    %>
+                    <%},0) %>
+                      <%= offer %>
+              </span>
             </div>
 
-            <div class="m-t-10">
-              <p class="cl2 mtext-101">
-                Coupon Discount: <span id="couponDiscountAmount"> 0 </span>
-              </p>
-              <p class="cl2 mtext-101 m-t-5">
-                Total Discount Amount:
-                <span id="discountAmount">
-                  <%= offer %>
-                </span>
-              </p>
-              <p class="cl2 mtext-101 m-t-5">
-                Tax Amount:
-                <span id="taxAmount">
-                  <%= cart.totalPrice * 2 / 100 %>
-                </span>
-              </p>
-              <p class="cl2 mtext-101 m-t-5">
-                Delivery Charge:
-                <span id="deliveryCharge"> 100 </span>
-              </p>
+            <div class="summary-item" style="color: #28a745;">
+              <span>Coupon Discount</span>
+              <span class="summary-value" id="couponDiscountAmount" style="color: #28a745;"> 0 </span>
+            </div>
 
-              <p class="cl2 mtext-101 m-t-5">
-                Total Amount:
-                <span id="totalAmount">
-                  <%= cart.totalPrice-offer+100 %>
-                </span>
-              </p>
+            <div class="summary-item" style="color: #28a745; font-weight: 600;">
+              <span>Total Savings</span>
+              <span class="summary-value" id="discountAmount" style="color: #28a745;">
+                <%= offer %>
+              </span>
+            </div>
+
+            <div class="summary-item total-row">
+              <span>Total Amount</span>
+              <span class="summary-value" id="totalAmount">
+                <%= cart.totalPrice-offer+100 %>
+              </span>
+            </div>
+
+            <!-- Coupon Section -->
+            <div class="coupon-section">
+              <div class="coupon-input-group">
+                <input type="text" id="couponCodeInput" class="coupon-input" placeholder="Enter coupon code" />
+                <button class="btn-apply" id="applyCoupon" onclick="addCouponDiscount()">Apply</button>
+              </div>
+
+              <div class="coupon-list-container">
+                <div class="coupon-list-title">Applied Coupons</div>
+                <ul id="couponList" style="list-style: none; padding: 0;"></ul>
+              </div>
+
+              <div class="coupon-list-container">
+                <div class="coupon-list-title">Available Coupons</div>
+                <ul id="availableCouponList" style="list-style: none; padding: 0;"></ul>
+              </div>
             </div>
 
             <!-- Payment Method -->
-            <div class="p-t-20 p-b-33">
-              <div class="size-208 w-full">
-                <span class="mtext-101 cl2"> Payment Method: </span>
-              </div>
-              <div class="size-209 p-t-1">
-                <select id="paymentMethod" class="form-control">
-                  <option value="COD">Cash On Delivery</option>
-                  <option value="Razorpay">Online Payment</option>
-                  <option value="Wallet">Wallet</option>
-                </select>
-              </div>
+            <div class="payment-method-section">
+              <h5 class="mtext-101 cl2 p-b-10" style="font-size: 16px; font-weight: 600;">Payment Method</h5>
+              <select id="paymentMethod" class="payment-select">
+                <option value="COD">Cash On Delivery</option>
+                <option value="Razorpay">Online Payment</option>
+                <option value="Wallet">Wallet</option>
+              </select>
             </div>
 
-            <button class="flex-c-m stext-101 cl0 size-116 bg3 bor14 hov-btn3 p-lr-15 trans-04 pointer"
-              id="proceedCheckout" onclick="proceedToPayment(event)">
+            <button class="btn-checkout" id="proceedCheckout" onclick="proceedToPayment(event)">
               Proceed to Payment
             </button>
           </div>
@@ -337,10 +511,12 @@
                           }
 
                           const newCouponListItem = `
-                      <li class="flex-sb" id="coupon_${coupon.couponCode}">
-                        <p style="font-family: monospace;">${coupon.couponCode} : ₹${coupon.discountAmount}</p>
-                        <button type="button" onclick="removeCoupon('${coupon._id}',${coupon.discountAmount})"><i
-                          class="fa-solid fa-trash"></i></button>
+                      <li class="coupon-tag" id="coupon_${coupon.couponCode}">
+                        <span class="coupon-code-text">${coupon.couponCode}</span>
+                        <span class="coupon-discount-text">-₹${coupon.discountAmount}</span>
+                        <button type="button" style="background:none;border:none;color:#dc3545;" onclick="removeCoupon('${coupon._id}',${coupon.discountAmount})">
+                          <i class="fa-solid fa-trash"></i>
+                        </button>
                       </li>
                     `;
                           if (!document.getElementById(`coupon_${coupon.couponCode}`)) {
@@ -1017,10 +1193,12 @@
                         Number(totalAmount.textContent) - data.couponDiscount;
 
                       const newCouponListItem = `
-      <li class="flex-sb" id="coupon_${data.couponCode}">
-        <p style="font-family: monospace;">${couponCode} : ₹${data.couponDiscount}</p>
-        <button type="button" onclick="removeCoupon('${data.couponID}',${data.couponDiscount})"><i
-          class="fa-solid fa-trash"></i></button>
+      <li class="coupon-tag" id="coupon_${data.couponCode}">
+        <span class="coupon-code-text">${couponCode}</span>
+        <span class="coupon-discount-text">-₹${data.couponDiscount}</span>
+        <button type="button" style="background:none;border:none;color:#dc3545;" onclick="removeCoupon('${data.couponID}',${data.couponDiscount})">
+          <i class="fa-solid fa-trash"></i>
+        </button>
       </li>
       `;
 
@@ -1106,8 +1284,9 @@
 
                     data.availableCouponList.forEach((coupon) => {
                       const newCouponListItem = `
-      <li class="flex-sb" id="coupon_view_${coupon._id}">
-        <p style="font-family: monospace;" class="fs-20">${coupon.couponCode}</p>
+      <li class="coupon-tag" id="coupon_view_${coupon._id}">
+        <span class="coupon-code-text">${coupon.couponCode}</span>
+        <button class="btn btn-sm btn-dark" onclick="navigator.clipboard.writeText('${coupon.couponCode}'); Swal.fire({toast: true, position: 'top-end', icon: 'success', title: 'Copied!', showConfirmButton: false, timer: 1500});">Copy</button>
       </li>
       `;
 
