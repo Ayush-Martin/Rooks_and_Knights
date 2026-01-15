@@ -18,7 +18,11 @@ export const getWalletList = async (userID) => {
 
 // Service to add money to wallet
 export const addToWallet = async (userID, amount) => {
-  await walletCollection.updateOne({ userID }, { $inc: { balance: amount } });
+  await walletCollection.updateOne(
+    { userID },
+    { $inc: { balance: amount } },
+    { upsert: true }
+  );
 };
 
 // Service to pay from wallet
